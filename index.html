@@ -262,9 +262,45 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
 
 button{font-family:var(--font)}
+
+/* ── LOGIN OVERLAY ── */
+#loginOverlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
+#loginOverlay.hidden{display:none}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px 36px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:20px}
+.login-logo{font-family:var(--display);font-size:20px;font-weight:700;color:var(--g4);text-align:center;letter-spacing:-.01em}
+.login-logo span{color:var(--text3);font-weight:400}
+.login-title{font-size:13px;color:var(--text2);text-align:center;margin-top:-8px}
+.login-field{display:flex;flex-direction:column;gap:6px}
+.login-field label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.login-input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border .15s}
+.login-input:focus{border-color:var(--g3)}
+.login-btn{background:var(--g2);color:#fff;border:none;border-radius:var(--radius-sm);padding:11px;font-family:var(--display);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;letter-spacing:.01em}
+.login-btn:hover{background:var(--g3)}
+.login-btn:disabled{background:var(--surface3);color:var(--text3);cursor:not-allowed}
+.login-error{font-size:12px;color:var(--coral);text-align:center;min-height:16px}
+.logout-btn{font-family:var(--font);font-size:11px;font-weight:500;color:var(--text3);background:none;border:1px solid var(--border2);padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;letter-spacing:.01em}
+.logout-btn:hover{color:var(--coral);border-color:var(--coral)}
 </style>
 </head>
 <body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">JS<span>/</span>Sistema</div>
+    <div class="login-title">Acesso restrito — faça login para continuar</div>
+    <div class="login-field">
+      <label>E-mail</label>
+      <input class="login-input" id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <label>Senha</label>
+      <input class="login-input" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-error" id="loginError"></div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Entrar</button>
+  </div>
+</div>
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -280,6 +316,7 @@ button{font-family:var(--font)}
   </nav>
   <div class="topbar-right">
     <span class="save-indicator" id="saveIndicator">✓ salvo</span>
+    <button class="logout-btn" onclick="doLogout()">Sair</button>
   </div>
 </div>
 
@@ -992,9 +1029,11 @@ function showSaved(){
   setTimeout(()=>el.classList.remove('show'),2000);
 }
 
-// Init registro
-document.getElementById('regDate').value=today();
-loadDay();
+// Init registro — só roda após autenticação
+function initApp(){
+  document.getElementById('regDate').value=today();
+  loadDay();
+}
 
 // ══════════════════════════════════════════
 // API — COMUNICAÇÃO COM BANCO DE DADOS
@@ -1408,6 +1447,63 @@ function updateTpCalc(){
   document.getElementById('tp-cpb').textContent=v&&comp?(v/comp).toFixed(2):'—';
   document.getElementById('tp-roas-calc').textContent=v&&fat?(fat/v).toFixed(2)+'x':'—';
 }
+
+// ══════════════════════════════════════════
+// AUTENTICAÇÃO — SUPABASE AUTH
+// ══════════════════════════════════════════
+const AUTH_KEY='js_sistema_token';
+const AUTH_EXPIRY='js_sistema_expiry';
+
+function checkAuth(){
+  const token=localStorage.getItem(AUTH_KEY);
+  const expiry=localStorage.getItem(AUTH_EXPIRY);
+  if(token && expiry && Date.now() < parseInt(expiry)){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    initApp();
+  }
+}
+
+async function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  const btn=document.getElementById('loginBtn');
+  const errEl=document.getElementById('loginError');
+  errEl.textContent='';
+  if(!email||!password){errEl.textContent='Preencha e-mail e senha.';return;}
+  btn.disabled=true;
+  btn.textContent='Entrando…';
+  try{
+    const r=await fetch(SUPA_URL+'/auth/v1/token?grant_type=password',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({email,password})
+    });
+    const data=await r.json();
+    if(!r.ok||!data.access_token){
+      errEl.textContent='E-mail ou senha incorretos.';
+      btn.disabled=false;btn.textContent='Entrar';return;
+    }
+    const expiry=Date.now()+(data.expires_in||3600)*1000;
+    localStorage.setItem(AUTH_KEY,data.access_token);
+    localStorage.setItem(AUTH_EXPIRY,String(expiry));
+    document.getElementById('loginOverlay').classList.add('hidden');
+    initApp();
+  }catch(e){
+    errEl.textContent='Erro de conexão. Tente novamente.';
+    btn.disabled=false;btn.textContent='Entrar';
+  }
+}
+
+function doLogout(){
+  localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem(AUTH_EXPIRY);
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPassword').value='';
+}
+
+// Verificar autenticação ao carregar a página
+checkAuth();
 </script>
 </body>
 </html>
