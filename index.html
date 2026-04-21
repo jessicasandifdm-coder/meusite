@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema Operacional — JS Mentoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0d0b;
+  --surface:#111510;
+  --surface2:#181d16;
+  --surface3:#1f261c;
+  --border:#253022;
+  --border2:#2f3d2b;
+  --g1:#1b4332;
+  --g2:#2d6a4f;
+  --g3:#40916c;
+  --g4:#74c69d;
+  --g5:#d8f3dc;
+  --amber:#e9a84c;
+  --amber-dim:#7a4d12;
+  --purple:#9b72cf;
+  --purple-dim:#3d1f6e;
+  --teal:#4db8c8;
+  --teal-dim:#0d3d47;
+  --coral:#e07070;
+  --coral-dim:#5a1f1f;
+  --text:#e4ede6;
+  --text2:#7a9b7e;
+  --text3:#435744;
+  --font:'DM Sans',sans-serif;
+  --display:'Syne',sans-serif;
+  --mono:'DM Mono',monospace;
+  --radius:10px;
+  --radius-sm:6px;
+}
+
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.6;display:flex;flex-direction:column}
+
+/* ── TOP BAR ── */
+.topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;gap:24px;flex-shrink:0;z-index:100}
+.logo{font-family:var(--display);font-size:15px;font-weight:700;color:var(--g4);letter-spacing:-.01em;white-space:nowrap}
+.logo span{color:var(--text3);font-weight:400}
+.nav{display:flex;gap:2px;flex:1;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{font-family:var(--font);font-size:12px;font-weight:500;color:var(--text3);background:none;border:none;padding:6px 14px;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap;transition:all .15s;letter-spacing:.01em}
+.nav-btn:hover{color:var(--text2);background:var(--surface2)}
+.nav-btn.active{color:var(--g4);background:rgba(45,106,79,.15);border:1px solid rgba(64,145,108,.2)}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.save-indicator{font-size:11px;color:var(--text3);font-family:var(--mono);opacity:0;transition:opacity .3s}
+.save-indicator.show{opacity:1}
+
+/* ── LAYOUT ── */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.tab-content{display:none;flex:1;overflow-y:auto;padding:32px 36px 60px}
+.tab-content.active{display:block}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.sh-line{flex:1;height:1px;background:var(--border)}
+.sh-label{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.badge-g{background:rgba(45,106,79,.25);color:var(--g4)}
+.badge-a{background:rgba(233,168,76,.18);color:var(--amber)}
+.badge-p{background:rgba(155,114,207,.18);color:var(--purple)}
+.badge-t{background:rgba(77,184,200,.18);color:var(--teal)}
+.badge-c{background:rgba(224,112,112,.18);color:var(--coral)}
+.badge-x{background:var(--surface2);color:var(--text2)}
+
+/* ── PAGE: VISÃO GERAL ── */
+.page-title{font-family:var(--display);font-size:26px;font-weight:600;color:var(--text);letter-spacing:-.02em;line-height:1.2;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--text2);margin-bottom:32px}
+
+.funil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.funil-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:border-color .2s}
+.funil-card:hover{border-color:var(--border2)}
+.funil-card.open{border-color:var(--g3)}
+.funil-head{padding:18px 20px 14px;display:flex;align-items:flex-start;justify-content:space-between}
+.funil-name{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-top:6px;line-height:1.3}
+.funil-obj{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.4}
+.funil-toggle{width:22px;height:22px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);flex-shrink:0;transition:all .2s;margin-top:2px}
+.funil-card.open .funil-toggle{border-color:var(--g3);color:var(--g4);transform:rotate(45deg)}
+.funil-body{padding:0 20px 18px;display:none}
+.funil-card.open .funil-body{display:block}
+.step-row{display:flex;gap:10px;align-items:flex-start}
+.step-col{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:12px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);flex-shrink:0;margin-top:5px}
+.step-dot.on{background:var(--g3)}
+.step-dot.end{background:var(--g4);box-shadow:0 0 6px rgba(116,198,157,.4)}
+.step-line{width:1px;flex:1;background:var(--border);min-height:12px}
+.step-body{padding-bottom:12px}
+.step-who{font-size:9px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:2px}
+.step-action{font-size:12px;color:var(--text2);line-height:1.4}
+.step-action b{color:var(--text);font-weight:500}
+
+.content-types{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.ct-pill{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 12px}
+.ct-label{font-size:9px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.ct-text{font-size:11px;color:var(--text2);line-height:1.4}
+
+.meta-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px}
+.meta-c{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.meta-c.highlight{border-color:var(--g2);background:rgba(27,67,50,.15)}
+.meta-num{font-family:var(--display);font-size:24px;font-weight:700;color:var(--text);line-height:1}
+.meta-num small{font-size:14px;font-weight:400;color:var(--text3)}
+.meta-lbl{font-size:11px;color:var(--text3);margin-top:4px;line-height:1.3}
+
+.caminho-final{background:var(--surface);border:1px solid var(--g2);border-radius:var(--radius);overflow:hidden}
+.cf-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.cf-step{padding:16px 18px;border-right:1px solid var(--border)}
+.cf-step:last-child{border-right:none}
+.cf-step.hi{background:rgba(27,67,50,.2)}
+.cf-n{font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:4px}
+.cf-t{font-size:13px;font-weight:500;color:var(--text)}
+.cf-s{font-size:11px;color:var(--text3);margin-top:2px}
+.cf-step.hi .cf-t{color:var(--g4)}
+
+/* ── PAGE: REGISTRO DIÁRIO ── */
+.date-nav{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.date-nav input[type=date]{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:7px 12px;cursor:pointer}
+.date-nav input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.5)}
+.btn-nav{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text2);font-size:13px;padding:7px 12px;cursor:pointer;transition:all .15s}
+.btn-nav:hover{border-color:var(--g3);color:var(--g4)}
+.btn-save{background:var(--g2);border:none;border-radius:var(--radius-sm);color:white;font-family:var(--font);font-size:13px;font-weight:500;padding:8px 20px;cursor:pointer;transition:background .15s}
+.btn-save:hover{background:var(--g3)}
+
+.canal-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.canal-header{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.canal-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text)}
+.canal-goal{font-size:11px;color:var(--text3);margin-top:1px}
+.canal-fields{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.field-group{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.field-input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--mono);font-size:14px;padding:8px 10px;width:100%;transition:border-color .15s;text-align:center}
+.field-input:focus{outline:none;border-color:var(--g3)}
+.field-input[type=text]{text-align:left;font-family:var(--font);font-size:13px}
+.obs-field{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text2);font-family:var(--font);font-size:12px;padding:8px 12px;resize:vertical;min-height:56px}
+.obs-field:focus{outline:none;border-color:var(--g3)}
+
+.daily-summary{background:var(--surface2);border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+.ds-item{text-align:center}
+.ds-val{font-family:var(--display);font-size:20px;font-weight:700;color:var(--g4)}
+.ds-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+
+/* ── PAGE: DASHBOARDS ── */
+.period-tabs{display:flex;gap:4px;margin-bottom:20px}
+.period-tab{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);font-size:12px;font-weight:500;padding:6px 14px;cursor:pointer;transition:all .15s}
+.period-tab.active{background:rgba(45,106,79,.2);border-color:var(--g3);color:var(--g4)}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.kpi-val{font-family:var(--display);font-size:28px;font-weight:700;color:var(--text);line-height:1}
+.kpi-lbl{font-size:11px;color:var(--text3);margin-top:4px}
+.kpi-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.kpi-trend{font-size:11px;margin-top:6px;font-weight:500}
+.kpi-trend.up{color:var(--g4)}
+.kpi-trend.down{color:var(--coral)}
+
+.funil-rates{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.fr-header{padding:14px 20px;border-bottom:1px solid var(--border)}
+.fr-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text)}
+.fr-body{padding:16px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.fr-item{text-align:center}
+.fr-pct{font-family:var(--display);font-size:22px;font-weight:700;margin-bottom:4px}
+.fr-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;line-height:1.3}
+.fr-arrow{font-size:18px;color:var(--border2);align-self:center}
+
+.canal-table{width:100%;border-collapse:collapse;font-size:12px}
+.canal-table th{background:var(--surface2);color:var(--text3);font-weight:500;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:8px 12px;text-align:center;border:1px solid var(--border)}
+.canal-table td{padding:9px 12px;text-align:center;border:1px solid var(--border);color:var(--text2)}
+.canal-table tr:nth-child(even) td{background:var(--surface2)}
+.canal-table td:first-child{text-align:left;color:var(--text);font-weight:500}
+.canal-table .total-row td{background:rgba(45,106,79,.1);color:var(--text);font-weight:500;border-color:var(--g2)}
+.alert-box{border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.alert-warn{background:rgba(233,168,76,.1);border:1px solid rgba(233,168,76,.25);color:var(--amber)}
+.alert-ok{background:rgba(45,106,79,.1);border:1px solid rgba(64,145,108,.2);color:var(--g4)}
+.alert-bad{background:rgba(224,112,112,.1);border:1px solid rgba(224,112,112,.25);color:var(--coral)}
+
+/* ── PAGE: TRÁFEGO PAGO ── */
+.tp-note{background:rgba(155,114,207,.08);border:1px solid rgba(155,114,207,.2);border-radius:var(--radius);padding:14px 18px;font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+
+/* ── PAGE: SCRIPTS ── */
+.script-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.script-head{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border-bottom:1px solid transparent}
+.script-card.open .script-head{border-bottom-color:var(--border)}
+.script-name{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text)}
+.script-status{font-size:11px;padding:3px 9px;border-radius:20px}
+.script-status.done{background:rgba(45,106,79,.2);color:var(--g4)}
+.script-status.pending{background:var(--surface2);color:var(--text3)}
+.script-body{padding:20px;display:none}
+.script-card.open .script-body{display:block}
+.script-step{margin-bottom:18px}
+.script-step-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.script-msg{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text);line-height:1.6;margin-bottom:6px;border-left:3px solid var(--g3)}
+.script-case{padding:10px 14px;border-radius:var(--radius-sm);margin-bottom:6px}
+.case-green{background:rgba(45,106,79,.1);border:1px solid rgba(64,145,108,.2)}
+.case-amber{background:rgba(233,168,76,.08);border:1px solid rgba(233,168,76,.2)}
+.case-red{background:rgba(224,112,112,.08);border:1px solid rgba(224,112,112,.2)}
+.case-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.case-green .case-title{color:var(--g4)}
+.case-amber .case-title{color:var(--amber)}
+.case-red .case-title{color:var(--coral)}
+.case-text{font-size:12px;color:var(--text2);line-height:1.6}
+.rules-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px}
+.rules-col{flex:1;min-width:180px}
+.rules-col-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.rules-col-title.no{color:var(--coral)}
+.rules-col-title.yes{color:var(--g4)}
+.rule-pill{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;margin:2px;border:1px solid var(--border2);color:var(--text2)}
+.script-pending{padding:20px;text-align:center;color:var(--text3);font-size:13px}
+.add-script-btn{background:rgba(45,106,79,.1);border:1px solid rgba(64,145,108,.2);border-radius:var(--radius-sm);color:var(--g4);font-family:var(--font);font-size:12px;padding:8px 16px;cursor:pointer;margin-top:10px;transition:all .15s}
+.add-script-btn:hover{background:rgba(45,106,79,.2)}
+
+/* ── PAGE: GUIA ── */
+.guia-section{margin-bottom:28px}
+.guia-title{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px}
+.guia-row{display:flex;gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:8px}
+.guia-key{width:220px;flex-shrink:0;padding:10px 14px;background:var(--surface2);font-size:12px;font-weight:500;color:var(--text2);border-right:1px solid var(--border)}
+.guia-val{padding:10px 14px;font-size:12px;color:var(--text3);line-height:1.5;flex:1}
+
+/* ── ANUAL ── */
+.year-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+.month-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.month-card:hover{border-color:var(--border2)}
+.month-card.active{border-color:var(--g3);background:rgba(27,67,50,.15)}
+.month-name{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:4px}
+.month-val{font-family:var(--display);font-size:18px;font-weight:700;color:var(--text3)}
+.month-val.has-data{color:var(--g4)}
+
+/* ── TRÁFEGO ── */
+.tp-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
+.tp-head{padding:14px 20px;border-bottom:1px solid var(--border)}
+.tp-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text)}
+.tp-fields{padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.tp-auto{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;text-align:center}
+.tp-auto-val{font-family:var(--display);font-size:18px;font-weight:700;color:var(--g4)}
+.tp-auto-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+
+/* ── MISC ── */
+.nota{background:rgba(45,106,79,.08);border:1px solid rgba(64,145,108,.15);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--text3);line-height:1.5;margin-top:10px}
+.nota b{color:var(--g4);font-weight:500}
+.divider{height:1px;background:var(--border);margin:20px 0}
+.empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+
+button{font-family:var(--font)}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">JS<span>/</span>Sistema</div>
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showTab('visao')">Visão Geral</button>
+    <button class="nav-btn" onclick="showTab('registro')">Registro Diário</button>
+    <button class="nav-btn" onclick="showTab('mensal')">Dashboard Mensal</button>
+    <button class="nav-btn" onclick="showTab('anual')">Dashboard Anual</button>
+    <button class="nav-btn" onclick="showTab('trafego')">Tráfego Pago</button>
+    <button class="nav-btn" onclick="showTab('scripts')">Scripts</button>
+    <button class="nav-btn" onclick="showTab('guia')">Guia de Uso</button>
+  </nav>
+  <div class="topbar-right">
+    <span class="save-indicator" id="saveIndicator">✓ salvo</span>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- VISÃO GERAL -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-visao">
+
+  <p class="page-title">Sistema de funis e geração de demanda</p>
+  <p class="page-sub">Todos os funis têm um único objetivo final → reunião → oferta → fechamento</p>
+
+  <!-- Conteúdo -->
+  <div class="sh"><span class="sh-label">Conteúdo — base de tudo</span><div class="sh-line"></div></div>
+  <div class="card" style="margin-bottom:24px">
+    <p style="font-size:13px;color:var(--text2);max-width:680px;margin-bottom:14px">O conteúdo não vende diretamente — ele <b style="color:var(--text);font-weight:500">atrai, aquece e prepara</b> as pessoas para entrarem nos funis. Cada peça tem uma função específica.</p>
+    <div class="content-types">
+      <div class="ct-pill"><div class="ct-label">Atração</div><div class="ct-text">Novos seguidores, alcance, perfil ideal descobrindo o trabalho</div></div>
+      <div class="ct-pill"><div class="ct-label">Autoridade</div><div class="ct-text">Percepção de valor, prova social, posicionamento como referência</div></div>
+      <div class="ct-pill"><div class="ct-label">Nutrição</div><div class="ct-text">Aquecer quem já segue, aumentar consciência da dor e da solução</div></div>
+      <div class="ct-pill"><div class="ct-label">Isca</div><div class="ct-text">Conteúdo que desbloqueia material e leva ao funil de captura</div></div>
+      <div class="ct-pill"><div class="ct-label">Ativação</div><div class="ct-text">Stories com enquete ou caixinha — gera interação e abre conversa</div></div>
+    </div>
+  </div>
+
+  <!-- Metas diárias -->
+  <div class="sh"><span class="sh-label">Meta diária — 40 a 50 conversas</span><div class="sh-line"></div></div>
+  <div class="meta-row" style="margin-bottom:24px">
+    <div class="meta-c"><div class="meta-num">10<small>–15</small></div><div class="meta-lbl">Stories — interações</div><div style="margin-top:8px"><span class="badge badge-g">Stories</span></div></div>
+    <div class="meta-c"><div class="meta-num">20</div><div class="meta-lbl">PC — abordagem fria</div><div style="margin-top:8px"><span class="badge badge-t">Outbound</span></div></div>
+    <div class="meta-c"><div class="meta-num">—</div><div class="meta-lbl">Follow-up sem meta fixa</div><div style="margin-top:8px"><span class="badge badge-x">Follow-up</span></div></div>
+    <div class="meta-c"><div class="meta-num">10</div><div class="meta-lbl">Reativação de quem sumiu</div><div style="margin-top:8px"><span class="badge badge-a">Reativação</span></div></div>
+    <div class="meta-c highlight"><div class="meta-num" style="color:var(--g4)">40<small>–50</small></div><div class="meta-lbl" style="color:var(--text2)">Total conversas/dia</div><div style="margin-top:8px"><span class="badge badge-g">Meta geral</span></div></div>
+  </div>
+
+  <!-- Funis -->
+  <div class="sh"><span class="sh-label">Funis ativos</span><div class="sh-line"></div></div>
+  <div class="funil-grid" style="margin-bottom:24px">
+
+    <!-- BV AUTOMÁTICO -->
+    <div class="funil-card" onclick="toggleFunil(this)">
+      <div class="funil-head">
+        <div><span class="badge badge-g">Funil 1</span><div class="funil-name">BV Automático</div><div class="funil-obj">Novos seguidores → nutrição → aplicação</div></div>
+        <div class="funil-toggle">+</div>
+      </div>
+      <div class="funil-body">
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Conteúdo / Tráfego</div><div class="step-action">Atrai <b>novos seguidores</b> para o perfil</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Automação — ManyChat</div><div class="step-action">Seguidor recebe <b>mensagem automática</b> com link do vídeo</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Vídeo de nutrição</div><div class="step-action">Aumenta consciência da dor → leva ao <b>formulário de aplicação</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Analisa formulário, <b>identifica qualificados</b>, convida reunião</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot end"></div></div><div class="step-body"><div class="step-who">→ Caminho final</div><div class="step-action"><b>Reunião → oferta → fechamento</b></div></div></div>
+        <div class="nota"><b>Ferramenta:</b> ManyChat. Script de automação BV — a configurar.</div>
+      </div>
+    </div>
+
+    <!-- PC OUTBOUND -->
+    <div class="funil-card" onclick="toggleFunil(this)">
+      <div class="funil-head">
+        <div><span class="badge badge-t">Funil 2</span><div class="funil-name">PC — Outbound</div><div class="funil-obj">Prospecção fria fora do perfil · 20/dia</div></div>
+        <div class="funil-toggle">+</div>
+      </div>
+      <div class="funil-body">
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Prospecta perfis ideais — <b>abordagem fria qualificada</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Script de conexão → pergunta espelho → <b>identifica a dor</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Qualificada → <b>convida reunião de 15 min</b> e agenda</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot end"></div></div><div class="step-body"><div class="step-who">→ Caminho final</div><div class="step-action"><b>Reunião → oferta → fechamento</b></div></div></div>
+        <div class="nota"><b>Script completo</b> disponível na aba Scripts.</div>
+      </div>
+    </div>
+
+    <!-- STORIES -->
+    <div class="funil-card" onclick="toggleFunil(this)">
+      <div class="funil-head">
+        <div><span class="badge badge-g">Funil 3</span><div class="funil-name">Stories — Engajamento</div><div class="funil-obj">Quem interagiu vira conversa · 10–15/dia</div></div>
+        <div class="funil-toggle">+</div>
+      </div>
+      <div class="funil-body">
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Jéssica</div><div class="step-action">Posta story com <b>enquete, caixinha ou chamada direta</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR ou Jéssica</div><div class="step-action">Vê quem respondeu/votou → <b>abre conversa no direct</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR ou Jéssica</div><div class="step-action">Conduz conversa → qualifica → <b>convida reunião</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot end"></div></div><div class="step-body"><div class="step-who">→ Caminho final</div><div class="step-action"><b>Reunião → oferta → fechamento</b></div></div></div>
+        <div class="nota">Script Stories — a adicionar.</div>
+      </div>
+    </div>
+
+    <!-- ISCA -->
+    <div class="funil-card" onclick="toggleFunil(this)">
+      <div class="funil-head">
+        <div><span class="badge badge-a">Funil 4</span><div class="funil-name">Isca Digital</div><div class="funil-obj">Captura via conteúdo → entrega → prospecção</div></div>
+        <div class="funil-toggle">+</div>
+      </div>
+      <div class="funil-body">
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Conteúdo de feed</div><div class="step-action">Comentário desbloqueia → <b>ManyChat</b> leva à página de captura</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Página de captura</div><div class="step-action">Mini formulário com dor → <b>recebe a isca</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Automação</div><div class="step-action">Página de obrigada + <b>mensagem WhatsApp</b> confirmando acesso</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Conversa sobre a dor → qualifica → <b>convida reunião</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot end"></div></div><div class="step-body"><div class="step-who">→ Caminho final</div><div class="step-action"><b>Reunião → oferta → fechamento</b></div></div></div>
+        <div class="nota"><b>Ferramentas:</b> ManyChat + WhatsApp API. Script Isca — a adicionar.</div>
+      </div>
+    </div>
+
+    <!-- FOLLOW-UP / REATIVAÇÃO -->
+    <div class="funil-card" onclick="toggleFunil(this)">
+      <div class="funil-head">
+        <div><span class="badge badge-x">Funil 5</span><div class="funil-name">Follow-up e Reativação</div><div class="funil-obj">Retomar quem parou ou esfriou · 10/dia</div></div>
+        <div class="funil-toggle">+</div>
+      </div>
+      <div class="funil-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div class="card-sm"><div class="step-who">Follow-up — sem meta</div><div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5">Conversas iniciadas no PC ou BV que <b style="color:var(--text)">pararam no meio</b>. SDR retoma até 2x.</div></div>
+          <div class="card-sm"><div class="step-who">Reativação — 10/dia</div><div style="font-size:12px;color:var(--text2);margin-top:4px;line-height:1.5">Quem caiu em algum funil e <b style="color:var(--text)">não avançou</b>. Nova abertura de conversa.</div></div>
+        </div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Identifica quem parou → <b>mensagem de retomada</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Se responder → qualifica → <b>convida reunião</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot end"></div></div><div class="step-body"><div class="step-who">→ Caminho final</div><div class="step-action"><b>Reunião → oferta → fechamento</b></div></div></div>
+        <div class="nota">Scripts Follow-up e Reativação — a adicionar.</div>
+      </div>
+    </div>
+
+    <!-- TRÁFEGO PAGO -->
+    <div class="funil-card" onclick="toggleFunil(this)">
+      <div class="funil-head">
+        <div><span class="badge badge-p">Funil 6</span><div class="funil-name">Tráfego Pago — Baixo Ticket</div><div class="funil-obj">Gera lista · paga o tráfego · qualifica compradores</div></div>
+        <div class="funil-toggle">+</div>
+      </div>
+      <div class="funil-body">
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Anúncio pago</div><div class="step-action">Tráfego direto para <b>página de vendas</b> do produto baixo ticket</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">Comprador</div><div class="step-action">Compra → recebe acesso → <b>entra na lista de clientes</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Entra em contato → <b>qualifica para mentoria</b></div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot on"></div><div class="step-line"></div></div><div class="step-body"><div class="step-who">SDR</div><div class="step-action">Qualificado → <b>convida reunião</b>. Não qualificado → suporte e material</div></div></div>
+        <div class="step-row"><div class="step-col"><div class="step-dot end"></div></div><div class="step-body"><div class="step-who">→ Caminho final</div><div class="step-action"><b>Reunião → oferta → fechamento</b></div></div></div>
+        <div class="nota">Objetivo: tráfego se paga com o produto · lista cresce · melhores viram mentoradas</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Caminho final -->
+  <div class="sh"><span class="sh-label">Caminho final — compartilhado por todos os funis</span><div class="sh-line"></div></div>
+  <div class="caminho-final">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--border)"><span style="font-size:12px;color:var(--text3)">A partir daqui, Jéssica assume.</span></div>
+    <div class="cf-grid">
+      <div class="cf-step"><div class="cf-n">01</div><div class="cf-t">Reunião agendada</div><div class="cf-s">SDR confirmou e aqueceu</div></div>
+      <div class="cf-step"><div class="cf-n">02</div><div class="cf-t">Diagnóstico</div><div class="cf-s">Jéssica conduz — 15 a 30 min</div></div>
+      <div class="cf-step hi"><div class="cf-n">03</div><div class="cf-t">Oferta — Lapidar ou JS</div><div class="cf-s">Apresentação da mentoria ideal</div></div>
+      <div class="cf-step hi"><div class="cf-n">04</div><div class="cf-t">Fechamento + follow-up</div><div class="cf-s">Jéssica cuida do pós-reunião</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- REGISTRO DIÁRIO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-registro">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div>
+      <p class="page-title">Registro Diário</p>
+      <p class="page-sub">Preencha os dados de cada canal ao final do dia</p>
+    </div>
+    <div class="date-nav">
+      <button class="btn-nav" onclick="changeDay(-1)">← Dia anterior</button>
+      <input type="date" id="regDate" onchange="loadDay()">
+      <button class="btn-nav" onclick="changeDay(1)">Dia seguinte →</button>
+      <button class="btn-save" onclick="saveDay()">Salvar dia</button>
+    </div>
+  </div>
+
+  <!-- Resumo do dia -->
+  <div class="daily-summary" id="dailySummary">
+    <div class="ds-item"><div class="ds-val" id="ds-abord">0</div><div class="ds-lbl">Abordagens</div></div>
+    <div class="ds-item"><div class="ds-val" id="ds-conv">0</div><div class="ds-lbl">Conversas</div></div>
+    <div class="ds-item"><div class="ds-val" id="ds-convites">0</div><div class="ds-lbl">Convites</div></div>
+    <div class="ds-item"><div class="ds-val" id="ds-reunioes">0</div><div class="ds-lbl">Reuniões</div></div>
+    <div class="ds-item"><div class="ds-val" id="ds-vendas">0</div><div class="ds-lbl">Vendas</div></div>
+  </div>
+
+  <!-- BV Automático -->
+  <div class="canal-section">
+    <div class="canal-header"><div><div class="canal-title">BV Automático</div><div class="canal-goal">Funil 1 · Novos seguidores na automação</div></div><span class="badge badge-g">Funil 1</span></div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Entraram na auto.</div><input class="field-input" type="number" id="bv_auto" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Assistiram vídeo</div><input class="field-input" type="number" id="bv_video" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Preencheram form.</div><input class="field-input" type="number" id="bv_form" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="bv_sdr" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="bv_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="bv_reunioes" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="bv_vendas" min="0" oninput="updateSummary()"></div>
+    </div>
+  </div>
+
+  <!-- PC Outbound -->
+  <div class="canal-section">
+    <div class="canal-header"><div><div class="canal-title">PC — Outbound</div><div class="canal-goal">Funil 2 · Meta: 20 abordagens/dia</div></div><span class="badge badge-t">Funil 2</span></div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="pc_abord" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="pc_resp" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Conv. iniciadas</div><input class="field-input" type="number" id="pc_conv" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="pc_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Agendados</div><input class="field-input" type="number" id="pc_agend" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="pc_reunioes" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="pc_vendas" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Vendas curso</div><input class="field-input" type="number" id="pc_vcurso" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Valor mentoria (R$)</div><input class="field-input" type="number" id="pc_valor" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Valor curso (R$)</div><input class="field-input" type="number" id="pc_vcurso_val" min="0" oninput="updateSummary()"></div>
+    </div>
+  </div>
+
+  <!-- Stories -->
+  <div class="canal-section">
+    <div class="canal-header"><div><div class="canal-title">Stories — Engajamento</div><div class="canal-goal">Funil 3 · Meta: 10–15 interações/dia</div></div><span class="badge badge-g">Funil 3</span></div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Interações (votos/resp.)</div><input class="field-input" type="number" id="st_inter" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">SDR/JS contactou</div><input class="field-input" type="number" id="st_sdr" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Conv. iniciadas</div><input class="field-input" type="number" id="st_conv" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="st_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="st_reunioes" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="st_vendas" min="0" oninput="updateSummary()"></div>
+    </div>
+  </div>
+
+  <!-- Follow-up -->
+  <div class="canal-section">
+    <div class="canal-header"><div><div class="canal-title">Follow-up</div><div class="canal-goal">Funil 5 · Conversas paradas no PC ou BV</div></div><span class="badge badge-x">Funil 5</span></div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Retomadas</div><input class="field-input" type="number" id="fu_retom" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="fu_resp" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="fu_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="fu_reunioes" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="fu_vendas" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Valor ment. (R$)</div><input class="field-input" type="number" id="fu_valor" min="0"></div>
+      <div class="field-group"><div class="field-label">Vendas curso</div><input class="field-input" type="number" id="fu_vcurso" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Valor curso (R$)</div><input class="field-input" type="number" id="fu_vcurso_val" min="0"></div>
+    </div>
+  </div>
+
+  <!-- Reativação -->
+  <div class="canal-section">
+    <div class="canal-header"><div><div class="canal-title">Reativação</div><div class="canal-goal">Funil 5 · Meta: 10 abordagens/dia</div></div><span class="badge badge-a">Funil 5</span></div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="re_abord" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="re_resp" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="re_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="re_reunioes" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="re_vendas" min="0" oninput="updateSummary()"></div>
+    </div>
+  </div>
+
+  <!-- Isca -->
+  <div class="canal-section">
+    <div class="canal-header"><div><div class="canal-title">Isca Digital</div><div class="canal-goal">Funil 4 · Captura e prospecção</div></div><span class="badge badge-a">Funil 4</span></div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Leads capturados</div><input class="field-input" type="number" id="is_leads" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Iscas entregues</div><input class="field-input" type="number" id="is_entregues" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="is_sdr" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="is_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="is_reunioes" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="is_vendas" min="0" oninput="updateSummary()"></div>
+    </div>
+  </div>
+
+  <!-- Observações -->
+  <div class="canal-section">
+    <div class="canal-header"><div><div class="canal-title">Observações do dia</div></div></div>
+    <div style="padding:16px 20px"><textarea class="obs-field" id="obs_dia" placeholder="O que funcionou? O que travar? Ajustes para amanhã..."></textarea></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DASHBOARD MENSAL -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-mensal">
+
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div><p class="page-title">Dashboard Mensal</p><p class="page-sub">Comparativo semana a semana · taxas do funil · metas vs real</p></div>
+    <div class="period-tabs" id="monthTabs"></div>
+  </div>
+
+  <!-- KPIs topo -->
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px">
+    <div class="kpi-card"><div class="kpi-val" id="kpi-abord">—</div><div class="kpi-lbl">Abordagens</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-resp">—</div><div class="kpi-lbl">Respostas</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-conv">—</div><div class="kpi-lbl">Convites</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-reun">—</div><div class="kpi-lbl">Reuniões</div></div>
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="kpi-vendas">—</div><div class="kpi-lbl">Vendas ment.</div></div>
+    <div class="kpi-card" style="border-color:var(--amber-dim);background:rgba(233,168,76,.06)"><div class="kpi-val" style="color:var(--amber)" id="kpi-vcurso">—</div><div class="kpi-lbl">Vendas curso</div></div>
+  </div>
+
+  <!-- Taxas do funil -->
+  <div class="funil-rates" style="margin-bottom:14px">
+    <div class="fr-header"><div class="fr-title">Taxas do funil — mentoria</div></div>
+    <div class="fr-body">
+      <div class="fr-item"><div class="fr-pct" id="taxa-resp" style="color:var(--amber)">—</div><div class="fr-lbl">Taxa de resposta</div><div style="font-size:10px;color:var(--text3);margin-top:3px">resposta / abordagem</div></div>
+      <div class="fr-item"><div class="fr-pct" id="taxa-convite" style="color:var(--teal)">—</div><div class="fr-lbl">Conv → Convite</div><div style="font-size:10px;color:var(--text3);margin-top:3px">convite / resposta</div></div>
+      <div class="fr-item"><div class="fr-pct" id="taxa-reun" style="color:var(--g4)">—</div><div class="fr-lbl">Convite → Reunião</div><div style="font-size:10px;color:var(--text3);margin-top:3px">reunião / convite</div></div>
+      <div class="fr-item"><div class="fr-pct" id="taxa-fech" style="color:var(--purple)">—</div><div class="fr-lbl">Fechamento</div><div style="font-size:10px;color:var(--text3);margin-top:3px">venda ment. / reunião</div></div>
+    </div>
+  </div>
+
+  <!-- COMPARATIVO SEMANA A SEMANA -->
+  <div class="sh"><span class="sh-label">Comparativo semana a semana</span><div class="sh-line"></div></div>
+  <div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">
+    <div style="overflow-x:auto">
+      <table class="canal-table" id="semanaTable">
+        <thead><tr>
+          <th>Semana</th>
+          <th>Abordagens</th>
+          <th>Respostas</th>
+          <th>Convites</th>
+          <th>Reuniões</th>
+          <th>V.Mentoria</th>
+          <th>Fat.Ment (R$)</th>
+          <th>V.Curso</th>
+          <th>Fat.Curso (R$)</th>
+          <th>% Resposta</th>
+          <th>% Conv→Conv</th>
+          <th>% Conv→Reun</th>
+          <th>% Fechamento</th>
+        </tr></thead>
+        <tbody id="semanaTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tabela por canal -->
+  <div class="sh"><span class="sh-label">Volume por canal — mês completo</span><div class="sh-line"></div></div>
+  <div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">
+    <div style="overflow-x:auto">
+      <table class="canal-table" id="canalTable">
+        <thead><tr>
+          <th>Canal</th><th>Abordagens</th><th>Respostas</th><th>Convites</th><th>Reuniões</th><th>V.Ment.</th><th>Fat.Ment (R$)</th><th>V.Curso</th><th>% Resp.</th><th>% Fech.</th>
+        </tr></thead>
+        <tbody id="canalTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Alertas automáticos -->
+  <div class="sh"><span class="sh-label">Alertas automáticos</span><div class="sh-line"></div></div>
+  <div id="alertasBox" style="margin-bottom:14px"></div>
+
+  <!-- Insights automáticos -->
+  <div class="sh"><span class="sh-label">Insights automáticos</span><div class="sh-line"></div></div>
+  <div id="insightsBox" style="margin-bottom:20px"></div>
+
+  <!-- METAS -->
+  <div class="sh"><span class="sh-label">Metas do mês — meta vs real</span><div class="sh-line"></div></div>
+  <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
+    <table class="canal-table" id="metasTable">
+      <thead><tr><th>Meta</th><th>Valor alvo</th><th>Real</th><th>% Atingido</th><th>Falta</th></tr></thead>
+      <tbody id="metasTableBody"></tbody>
+    </table>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:8px">
+    <div class="field-group"><div class="field-label">Abordagens</div><input class="field-input" type="number" id="meta_abord" placeholder="ex: 600" oninput="saveMetas();renderMensal()"></div>
+    <div class="field-group"><div class="field-label">Reuniões</div><input class="field-input" type="number" id="meta_reun" placeholder="ex: 30" oninput="saveMetas();renderMensal()"></div>
+    <div class="field-group"><div class="field-label">Vendas ment. (qtd)</div><input class="field-input" type="number" id="meta_vendas" placeholder="ex: 5" oninput="saveMetas();renderMensal()"></div>
+    <div class="field-group"><div class="field-label">Fat. ment. (R$)</div><input class="field-input" type="number" id="meta_fat" placeholder="ex: 15000" oninput="saveMetas();renderMensal()"></div>
+    <div class="field-group"><div class="field-label">Vendas curso (qtd)</div><input class="field-input" type="number" id="meta_vcurso" placeholder="ex: 10" oninput="saveMetas();renderMensal()"></div>
+    <div class="field-group"><div class="field-label">Fat. curso (R$)</div><input class="field-input" type="number" id="meta_fcurso" placeholder="ex: 3000" oninput="saveMetas();renderMensal()"></div>
+  </div>
+  <p style="font-size:11px;color:var(--text3);margin-bottom:20px">Preencha os valores-alvo acima. O sistema calcula % atingido e quanto falta automaticamente.</p>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- DASHBOARD ANUAL -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-anual">
+
+  <p class="page-title">Dashboard Anual 2026</p>
+  <p class="page-sub">Visão acumulada mês a mês — evolução de KPIs e origem das vendas</p>
+
+  <div class="year-grid" id="yearGrid"></div>
+
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="anual-abord">—</div><div class="kpi-lbl">Total abordagens no ano</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="anual-reun">—</div><div class="kpi-lbl">Total reuniões no ano</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="anual-vendas">—</div><div class="kpi-lbl">Total vendas mentoria</div></div>
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.1)"><div class="kpi-val" style="color:var(--g4)" id="anual-fat">—</div><div class="kpi-lbl">Faturamento total (R$)</div></div>
+  </div>
+
+  <div class="card">
+    <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução mensal</div>
+    <div style="overflow-x:auto"><table class="canal-table" id="anualTable">
+      <thead><tr><th>Mês</th><th>Abordagens</th><th>Reuniões</th><th>Vendas</th><th>Faturamento (R$)</th><th>Taxa resp.</th><th>Fech.</th></tr></thead>
+      <tbody id="anualTableBody"></tbody>
+    </table></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- TRÁFEGO PAGO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-trafego">
+
+  <p class="page-title">Tráfego Pago</p>
+  <p class="page-sub">Alimentado por Jéssica · separado dos funis orgânicos</p>
+
+  <div class="tp-note">
+    <b style="color:var(--purple)">Objetivo:</b> o produto de baixo ticket paga o tráfego → a lista de compradores cresce → os qualificados viram mentoradas.<br>
+    CPM, CPC e ROAS são calculados automaticamente a partir dos dados que você preenche.
+  </div>
+
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div class="period-tabs" id="tpMonthTabs"></div>
+    <button class="btn-save" onclick="saveTrafego()">Salvar</button>
+  </div>
+
+  <!-- KPIs tráfego -->
+  <div class="kpi-grid" style="margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="tp-verba" style="color:var(--coral)">R$ —</div><div class="kpi-lbl">Verba investida</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-comp">—</div><div class="kpi-lbl">Compradores</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-roas" style="color:var(--g4)">—</div><div class="kpi-lbl">ROAS</div></div>
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.1)"><div class="kpi-val" style="color:var(--g4)" id="tp-reun">—</div><div class="kpi-lbl">Reuniões geradas</div></div>
+  </div>
+
+  <!-- Registro mensal tráfego -->
+  <div class="tp-section">
+    <div class="tp-head"><div class="tp-title" id="tpMonthTitle">Mês atual</div></div>
+    <div class="tp-fields">
+      <div class="field-group"><div class="field-label" style="color:var(--purple)">Verba gasta (R$)</div><input class="field-input" type="number" id="tp_verba" min="0" oninput="updateTpCalc()"></div>
+      <div class="field-group"><div class="field-label">Impressões</div><input class="field-input" type="number" id="tp_imp" min="0" oninput="updateTpCalc()"></div>
+      <div class="field-group"><div class="field-label">Cliques</div><input class="field-input" type="number" id="tp_cliq" min="0" oninput="updateTpCalc()"></div>
+      <div class="field-group"><div class="field-label">Compradores produto</div><input class="field-input" type="number" id="tp_comp" min="0" oninput="updateTpCalc()"></div>
+      <div class="field-group"><div class="field-label">Fat. produto (R$)</div><input class="field-input" type="number" id="tp_fat" min="0" oninput="updateTpCalc()"></div>
+      <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="tp_sdr" min="0"></div>
+      <div class="field-group"><div class="field-label">Qualificados</div><input class="field-input" type="number" id="tp_qual" min="0"></div>
+      <div class="field-group"><div class="field-label">Reuniões geradas</div><input class="field-input" type="number" id="tp_reun" min="0" oninput="updateTpCalc()"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="tp_vend" min="0"></div>
+    </div>
+    <div style="padding:0 20px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+      <div class="tp-auto"><div class="tp-auto-val" id="tp-cpm">—</div><div class="tp-auto-lbl">CPM (R$)</div></div>
+      <div class="tp-auto"><div class="tp-auto-val" id="tp-cpc">—</div><div class="tp-auto-lbl">CPC (R$)</div></div>
+      <div class="tp-auto"><div class="tp-auto-val" id="tp-cpb">—</div><div class="tp-auto-lbl">Custo/comprador (R$)</div></div>
+      <div class="tp-auto"><div class="tp-auto-val" id="tp-roas-calc">—</div><div class="tp-auto-lbl">ROAS</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- SCRIPTS -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-scripts">
+
+  <p class="page-title">Scripts</p>
+  <p class="page-sub">Roteiros de abordagem para cada funil</p>
+
+  <!-- PC COMPLETO -->
+  <div class="script-card open">
+    <div class="script-head" onclick="toggleScript(this)">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-t">Funil 2</span><span class="script-name">PC — Outbound</span></div>
+      <span class="script-status done">Completo</span>
+    </div>
+    <div class="script-body">
+      <div class="script-step">
+        <div class="script-step-label">1. Abordagem</div>
+        <div class="script-msg">"Oi! Vi seu conteúdo no explorar e adorei a forma como você [cita algo específico: ex. mostra as peças / conduz o provador]. Sou mentora de lojistas e analiso muitos perfis, mas o seu me chamou atenção pela dedicação... parabéns!"<br><br><i style="font-size:11px;color:var(--text3)">(Aguardar agradecimento)</i></div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">2. Gancho</div>
+        <div class="script-msg">"Imagina! Posso te fazer uma única pergunta sobre o Instagram da sua loja?"<br><br><i style="font-size:11px;color:var(--text3)">(Lojista diz que sim)</i></div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">3. Pergunta espelho — qualificação</div>
+        <div class="script-msg">"Sendo bem sincera: com tudo o que você já faz hoje, você sente que tem clareza e previsibilidade do faturamento, ou sente que está sempre correndo em círculos, dependendo demais do seu esforço de postar para a meta acontecer?"</div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">4. Respostas — árvore</div>
+        <div class="script-case case-green">
+          <div class="case-title">Confirmou a dor</div>
+          <div class="case-text">"Perfeito, então hoje você até vende, mas sente que tudo depende muito de você no dia a dia." + complemento: "e aí acaba ficando muito no esforço" <br><br>"Topa que eu te mostre como organizar isso aplicando na sua loja, sem precisar fazer mais do que você já faz?"<br><br>Se SIM → "Em 15 minutinhos te mostro isso na prática. Amanhã tenho X ou Y horário — qual fica melhor?"</div>
+        </div>
+        <div class="script-case case-amber" style="margin-top:6px">
+          <div class="case-title">Diz que já tem clareza / vende bem</div>
+          <div class="case-text">"Isso já te coloca na frente de muita gente. Então o próximo passo é fazer acontecer com mais consistência sem depender tanto de você."<br><br>"Topa que eu te mostre como ajustar isso pra escalar com mais leveza?" — Se SIM → agendamento normal</div>
+        </div>
+        <div class="script-case case-red" style="margin-top:6px">
+          <div class="case-title">Não é perfil</div>
+          <div class="case-text">"Entendi! Quando começar a estruturar isso com mais frequência, faz sentido a gente falar." → encerrar</div>
+        </div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">5. Follow-up (some no meio)</div>
+        <div class="script-msg">FU1: "Fiquei pensando no que você falou sobre seu Instagram… ainda está desse jeito por aí?"<br><br>FU2 (último): "Se fizer sentido retomar isso depois, me chama."</div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">6. Objeções</div>
+        <div class="script-msg">"Pode falar por aqui?" → "Até posso te dar uma direção, mas pra te mostrar exatamente onde ajustar no seu caso, preciso ver contigo rapidinho — fica muito mais claro."<br><br>"É curso?" → "Não, é mentoria mesmo — eu te ajudo a organizar isso no teu cenário."<br><br>"Sem tempo" → "Super entendo — por isso a ideia é ser bem direto, em 15 minutinhos já te mostro o principal."</div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">7. Pré-aquecimento</div>
+        <div class="script-msg">1 dia antes: "Passando pra confirmar nossa conversa amanhã. Já dei uma olhada no teu perfil."<br><br>No dia: "Daqui a pouco a gente se fala! Se puder entrar com o Instagram aberto já ajuda bastante."</div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">Filtro interno — SDR não pergunta, observa</div>
+        <div class="rules-row">
+          <div class="rules-col"><div class="rules-col-title yes">Perfil ideal</div><span class="rule-pill">já posta</span><span class="rule-pill">já vende</span><span class="rule-pill">faz stories</span><span class="rule-pill">esforço sem estrutura</span></div>
+          <div class="rules-col"><div class="rules-col-title no">Não ideal</div><span class="rule-pill">iniciante total</span><span class="rule-pill">não usa Instagram</span><span class="rule-pill">não vende nada</span></div>
+        </div>
+      </div>
+      <div class="script-step">
+        <div class="script-step-label">Regras de ouro</div>
+        <div class="rules-row">
+          <div class="rules-col"><div class="rules-col-title no">Nunca</div><span class="rule-pill">texto longo</span><span class="rule-pill">explicar demais</span><span class="rule-pill">dar aula na DM</span><span class="rule-pill">5 perguntas seguidas</span></div>
+          <div class="rules-col"><div class="rules-col-title yes">Sempre</div><span class="rule-pill">frases curtas</span><span class="rule-pill">1 pergunta por vez</span><span class="rule-pill">responder rápido</span><span class="rule-pill">conduzir sempre</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts pendentes -->
+  <div class="script-card">
+    <div class="script-head" onclick="toggleScript(this)">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-g">Funil 1</span><span class="script-name">BV Automático — Mensagem de automação</span></div>
+      <span class="script-status pending">A adicionar</span>
+    </div>
+    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+  </div>
+
+  <div class="script-card">
+    <div class="script-head" onclick="toggleScript(this)">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-g">Funil 3</span><span class="script-name">Stories — Abordagem após interação</span></div>
+      <span class="script-status pending">A adicionar</span>
+    </div>
+    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+  </div>
+
+  <div class="script-card">
+    <div class="script-head" onclick="toggleScript(this)">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-a">Funil 4</span><span class="script-name">Isca — Abordagem pós-captura</span></div>
+      <span class="script-status pending">A adicionar</span>
+    </div>
+    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+  </div>
+
+  <div class="script-card">
+    <div class="script-head" onclick="toggleScript(this)">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-x">Funil 5</span><span class="script-name">Follow-up — Retomada de conversa</span></div>
+      <span class="script-status pending">A adicionar</span>
+    </div>
+    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+  </div>
+
+  <div class="script-card">
+    <div class="script-head" onclick="toggleScript(this)">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-a">Funil 5</span><span class="script-name">Reativação — Quem caiu em algo e sumiu</span></div>
+      <span class="script-status pending">A adicionar</span>
+    </div>
+    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- GUIA DE USO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-guia">
+
+  <p class="page-title">Guia de Uso</p>
+  <p class="page-sub">Referência operacional — leia antes de começar a usar o sistema</p>
+
+  <div class="guia-section">
+    <div class="guia-title">Quem preenche o quê</div>
+    <div class="guia-row"><div class="guia-key">SDR preenche</div><div class="guia-val">Registro Diário — todos os canais: BV Automático, PC, Stories, Follow-up, Reativação, Isca</div></div>
+    <div class="guia-row"><div class="guia-key">Jéssica preenche</div><div class="guia-val">Tráfego Pago · Metas mensais · Observações estratégicas do dia</div></div>
+    <div class="guia-row"><div class="guia-key">Automático</div><div class="guia-val">Taxas do funil, KPIs mensais/anuais, ROAS, CPM, CPC, custo por comprador</div></div>
+  </div>
+
+  <div class="guia-section">
+    <div class="guia-title">Funis e metas diárias</div>
+    <div class="guia-row"><div class="guia-key">BV Automático — Funil 1</div><div class="guia-val">Medir: entraram → assistiram vídeo → preencheram form → SDR contactou → reuniões. Sem meta de abordagem — é o volume natural de novos seguidores.</div></div>
+    <div class="guia-row"><div class="guia-key">PC — Funil 2</div><div class="guia-val">Meta: 20 abordagens/dia. Medir resposta, conversas iniciadas, convites, reuniões.</div></div>
+    <div class="guia-row"><div class="guia-key">Stories — Funil 3</div><div class="guia-val">Meta: 10–15 interações/dia (votos + respostas caixinha). SDR ou Jéssica abre conversa com quem interagiu.</div></div>
+    <div class="guia-row"><div class="guia-key">Follow-up — Funil 5</div><div class="guia-val">Sem meta fixa. Retomar conversas que pararam no PC ou BV. SDR tenta até 2 vezes antes de encerrar.</div></div>
+    <div class="guia-row"><div class="guia-key">Reativação — Funil 5</div><div class="guia-val">Meta: 10/dia. Pessoas que caíram em algum funil (isca, BV, comentaram no feed) e sumiram. Nova abertura.</div></div>
+    <div class="guia-row"><div class="guia-key">Isca — Funil 4</div><div class="guia-val">Medir: leads capturados → iscas entregues → SDR contactou → convites → reuniões.</div></div>
+  </div>
+
+  <div class="guia-section">
+    <div class="guia-title">O que fazer quando as taxas estiverem baixas</div>
+    <div class="guia-row"><div class="guia-key" style="color:var(--coral)">Taxa de resposta baixa</div><div class="guia-val">Problema na abordagem ou no perfil prospectado. Revisar script PC e filtro de qualificação da SDR.</div></div>
+    <div class="guia-row"><div class="guia-key" style="color:var(--amber)">Poucos convites p/ reunião</div><div class="guia-val">Problema na condução da conversa — qualificação ou falta de confiança para convidar. Treinar SDR.</div></div>
+    <div class="guia-row"><div class="guia-key" style="color:var(--amber)">Baixo comparecimento</div><div class="guia-val">Problema no pré-aquecimento. Reforçar confirmação 1 dia antes + mensagem no dia com antecipação.</div></div>
+    <div class="guia-row"><div class="guia-key" style="color:var(--coral)">Baixo fechamento</div><div class="guia-val">Problema na oferta, no pitch ou na qualificação pré-reunião. Revisar apresentação e fit do lead.</div></div>
+  </div>
+
+  <div class="guia-section">
+    <div class="guia-title">Rotina de revisão</div>
+    <div class="guia-row"><div class="guia-key">Diária (SDR)</div><div class="guia-val">Preencher o Registro Diário ao final do dia. Anotar observações do que funcionou ou travou.</div></div>
+    <div class="guia-row"><div class="guia-key">Sexta-feira (revisão semanal)</div><div class="guia-val">1. Volume atingido vs meta · 2. Canal com melhor taxa · 3. Gargalo da semana · 4. Ajuste de foco para semana seguinte</div></div>
+    <div class="guia-row"><div class="guia-key">Final de mês (revisão mensal)</div><div class="guia-val">Comparar semanas. Qual canal gerou mais reuniões? Qual teve melhor fechamento? Ajustar metas do próximo mês.</div></div>
+  </div>
+
+  <div class="guia-section">
+    <div class="guia-title">Sobre o sistema</div>
+    <div class="guia-row"><div class="guia-key">Armazenamento</div><div class="guia-val">Todos os dados são salvos no banco de dados MySQL na Hostinger — acessíveis de qualquer computador, a qualquer hora.</div></div>
+    <div class="guia-row"><div class="guia-key">Backup</div><div class="guia-val">Dados protegidos no servidor Hostinger. Recomendado exportar backup mensal pelo hPanel → Banco de Dados → Exportar.</div></div>
+    <div class="guia-row"><div class="guia-key">Acesso da SDR</div><div class="guia-val">Compartilhe o link do site com a SDR. Ela preenche, você abre e os dados já aparecem em tempo real.</div></div>
+  </div>
+
+</div>
+
+</div><!-- /main -->
+
+<script>
+// ══════════════════════════════════════════
+// NAVEGAÇÃO
+// ══════════════════════════════════════════
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+  if(id==='mensal') renderMensal();
+  if(id==='anual') renderAnual();
+  if(id==='trafego') renderTrafego();
+}
+
+function toggleFunil(card){card.classList.toggle('open')}
+function toggleScript(head){head.closest('.script-card').classList.toggle('open')}
+
+// ══════════════════════════════════════════
+// DATA HELPERS
+// ══════════════════════════════════════════
+function today(){
+  const d=new Date();
+  return d.toISOString().split('T')[0];
+}
+function formatDatePT(str){
+  const [y,m,d]=str.split('-');
+  return `${d}/${m}/${y}`;
+}
+const MONTHS_PT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// ══════════════════════════════════════════
+// REGISTRO DIÁRIO
+// ══════════════════════════════════════════
+const FIELDS=['bv_auto','bv_video','bv_form','bv_sdr','bv_convites','bv_reunioes','bv_vendas','bv_valor','bv_vcurso','bv_vcurso_val',
+  'pc_abord','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val',
+  'st_inter','st_sdr','st_conv','st_convites','st_reunioes','st_vendas',
+  'fu_retom','fu_resp','fu_convites','fu_reunioes','fu_vendas','fu_valor','fu_vcurso','fu_vcurso_val',
+  're_abord','re_resp','re_convites','re_reunioes','re_vendas',
+  'is_leads','is_entregues','is_sdr','is_convites','is_reunioes','is_vendas',
+  'obs_dia'];
+
+async function saveDay(){
+  const date=document.getElementById('regDate').value;
+  if(!date)return;
+  const data={};
+  FIELDS.forEach(f=>{
+    const el=document.getElementById(f);
+    if(el)data[f]=el.value||'';
+  });
+  try{
+    await apiPost('save_day',{date,dados:data});
+    invalidateCache();
+    showSaved();
+  }catch(e){showError('Erro ao salvar. Verifique a conexão.');}
+}
+
+async function loadDay(){
+  const date=document.getElementById('regDate').value;
+  if(!date)return;
+  showLoading(true);
+  try{
+    const res=await apiGet({action:'get_day',date});
+    const data=res.dados||{};
+    FIELDS.forEach(f=>{
+      const el=document.getElementById(f);
+      if(el)el.value=data[f]||'';
+    });
+    updateSummary();
+  }catch(e){showError('Erro ao carregar dados do dia.');}
+  showLoading(false);
+}
+
+function changeDay(delta){
+  const inp=document.getElementById('regDate');
+  const d=new Date(inp.value||today());
+  d.setDate(d.getDate()+delta);
+  inp.value=d.toISOString().split('T')[0];
+  loadDay();
+}
+
+function getNum(id){return parseInt(document.getElementById(id)?.value)||0;}
+
+function updateSummary(){
+  const abord=getNum('pc_abord')+getNum('re_abord')+getNum('bv_sdr')+getNum('st_inter')+getNum('fu_retom')+getNum('is_sdr');
+  const conv=getNum('pc_conv')+getNum('st_conv')+getNum('bv_form');
+  const convites=getNum('pc_convites')+getNum('st_convites')+getNum('bv_convites')+getNum('fu_convites')+getNum('re_convites')+getNum('is_convites');
+  const reunioes=getNum('pc_reunioes')+getNum('st_reunioes')+getNum('bv_reunioes')+getNum('fu_reunioes')+getNum('re_reunioes')+getNum('is_reunioes');
+  const vendas=getNum('pc_vendas')+getNum('st_vendas')+getNum('bv_vendas')+getNum('fu_vendas')+getNum('re_vendas')+getNum('is_vendas');
+  document.getElementById('ds-abord').textContent=abord;
+  document.getElementById('ds-conv').textContent=conv;
+  document.getElementById('ds-convites').textContent=convites;
+  document.getElementById('ds-reunioes').textContent=reunioes;
+  document.getElementById('ds-vendas').textContent=vendas;
+}
+
+function showSaved(){
+  const el=document.getElementById('saveIndicator');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2000);
+}
+
+// Init registro
+document.getElementById('regDate').value=today();
+loadDay();
+
+// ══════════════════════════════════════════
+// API — COMUNICAÇÃO COM BANCO DE DADOS
+// ══════════════════════════════════════════
+const SUPA_URL='https://lnfghtlrzoioaotamzvy.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZmdodGxyem9pb2FvdGFtenZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg5MTMsImV4cCI6MjA5MjI4NDkxM30.lNHckve8P--rp9axdwZ6v6zTl4LLnk-1xY_kJS3wfFo';
+
+async function supaGet(table, filters={}){
+  let url=SUPA_URL+'/rest/v1/'+table+'?';
+  const params=[];
+  for(const[k,v]of Object.entries(filters))params.push(k+'=eq.'+encodeURIComponent(v));
+  if(params.length)url+=params.join('&');
+  const r=await fetch(url,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return r.json();
+}
+
+async function supaUpsert(table, data){
+  const r=await fetch(SUPA_URL+'/rest/v1/'+table,{
+    method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,
+      'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+    body:JSON.stringify(data)
+  });
+  if(!r.ok){const t=await r.text();throw new Error('HTTP '+r.status+': '+t);}
+  return true;
+}
+
+async function apiGet(params){
+  const action=params.action;
+  if(action==='get_day'){
+    const rows=await supaGet('registro_diario',{data_reg:params.date});
+    return{dados:rows.length?rows[0].dados:null};
+  }
+  if(action==='get_anual'){
+    const ano=params.ano||new Date().getFullYear();
+    const url=SUPA_URL+'/rest/v1/registro_diario?data_reg=gte.'+ano+'-01-01&data_reg=lte.'+ano+'-12-31&order=data_reg.asc';
+    const r=await fetch(url,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    const rows=await r.json();
+    const days=rows.map(row=>{const d={...row.dados};d._date=row.data_reg;return d;});
+    return{days};
+  }
+  if(action==='get_metas'){
+    const rows=await supaGet('metas_mensais',{ano:params.ano,mes:params.mes});
+    return{dados:rows.length?rows[0].dados:null};
+  }
+  if(action==='get_trafego'){
+    const rows=await supaGet('trafego_pago',{ano:params.ano,mes:params.mes});
+    return{dados:rows.length?rows[0].dados:null};
+  }
+  return{};
+}
+
+async function apiPost(action,body){
+  if(action==='save_day'){
+    await supaUpsert('registro_diario',{data_reg:body.date,dados:body.dados});
+    return{ok:true};
+  }
+  if(action==='save_metas'){
+    await supaUpsert('metas_mensais',{ano:body.ano,mes:body.mes,dados:body.dados});
+    return{ok:true};
+  }
+  if(action==='save_trafego'){
+    await supaUpsert('trafego_pago',{ano:body.ano,mes:body.mes,dados:body.dados});
+    return{ok:true};
+  }
+  return{};
+}
+
+let _cacheAnual=null;
+let _cacheAnualYear=null;
+
+async function getAllDaysAsync(year){
+  year=year||currentYear;
+  if(_cacheAnual&&_cacheAnualYear===year)return _cacheAnual;
+  const res=await apiGet({action:'get_anual',ano:year});
+  _cacheAnual=res.days||[];
+  _cacheAnualYear=year;
+  return _cacheAnual;
+}
+
+function invalidateCache(){_cacheAnual=null;}
+
+function showLoading(v){
+  const el=document.getElementById('saveIndicator');
+  if(v){el.textContent='carregando...';el.classList.add('show');}
+  else{el.classList.remove('show');}
+}
+function showError(msg){
+  const el=document.getElementById('saveIndicator');
+  el.textContent='⚠ '+msg;el.style.color='var(--coral)';el.classList.add('show');
+  setTimeout(()=>{el.classList.remove('show');el.style.color='';},3000);
+}
+
+// ══════════════════════════════════════════
+// AGREGAÇÃO DE DADOS
+// ══════════════════════════════════════════
+function getAllDays(){return _cacheAnual||[];}
+
+function getN(data,f){return parseInt(data[f])||0;}
+
+function aggregateDays(days){
+  return{
+    abord: days.reduce((s,d)=>s+getN(d,'pc_abord')+getN(d,'re_abord')+getN(d,'bv_sdr')+getN(d,'st_inter')+getN(d,'fu_retom'),0),
+    resp: days.reduce((s,d)=>s+getN(d,'pc_resp')+getN(d,'re_resp')+getN(d,'fu_resp')+getN(d,'st_sdr'),0),
+    conv: days.reduce((s,d)=>s+getN(d,'pc_conv')+getN(d,'st_conv')+getN(d,'bv_form'),0),
+    convites: days.reduce((s,d)=>s+getN(d,'pc_convites')+getN(d,'st_convites')+getN(d,'bv_convites')+getN(d,'fu_convites')+getN(d,'re_convites')+getN(d,'is_convites'),0),
+    reunioes: days.reduce((s,d)=>s+getN(d,'pc_reunioes')+getN(d,'st_reunioes')+getN(d,'bv_reunioes')+getN(d,'fu_reunioes')+getN(d,'re_reunioes')+getN(d,'is_reunioes'),0),
+    vendas: days.reduce((s,d)=>s+getN(d,'pc_vendas')+getN(d,'st_vendas')+getN(d,'bv_vendas')+getN(d,'fu_vendas')+getN(d,'re_vendas')+getN(d,'is_vendas'),0),
+    valor: days.reduce((s,d)=>s+getN(d,'pc_valor')+getN(d,'fu_valor'),0),
+    vcurso: days.reduce((s,d)=>s+getN(d,'pc_vcurso')+getN(d,'bv_vcurso')+getN(d,'fu_vcurso'),0),
+    vcurso_val: days.reduce((s,d)=>s+getN(d,'pc_vcurso_val')+getN(d,'bv_vcurso_val')+getN(d,'fu_vcurso_val'),0),
+    // por canal
+    bv:{auto:days.reduce((s,d)=>s+getN(d,'bv_auto'),0),sdr:days.reduce((s,d)=>s+getN(d,'bv_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'bv_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'bv_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'bv_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'bv_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'bv_vcurso'),0)},
+    pc:{abord:days.reduce((s,d)=>s+getN(d,'pc_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'pc_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'pc_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'pc_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'pc_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'pc_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'pc_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'pc_vcurso'),0)},
+    st:{inter:days.reduce((s,d)=>s+getN(d,'st_inter'),0),sdr:days.reduce((s,d)=>s+getN(d,'st_sdr'),0),conv:days.reduce((s,d)=>s+getN(d,'st_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'st_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'st_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'st_vendas'),0)},
+    fu:{ret:days.reduce((s,d)=>s+getN(d,'fu_retom'),0),resp:days.reduce((s,d)=>s+getN(d,'fu_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'fu_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'fu_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'fu_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'fu_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'fu_vcurso'),0)},
+    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0)},
+    is:{leads:days.reduce((s,d)=>s+getN(d,'is_leads'),0),sdr:days.reduce((s,d)=>s+getN(d,'is_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'is_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'is_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'is_vendas'),0)},
+  };
+}
+
+function pct(a,b){if(!b)return'—';return Math.round(a/b*100)+'%';}
+function fmtN(n){return n||'—';}
+
+// ══════════════════════════════════════════
+// DASHBOARD MENSAL
+// ══════════════════════════════════════════
+let currentMonth=new Date().getMonth();
+let currentYear=new Date().getFullYear();
+
+async function renderMensal(){
+  // Tabs de meses
+  const tabs=document.getElementById('monthTabs');
+  tabs.innerHTML='';
+  MONTHS_PT.forEach((m,i)=>{
+    const btn=document.createElement('button');
+    btn.className='period-tab'+(i===currentMonth?' active':'');
+    btn.textContent=m;
+    btn.onclick=()=>{currentMonth=i;renderMensal();};
+    tabs.appendChild(btn);
+  });
+
+  const allDays=await getAllDaysAsync(currentYear);
+  const monthDays=allDays.filter(d=>{
+    const [y,m]=d._date.split('-').map(Number);
+    return y===currentYear&&m-1===currentMonth;
+  });
+  const agg=aggregateDays(monthDays);
+
+  // KPIs topo
+  document.getElementById('kpi-abord').textContent=agg.abord||0;
+  document.getElementById('kpi-resp').textContent=agg.resp||0;
+  document.getElementById('kpi-conv').textContent=agg.convites||0;
+  document.getElementById('kpi-reun').textContent=agg.reunioes||0;
+  document.getElementById('kpi-vendas').textContent=agg.vendas||0;
+  document.getElementById('kpi-vcurso').textContent=agg.vcurso||0;
+
+  // Taxas
+  document.getElementById('taxa-resp').textContent=pct(agg.resp,agg.abord);
+  document.getElementById('taxa-convite').textContent=pct(agg.convites,agg.resp);
+  document.getElementById('taxa-reun').textContent=pct(agg.reunioes,agg.convites);
+  document.getElementById('taxa-fech').textContent=pct(agg.vendas,agg.reunioes);
+
+  // ── COMPARATIVO SEMANA A SEMANA ──
+  // Agrupar dias por semana do mês
+  const semanas={};
+  monthDays.forEach(d=>{
+    const dayNum=parseInt(d._date.split('-')[2]);
+    const wk=Math.ceil(dayNum/7);
+    const key='Semana '+wk;
+    if(!semanas[key])semanas[key]=[];
+    semanas[key].push(d);
+  });
+  // Garantir 5 semanas mesmo vazias
+  for(let i=1;i<=5;i++){if(!semanas['Semana '+i])semanas['Semana '+i]=[];}
+
+  const semBody=document.getElementById('semanaTableBody');
+  let melhorSem='';let melhorAbord=0;
+  semBody.innerHTML=Object.keys(semanas).sort().map(sem=>{
+    const sd=semanas[sem];
+    const sa=aggregateDays(sd);
+    if(sa.abord>melhorAbord){melhorAbord=sa.abord;melhorSem=sem;}
+    const isMelhor=false;
+    return`<tr>
+      <td style="font-weight:500">${sem}</td>
+      <td>${sa.abord||0}</td>
+      <td>${sa.resp||0}</td>
+      <td>${sa.convites||0}</td>
+      <td>${sa.reunioes||0}</td>
+      <td>${sa.vendas||0}</td>
+      <td>${sa.valor?'R$ '+sa.valor.toLocaleString('pt-BR'):'R$ 0,00'}</td>
+      <td>${sa.vcurso||0}</td>
+      <td>${sa.vcurso_val?'R$ '+sa.vcurso_val.toLocaleString('pt-BR'):'R$ 0,00'}</td>
+      <td>${pct(sa.resp,sa.abord)}</td>
+      <td>${pct(sa.convites,sa.resp)}</td>
+      <td>${pct(sa.reunioes,sa.convites)}</td>
+      <td>${pct(sa.vendas,sa.reunioes)}</td>
+    </tr>`;
+  }).join('')+`<tr class="total-row">
+    <td>TOTAL</td>
+    <td>${agg.abord}</td><td>${agg.resp}</td><td>${agg.convites}</td><td>${agg.reunioes}</td>
+    <td>${agg.vendas}</td>
+    <td>${agg.valor?'R$ '+agg.valor.toLocaleString('pt-BR'):'R$ 0,00'}</td>
+    <td>${agg.vcurso||0}</td>
+    <td>${agg.vcurso_val?'R$ '+agg.vcurso_val.toLocaleString('pt-BR'):'R$ 0,00'}</td>
+    <td>${pct(agg.resp,agg.abord)}</td>
+    <td>${pct(agg.convites,agg.resp)}</td>
+    <td>${pct(agg.reunioes,agg.convites)}</td>
+    <td>${pct(agg.vendas,agg.reunioes)}</td>
+  </tr>`;
+
+  // ── TABELA POR CANAL ──
+  const tbody=document.getElementById('canalTableBody');
+  const canais=[
+    ['BV Automático',agg.bv.auto,agg.bv.sdr,agg.bv.convites,agg.bv.reun,agg.bv.vend,agg.bv.valor,0],
+    ['PC — Outbound',agg.pc.abord,agg.pc.resp,agg.pc.convites,agg.pc.reun,agg.pc.vend,agg.pc.valor,agg.pc.vcurso],
+    ['Stories',agg.st.inter,agg.st.sdr,agg.st.convites,agg.st.reun,agg.st.vend,0,0],
+    ['Follow-up',agg.fu.ret,agg.fu.resp,agg.fu.convites,agg.fu.reun,agg.fu.vend,agg.fu.valor,agg.fu.vcurso],
+    ['Reativação',agg.re.abord,agg.re.resp,agg.re.convites,agg.re.reun,agg.re.vend,0,0],
+    ['Isca',agg.is.leads,agg.is.sdr,agg.is.convites,agg.is.reun,agg.is.vend,0,0],
+  ];
+  tbody.innerHTML=canais.map(c=>`<tr>
+    <td>${c[0]}</td><td>${c[1]||0}</td><td>${c[2]||0}</td><td>${c[3]||0}</td><td>${c[4]||0}</td>
+    <td>${c[5]||0}</td><td>${c[6]?'R$ '+c[6].toLocaleString('pt-BR'):'—'}</td><td>${c[7]||0}</td>
+    <td>${pct(c[2]||0,c[1]||0)}</td><td>${pct(c[5]||0,c[4]||0)}</td>
+  </tr>`).join('')+
+  `<tr class="total-row"><td>TOTAL</td><td>${agg.abord}</td><td>${agg.resp}</td><td>${agg.convites}</td><td>${agg.reunioes}</td>
+  <td>${agg.vendas}</td><td>${agg.valor?'R$ '+agg.valor.toLocaleString('pt-BR'):'—'}</td><td>${agg.vcurso||0}</td>
+  <td>${pct(agg.resp,agg.abord)}</td><td>${pct(agg.vendas,agg.reunioes)}</td></tr>`;
+
+  // ── ALERTAS AUTOMÁTICOS ──
+  const alertas=document.getElementById('alertasBox');
+  const taxaResp=agg.abord?agg.resp/agg.abord:0;
+  const taxaConv=agg.resp?agg.convites/agg.resp:0;
+  const taxaReun=agg.convites?agg.reunioes/agg.convites:0;
+  const taxaFech=agg.reunioes?agg.vendas/agg.reunioes:0;
+  let als=[];
+  if(agg.abord>0){
+    if(taxaResp>=0.2)als.push({type:'ok',msg:'✓ Taxa de resposta OK ('+pct(agg.resp,agg.abord)+')'});
+    else als.push({type:'bad',msg:'⚠ Taxa de resposta baixa ('+pct(agg.resp,agg.abord)+') → revisar script e filtro de qualificação'});
+    if(taxaConv<0.1&&agg.resp>5)als.push({type:'warn',msg:'⚠ Poucos convites ('+pct(agg.convites,agg.resp)+') → problema na conversa ou qualificação'});
+    if(taxaReun>=0.3)als.push({type:'ok',msg:'✓ Comparecimento em reunião OK ('+pct(agg.reunioes,agg.convites)+')'});
+    else if(agg.convites>2)als.push({type:'warn',msg:'⚠ Baixo comparecimento ('+pct(agg.reunioes,agg.convites)+') → reforçar pré-aquecimento'});
+    if(agg.reunioes>0&&taxaFech<0.2)als.push({type:'bad',msg:'⚠ Reuniões sem fechamento ('+pct(agg.vendas,agg.reunioes)+') → revisar oferta e pitch'});
+    else if(agg.vendas>0)als.push({type:'ok',msg:'✓ BV mantém boa performance relativa'});
+  } else {
+    als.push({type:'warn',msg:'Nenhum dado registrado neste mês ainda.'});
+  }
+  alertas.innerHTML=als.map(a=>`<div class="alert-box alert-${a.type}">${a.msg}</div>`).join('');
+
+  // ── INSIGHTS AUTOMÁTICOS ──
+  const insights=document.getElementById('insightsBox');
+  let ins=[];
+  if(agg.abord>0){
+    // Gargalo principal
+    if(taxaResp<0.15)ins.push('🔴 Gargalo na abordagem — menos de 15% respondem. Prioridade: revisar script PC e critério de seleção de perfis.');
+    else if(taxaConv<0.08)ins.push('🟠 Gargalo na conversa — poucas abordagens chegam ao convite. Prioridade: treinar SDR na condução e no momento de convidar.');
+    else if(taxaReun<0.25)ins.push('🟠 Gargalo no comparecimento — convidados não aparecem. Prioridade: reforçar pré-aquecimento 1 dia antes e no dia.');
+    else if(taxaFech<0.2&&agg.reunioes>0)ins.push('🟡 Gargalo no fechamento — reuniões acontecem mas não convertem. Prioridade: revisar oferta, fit do lead e apresentação da mentoria.');
+    else if(agg.vendas>0)ins.push('✅ Volume e resposta equilibrados. Foco: aumentar volume de abordagens para escalar o resultado.');
+    // Canal mais qualificado
+    const melhorCanal=canais.reduce((best,c)=>{
+      const t=c[4]>0?c[5]/c[4]:0;
+      const bestT=best[4]>0?best[5]/best[4]:0;
+      return t>bestT?c:best;
+    },canais[0]);
+    if(melhorCanal[5]>0)ins.push('💡 Canal com melhor taxa de fechamento: '+melhorCanal[0]+' ('+pct(melhorCanal[5],melhorCanal[4])+' de fechamento). Considere aumentar volume neste funil.');
+    // Semana de melhor performance
+    if(melhorAbord>0)ins.push('📅 Semana de maior volume: '+melhorSem+' ('+melhorAbord+' abordagens).');
+  } else {
+    ins.push('Sem dados suficientes para gerar insights. Comece a preencher o Registro Diário.');
+  }
+  insights.innerHTML=ins.map(i=>`<div class="alert-box alert-warn" style="margin-bottom:6px">${i}</div>`).join('');
+
+  // ── METAS VS REAL ──
+  const m=currentMonth;
+  const metaKeys=['abord','reun','vendas','fat','vcurso','fcurso'];
+  metaKeys.forEach(k=>{
+    const el=document.getElementById('meta_'+k);
+    if(el)el.value=localStorage.getItem('meta_'+k+'_'+m)||'';
+  });
+  const metaAbord=parseInt(localStorage.getItem('meta_abord_'+m))||0;
+  const metaReun=parseInt(localStorage.getItem('meta_reun_'+m))||0;
+  const metaVend=parseInt(localStorage.getItem('meta_vendas_'+m))||0;
+  const metaFat=parseFloat(localStorage.getItem('meta_fat_'+m))||0;
+  const metaVC=parseInt(localStorage.getItem('meta_vcurso_'+m))||0;
+  const metaFC=parseFloat(localStorage.getItem('meta_fcurso_'+m))||0;
+  const realFat=agg.valor||0;
+  const realFC=agg.vcurso_val||0;
+
+  function metaRow(label,meta,real,isMoney){
+    if(!meta)return`<tr><td>${label}</td><td style="color:var(--text3)">—</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>`;
+    const pct_val=meta?Math.round(real/meta*100):0;
+    const falta=meta-real;
+    const color=pct_val>=100?'var(--g4)':pct_val>=50?'var(--amber)':'var(--coral)';
+    return`<tr>
+      <td>${label}</td>
+      <td>${isMoney?'R$ '+meta.toLocaleString('pt-BR'):meta}</td>
+      <td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td>
+      <td style="font-weight:600;color:${color}">${pct_val}%</td>
+      <td style="color:${falta<=0?'var(--g4)':'var(--text2)'}">${falta<=0?'✓ atingido':(isMoney?'R$ '+falta.toLocaleString('pt-BR'):falta)}</td>
+    </tr>`;
+  }
+  document.getElementById('metasTableBody').innerHTML=
+    metaRow('Abordagens',metaAbord,agg.abord,false)+
+    metaRow('Reuniões',metaReun,agg.reunioes,false)+
+    metaRow('Vendas mentoria (qtd)',metaVend,agg.vendas,false)+
+    metaRow('Faturamento mentoria (R$)',metaFat,realFat,true)+
+    metaRow('Vendas curso (qtd)',metaVC,agg.vcurso||0,false)+
+    metaRow('Faturamento curso (R$)',metaFC,realFC,true);
+}
+
+async function saveMetas(){
+  const m=currentMonth;
+  const dados={};
+  ['abord','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
+    const el=document.getElementById('meta_'+k);
+    if(el)dados[k]=el.value||'';
+  });
+  try{
+    await apiPost('save_metas',{ano:currentYear,mes:m,dados});
+    showSaved();
+  }catch(e){showError('Erro ao salvar metas.');}
+}
+
+// ══════════════════════════════════════════
+// DASHBOARD ANUAL
+// ══════════════════════════════════════════
+async function renderAnual(){
+  const allDays=await getAllDaysAsync(currentYear);
+  const grid=document.getElementById('yearGrid');
+  grid.innerHTML='';
+  let totAbord=0,totReun=0,totVend=0,totFat=0;
+  const rows=[];
+
+  MONTHS_PT.forEach((m,i)=>{
+    const mDays=allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===i;});
+    const agg=aggregateDays(mDays);
+    totAbord+=agg.abord;totReun+=agg.reunioes;totVend+=agg.vendas;totFat+=agg.valor;
+
+    const card=document.createElement('div');
+    card.className='month-card'+(i===currentMonth?' active':'');
+    card.innerHTML=`<div class="month-name">${m}/26</div><div class="month-val ${agg.vendas>0?'has-data':''}">${agg.vendas>0?agg.vendas:'—'}<span style="font-size:12px;font-weight:400;color:var(--text3)"> vend.</span></div>`;
+    card.onclick=()=>{currentMonth=i;showTab('mensal');document.querySelectorAll('.nav-btn').forEach((b,bi)=>{if(bi===2)b.classList.add('active');else b.classList.remove('active');});};
+    grid.appendChild(card);
+
+    rows.push({m,agg});
+  });
+
+  document.getElementById('anual-abord').textContent=totAbord||'0';
+  document.getElementById('anual-reun').textContent=totReun||'0';
+  document.getElementById('anual-vendas').textContent=totVend||'0';
+  document.getElementById('anual-fat').textContent=totFat?'R$ '+totFat.toLocaleString('pt-BR'):'—';
+
+  const tbody=document.getElementById('anualTableBody');
+  tbody.innerHTML=rows.map(({m,agg})=>`<tr><td>${m}/26</td><td>${agg.abord||0}</td><td>${agg.reunioes||0}</td><td>${agg.vendas||0}</td><td>${agg.valor?'R$ '+agg.valor.toLocaleString('pt-BR'):'—'}</td><td>${pct(agg.resp,agg.abord)}</td><td>${pct(agg.vendas,agg.reunioes)}</td></tr>`).join('');
+}
+
+// ══════════════════════════════════════════
+// TRÁFEGO PAGO
+// ══════════════════════════════════════════
+let tpMonth=new Date().getMonth();
+
+async function renderTrafego(){
+  const tabs=document.getElementById('tpMonthTabs');
+  tabs.innerHTML='';
+  MONTHS_PT.forEach((m,i)=>{
+    const btn=document.createElement('button');
+    btn.className='period-tab'+(i===tpMonth?' active':'');
+    btn.textContent=m;
+    btn.onclick=()=>{tpMonth=i;renderTrafego();};
+    tabs.appendChild(btn);
+  });
+  document.getElementById('tpMonthTitle').textContent=MONTHS_PT[tpMonth]+'/26 — Tráfego Pago';
+  let tpData={};
+  try{const tr=await apiGet({action:'get_trafego',ano:currentYear,mes:tpMonth});tpData=tr.dados||{};}catch(e){}
+  ['verba','imp','cliq','comp','fat','sdr','qual','reun','vend'].forEach(f=>{
+    const el=document.getElementById('tp_'+f);
+    if(el)el.value=tpData[f]||'';
+  });
+  updateTpCalc();
+}
+
+async function saveTrafego(){
+  const dados={};
+  ['verba','imp','cliq','comp','fat','sdr','qual','reun','vend'].forEach(f=>{
+    const el=document.getElementById('tp_'+f);
+    if(el)dados[f]=el.value||'';
+  });
+  try{
+    await apiPost('save_trafego',{ano:currentYear,mes:tpMonth,dados});
+    showSaved();
+  }catch(e){showError('Erro ao salvar tráfego.');}
+}
+
+function updateTpCalc(){
+  const v=parseFloat(document.getElementById('tp_verba')?.value)||0;
+  const imp=parseFloat(document.getElementById('tp_imp')?.value)||0;
+  const cliq=parseFloat(document.getElementById('tp_cliq')?.value)||0;
+  const comp=parseFloat(document.getElementById('tp_comp')?.value)||0;
+  const fat=parseFloat(document.getElementById('tp_fat')?.value)||0;
+  const reun=parseFloat(document.getElementById('tp_reun')?.value)||0;
+
+  document.getElementById('tp-verba').textContent=v?'R$ '+v.toLocaleString('pt-BR'):'R$ —';
+  document.getElementById('tp-comp').textContent=comp||'—';
+  document.getElementById('tp-roas').textContent=v&&fat?(fat/v).toFixed(1)+'x':'—';
+  document.getElementById('tp-reun').textContent=reun||'—';
+  document.getElementById('tp-cpm').textContent=v&&imp?(v/imp*1000).toFixed(2):'—';
+  document.getElementById('tp-cpc').textContent=v&&cliq?(v/cliq).toFixed(2):'—';
+  document.getElementById('tp-cpb').textContent=v&&comp?(v/comp).toFixed(2):'—';
+  document.getElementById('tp-roas-calc').textContent=v&&fat?(fat/v).toFixed(2)+'x':'—';
+}
+</script>
+</body>
+</html>
