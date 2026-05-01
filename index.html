@@ -262,45 +262,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
 
 button{font-family:var(--font)}
-
-/* ── LOGIN OVERLAY ── */
-#loginOverlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
-#loginOverlay.hidden{display:none}
-.login-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px 36px;width:100%;max-width:360px;display:flex;flex-direction:column;gap:20px}
-.login-logo{font-family:var(--display);font-size:20px;font-weight:700;color:var(--g4);text-align:center;letter-spacing:-.01em}
-.login-logo span{color:var(--text3);font-weight:400}
-.login-title{font-size:13px;color:var(--text2);text-align:center;margin-top:-8px}
-.login-field{display:flex;flex-direction:column;gap:6px}
-.login-field label{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
-.login-input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border .15s}
-.login-input:focus{border-color:var(--g3)}
-.login-btn{background:var(--g2);color:#fff;border:none;border-radius:var(--radius-sm);padding:11px;font-family:var(--display);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;letter-spacing:.01em}
-.login-btn:hover{background:var(--g3)}
-.login-btn:disabled{background:var(--surface3);color:var(--text3);cursor:not-allowed}
-.login-error{font-size:12px;color:var(--coral);text-align:center;min-height:16px}
-.logout-btn{font-family:var(--font);font-size:11px;font-weight:500;color:var(--text3);background:none;border:1px solid var(--border2);padding:5px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;letter-spacing:.01em}
-.logout-btn:hover{color:var(--coral);border-color:var(--coral)}
 </style>
 </head>
 <body>
-
-<!-- LOGIN OVERLAY -->
-<div id="loginOverlay">
-  <div class="login-card">
-    <div class="login-logo">JS<span>/</span>Sistema</div>
-    <div class="login-title">Acesso restrito — faça login para continuar</div>
-    <div class="login-field">
-      <label>E-mail</label>
-      <input class="login-input" id="loginEmail" type="email" placeholder="seu@email.com" autocomplete="email">
-    </div>
-    <div class="login-field">
-      <label>Senha</label>
-      <input class="login-input" id="loginPassword" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-    </div>
-    <div class="login-error" id="loginError"></div>
-    <button class="login-btn" id="loginBtn" onclick="doLogin()">Entrar</button>
-  </div>
-</div>
 
 <!-- TOP BAR -->
 <div class="topbar">
@@ -316,7 +280,6 @@ button{font-family:var(--font)}
   </nav>
   <div class="topbar-right">
     <span class="save-indicator" id="saveIndicator">✓ salvo</span>
-    <button class="logout-btn" onclick="doLogout()">Sair</button>
   </div>
 </div>
 
@@ -475,17 +438,21 @@ button{font-family:var(--font)}
 <!-- ═══════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-registro">
 
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:12px">
     <div>
       <p class="page-title">Registro Diário</p>
-      <p class="page-sub">Preencha os dados de cada canal ao final do dia</p>
+      <p class="page-sub">Navegue por qualquer dia — passado ou presente — edite e salve</p>
     </div>
     <div class="date-nav">
-      <button class="btn-nav" onclick="changeDay(-1)">← Dia anterior</button>
+      <button class="btn-nav" onclick="changeDay(-1)">← Anterior</button>
       <input type="date" id="regDate" onchange="loadDay()">
-      <button class="btn-nav" onclick="changeDay(1)">Dia seguinte →</button>
+      <button class="btn-nav" onclick="changeDay(1)">Seguinte →</button>
+      <button class="btn-nav" onclick="goToday()">Hoje</button>
       <button class="btn-save" onclick="saveDay()">Salvar dia</button>
     </div>
+  </div>
+  <div id="editingBanner" style="display:none;background:rgba(233,168,76,.1);border:1px solid rgba(233,168,76,.25);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:14px;font-size:12px;color:var(--amber)">
+    ✏ Editando dia passado — clique em "Salvar dia" para gravar as alterações
   </div>
 
   <!-- Resumo do dia -->
@@ -495,6 +462,22 @@ button{font-family:var(--font)}
     <div class="ds-item"><div class="ds-val" id="ds-convites">0</div><div class="ds-lbl">Convites</div></div>
     <div class="ds-item"><div class="ds-val" id="ds-reunioes">0</div><div class="ds-lbl">Reuniões</div></div>
     <div class="ds-item"><div class="ds-val" id="ds-vendas">0</div><div class="ds-lbl">Vendas</div></div>
+  </div>
+
+  <!-- Seguidores do dia -->
+  <div class="canal-section" style="border-color:var(--g2)">
+    <div class="canal-header">
+      <div><div class="canal-title" style="color:var(--g4)">Seguidores do perfil</div><div class="canal-goal">Crescimento diário do Instagram</div></div>
+      <span class="badge badge-g">Instagram</span>
+    </div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Total de seguidores hoje</div><input class="field-input" type="number" id="seg_total" min="0" placeholder="ex: 27950" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Novos seguidores no dia</div><input class="field-input" type="number" id="seg_novos" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Seguidores perdidos no dia</div><input class="field-input" type="number" id="seg_perdidos" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label" style="color:var(--g4)">Saldo líquido</div>
+        <div class="field-input" id="seg_saldo" style="background:var(--surface3);cursor:default;color:var(--g4)">—</div>
+      </div>
+    </div>
   </div>
 
   <!-- BV Automático -->
@@ -525,6 +508,7 @@ button{font-family:var(--font)}
       <div class="field-group"><div class="field-label">Vendas curso</div><input class="field-input" type="number" id="pc_vcurso" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Valor mentoria (R$)</div><input class="field-input" type="number" id="pc_valor" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Valor curso (R$)</div><input class="field-input" type="number" id="pc_vcurso_val" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label" style="color:var(--g4)">Seguidores vindos do PC</div><input class="field-input" type="number" id="pc_seguidores" min="0" placeholder="ex: 3" oninput="updateSummary()"></div>
     </div>
   </div>
 
@@ -581,10 +565,27 @@ button{font-family:var(--font)}
     </div>
   </div>
 
+  <!-- Metas diárias -->
+  <div class="canal-section">
+    <div class="canal-header">
+      <div><div class="canal-title">Metas do dia</div><div class="canal-goal">Referência rápida — editável a qualquer hora</div></div>
+      <span class="badge badge-g">Metas</span>
+    </div>
+    <div class="canal-fields">
+      <div class="field-group"><div class="field-label">Meta abordagens/dia</div><input class="field-input" type="number" id="dmeta_abord" placeholder="ex: 50" oninput="saveDailyMetas()"></div>
+      <div class="field-group"><div class="field-label">Meta conversas/dia</div><input class="field-input" type="number" id="dmeta_conv" placeholder="ex: 20" oninput="saveDailyMetas()"></div>
+      <div class="field-group"><div class="field-label">Meta convites/dia</div><input class="field-input" type="number" id="dmeta_convites" placeholder="ex: 10" oninput="saveDailyMetas()"></div>
+      <div class="field-group"><div class="field-label">Meta reuniões/dia</div><input class="field-input" type="number" id="dmeta_reunioes" placeholder="ex: 3" oninput="saveDailyMetas()"></div>
+      <div class="field-group"><div class="field-label">Meta vendas/mês</div><input class="field-input" type="number" id="dmeta_vendas" placeholder="ex: 5" oninput="saveDailyMetas()"></div>
+      <div class="field-group"><div class="field-label">Meta fat. mensal (R$)</div><input class="field-input" type="number" id="dmeta_fat" placeholder="ex: 15000" oninput="saveDailyMetas()"></div>
+    </div>
+    <div id="metaProgressBar" style="padding:0 20px 14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px"></div>
+  </div>
+
   <!-- Observações -->
   <div class="canal-section">
     <div class="canal-header"><div><div class="canal-title">Observações do dia</div></div></div>
-    <div style="padding:16px 20px"><textarea class="obs-field" id="obs_dia" placeholder="O que funcionou? O que travar? Ajustes para amanhã..."></textarea></div>
+    <div style="padding:16px 20px"><textarea class="obs-field" id="obs_dia" placeholder="O que funcionou? O que travou? Ajustes para amanhã..."></textarea></div>
   </div>
 
 </div>
@@ -675,12 +676,12 @@ button{font-family:var(--font)}
     </table>
   </div>
   <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:8px">
-    <div class="field-group"><div class="field-label">Abordagens</div><input class="field-input" type="number" id="meta_abord" placeholder="ex: 600" oninput="saveMetas();renderMensal()"></div>
-    <div class="field-group"><div class="field-label">Reuniões</div><input class="field-input" type="number" id="meta_reun" placeholder="ex: 30" oninput="saveMetas();renderMensal()"></div>
-    <div class="field-group"><div class="field-label">Vendas ment. (qtd)</div><input class="field-input" type="number" id="meta_vendas" placeholder="ex: 5" oninput="saveMetas();renderMensal()"></div>
-    <div class="field-group"><div class="field-label">Fat. ment. (R$)</div><input class="field-input" type="number" id="meta_fat" placeholder="ex: 15000" oninput="saveMetas();renderMensal()"></div>
-    <div class="field-group"><div class="field-label">Vendas curso (qtd)</div><input class="field-input" type="number" id="meta_vcurso" placeholder="ex: 10" oninput="saveMetas();renderMensal()"></div>
-    <div class="field-group"><div class="field-label">Fat. curso (R$)</div><input class="field-input" type="number" id="meta_fcurso" placeholder="ex: 3000" oninput="saveMetas();renderMensal()"></div>
+    <div class="field-group"><div class="field-label">Abordagens</div><input class="field-input" type="number" id="meta_abord" placeholder="ex: 600" onchange="saveMetas()" oninput="saveMetas()"></div>
+    <div class="field-group"><div class="field-label">Reuniões</div><input class="field-input" type="number" id="meta_reun" placeholder="ex: 30" onchange="saveMetas()" oninput="saveMetas()"></div>
+    <div class="field-group"><div class="field-label">Vendas ment. (qtd)</div><input class="field-input" type="number" id="meta_vendas" placeholder="ex: 5" onchange="saveMetas()" oninput="saveMetas()"></div>
+    <div class="field-group"><div class="field-label">Fat. ment. (R$)</div><input class="field-input" type="number" id="meta_fat" placeholder="ex: 15000" onchange="saveMetas()" oninput="saveMetas()"></div>
+    <div class="field-group"><div class="field-label">Vendas curso (qtd)</div><input class="field-input" type="number" id="meta_vcurso" placeholder="ex: 10" onchange="saveMetas()" oninput="saveMetas()"></div>
+    <div class="field-group"><div class="field-label">Fat. curso (R$)</div><input class="field-input" type="number" id="meta_fcurso" placeholder="ex: 3000" onchange="saveMetas()" oninput="saveMetas()"></div>
   </div>
   <p style="font-size:11px;color:var(--text3);margin-bottom:20px">Preencha os valores-alvo acima. O sistema calcula % atingido e quanto falta automaticamente.</p>
 
@@ -961,8 +962,8 @@ const MONTHS_PT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','No
 // ══════════════════════════════════════════
 // REGISTRO DIÁRIO
 // ══════════════════════════════════════════
-const FIELDS=['bv_auto','bv_video','bv_form','bv_sdr','bv_convites','bv_reunioes','bv_vendas','bv_valor','bv_vcurso','bv_vcurso_val',
-  'pc_abord','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val',
+const FIELDS=['seg_total','seg_novos','seg_perdidos','bv_auto','bv_video','bv_form','bv_sdr','bv_convites','bv_reunioes','bv_vendas','bv_valor','bv_vcurso','bv_vcurso_val',
+  'pc_abord','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val','pc_seguidores',
   'st_inter','st_sdr','st_conv','st_convites','st_reunioes','st_vendas',
   'fu_retom','fu_resp','fu_convites','fu_reunioes','fu_vendas','fu_valor','fu_vcurso','fu_vcurso_val',
   're_abord','re_resp','re_convites','re_reunioes','re_vendas',
@@ -987,6 +988,12 @@ async function saveDay(){
 async function loadDay(){
   const date=document.getElementById('regDate').value;
   if(!date)return;
+  // Show editing banner for past days
+  const banner=document.getElementById('editingBanner');
+  if(banner){
+    const isToday=date===today();
+    banner.style.display=isToday?'none':'block';
+  }
   showLoading(true);
   try{
     const res=await apiGet({action:'get_day',date});
@@ -998,6 +1005,60 @@ async function loadDay(){
     updateSummary();
   }catch(e){showError('Erro ao carregar dados do dia.');}
   showLoading(false);
+  loadDailyMetas();
+}
+
+function goToday(){
+  document.getElementById('regDate').value=today();
+  loadDay();
+}
+
+function saveDailyMetas(){
+  const keys=['abord','conv','convites','reunioes','vendas','fat'];
+  const data={};
+  keys.forEach(k=>{
+    const el=document.getElementById('dmeta_'+k);
+    if(el)data[k]=el.value||'';
+  });
+  localStorage.setItem('daily_metas',JSON.stringify(data));
+  updateMetaProgress();
+}
+
+function loadDailyMetas(){
+  const saved=JSON.parse(localStorage.getItem('daily_metas')||'{}');
+  ['abord','conv','convites','reunioes','vendas','fat'].forEach(k=>{
+    const el=document.getElementById('dmeta_'+k);
+    if(el)el.value=saved[k]||'';
+  });
+  updateMetaProgress();
+}
+
+function updateMetaProgress(){
+  const box=document.getElementById('metaProgressBar');
+  if(!box)return;
+  const mAbord=parseInt(document.getElementById('dmeta_abord')?.value)||0;
+  const mConv=parseInt(document.getElementById('dmeta_conv')?.value)||0;
+  const mConvites=parseInt(document.getElementById('dmeta_convites')?.value)||0;
+  const mReun=parseInt(document.getElementById('dmeta_reunioes')?.value)||0;
+  const rAbord=parseInt(document.getElementById('ds-abord')?.textContent)||0;
+  const rConv=parseInt(document.getElementById('ds-conv')?.textContent)||0;
+  const rConvites=parseInt(document.getElementById('ds-convites')?.textContent)||0;
+  const rReun=parseInt(document.getElementById('ds-reunioes')?.textContent)||0;
+  function bar(label,meta,real){
+    if(!meta)return'';
+    const pct=Math.min(Math.round(real/meta*100),100);
+    const color=pct>=100?'var(--g4)':pct>=50?'var(--amber)':'var(--coral)';
+    return`<div style="background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+        <span style="font-size:11px;color:var(--text3)">${label}</span>
+        <span style="font-size:11px;font-weight:500;color:${color}">${real}/${meta}</span>
+      </div>
+      <div style="height:4px;background:var(--border2);border-radius:2px">
+        <div style="height:4px;width:${pct}%;background:${color};border-radius:2px;transition:width .3s"></div>
+      </div>
+    </div>`;
+  }
+  box.innerHTML=bar('Abordagens',mAbord,rAbord)+bar('Conversas',mConv,rConv)+bar('Convites',mConvites,rConvites)+bar('Reuniões',mReun,rReun);
 }
 
 function changeDay(delta){
@@ -1021,6 +1082,16 @@ function updateSummary(){
   document.getElementById('ds-convites').textContent=convites;
   document.getElementById('ds-reunioes').textContent=reunioes;
   document.getElementById('ds-vendas').textContent=vendas;
+  // Seguidores saldo
+  const segNovos=getNum('seg_novos');
+  const segPerdidos=getNum('seg_perdidos');
+  const saldo=segNovos-segPerdidos;
+  const saldoEl=document.getElementById('seg_saldo');
+  if(saldoEl){
+    saldoEl.textContent=saldo===0?'—':(saldo>0?'+':'')+saldo;
+    saldoEl.style.color=saldo>0?'var(--g4)':saldo<0?'var(--coral)':'var(--text3)';
+  }
+  updateMetaProgress();
 }
 
 function showSaved(){
@@ -1029,11 +1100,10 @@ function showSaved(){
   setTimeout(()=>el.classList.remove('show'),2000);
 }
 
-// Init registro — só roda após autenticação
-function initApp(){
-  document.getElementById('regDate').value=today();
-  loadDay();
-}
+// Init registro
+document.getElementById('regDate').value=today();
+loadDay();
+loadDailyMetas();
 
 // ══════════════════════════════════════════
 // API — COMUNICAÇÃO COM BANCO DE DADOS
@@ -1357,7 +1427,35 @@ async function saveMetas(){
   try{
     await apiPost('save_metas',{ano:currentYear,mes:m,dados});
     showSaved();
+    // Refresh table after short delay to not interrupt typing
+    clearTimeout(window._metasTimer);
+    window._metasTimer=setTimeout(()=>renderMetasTable(),800);
   }catch(e){showError('Erro ao salvar metas.');}
+}
+
+async function renderMetasTable(){
+  // Only re-render the metas table, not the entire dashboard
+  const m=currentMonth;
+  let metasData={};
+  try{const mr=await apiGet({action:'get_metas',ano:currentYear,mes:m});metasData=mr.dados||{};}catch(e){}
+  const allDays=await getAllDaysAsync(currentYear);
+  const monthDays=allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===currentMonth;});
+  const agg=aggregateDays(monthDays);
+  const metaAbord=parseFloat(metasData.abord)||0;
+  const metaReun=parseFloat(metasData.reun)||0;
+  const metaVend=parseFloat(metasData.vendas)||0;
+  const metaFat=parseFloat(metasData.fat)||0;
+  const metaVC=parseFloat(metasData.vcurso)||0;
+  const metaFC=parseFloat(metasData.fcurso)||0;
+  function metaRow(label,meta,real,isMoney){
+    if(!meta)return`<tr><td>${label}</td><td style="color:var(--text3)">—</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>`;
+    const pct_val=meta?Math.round(real/meta*100):0;
+    const falta=meta-real;
+    const color=pct_val>=100?'var(--g4)':pct_val>=50?'var(--amber)':'var(--coral)';
+    return`<tr><td>${label}</td><td>${isMoney?'R$ '+meta.toLocaleString('pt-BR'):meta}</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="font-weight:600;color:${color}">${pct_val}%</td><td style="color:${falta<=0?'var(--g4)':'var(--text2)'}">${falta<=0?'✓ atingido':(isMoney?'R$ '+falta.toLocaleString('pt-BR'):falta)}</td></tr>`;
+  }
+  const tbody=document.getElementById('metasTableBody');
+  if(tbody)tbody.innerHTML=metaRow('Abordagens',metaAbord,agg.abord,false)+metaRow('Reuniões',metaReun,agg.reunioes,false)+metaRow('Vendas mentoria',metaVend,agg.vendas,false)+metaRow('Fat. mentoria',metaFat,agg.valor||0,true)+metaRow('Vendas curso',metaVC,agg.vcurso||0,false)+metaRow('Fat. curso',metaFC,agg.vcurso_val||0,true);
 }
 
 // ══════════════════════════════════════════
@@ -1447,63 +1545,6 @@ function updateTpCalc(){
   document.getElementById('tp-cpb').textContent=v&&comp?(v/comp).toFixed(2):'—';
   document.getElementById('tp-roas-calc').textContent=v&&fat?(fat/v).toFixed(2)+'x':'—';
 }
-
-// ══════════════════════════════════════════
-// AUTENTICAÇÃO — SUPABASE AUTH
-// ══════════════════════════════════════════
-const AUTH_KEY='js_sistema_token';
-const AUTH_EXPIRY='js_sistema_expiry';
-
-function checkAuth(){
-  const token=localStorage.getItem(AUTH_KEY);
-  const expiry=localStorage.getItem(AUTH_EXPIRY);
-  if(token && expiry && Date.now() < parseInt(expiry)){
-    document.getElementById('loginOverlay').classList.add('hidden');
-    initApp();
-  }
-}
-
-async function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const password=document.getElementById('loginPassword').value;
-  const btn=document.getElementById('loginBtn');
-  const errEl=document.getElementById('loginError');
-  errEl.textContent='';
-  if(!email||!password){errEl.textContent='Preencha e-mail e senha.';return;}
-  btn.disabled=true;
-  btn.textContent='Entrando…';
-  try{
-    const r=await fetch(SUPA_URL+'/auth/v1/token?grant_type=password',{
-      method:'POST',
-      headers:{'apikey':SUPA_KEY,'Content-Type':'application/json'},
-      body:JSON.stringify({email,password})
-    });
-    const data=await r.json();
-    if(!r.ok||!data.access_token){
-      errEl.textContent='E-mail ou senha incorretos.';
-      btn.disabled=false;btn.textContent='Entrar';return;
-    }
-    const expiry=Date.now()+(data.expires_in||3600)*1000;
-    localStorage.setItem(AUTH_KEY,data.access_token);
-    localStorage.setItem(AUTH_EXPIRY,String(expiry));
-    document.getElementById('loginOverlay').classList.add('hidden');
-    initApp();
-  }catch(e){
-    errEl.textContent='Erro de conexão. Tente novamente.';
-    btn.disabled=false;btn.textContent='Entrar';
-  }
-}
-
-function doLogout(){
-  localStorage.removeItem(AUTH_KEY);
-  localStorage.removeItem(AUTH_EXPIRY);
-  document.getElementById('loginOverlay').classList.remove('hidden');
-  document.getElementById('loginEmail').value='';
-  document.getElementById('loginPassword').value='';
-}
-
-// Verificar autenticação ao carregar a página
-checkAuth();
 </script>
 </body>
 </html>
