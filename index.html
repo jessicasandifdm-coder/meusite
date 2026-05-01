@@ -262,11 +262,44 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
 
 button{font-family:var(--font)}
+
+/* ── LOGIN ── */
+.login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:0}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:40px 36px;width:100%;max-width:380px}
+.login-logo{font-family:var(--display);font-size:22px;font-weight:700;color:var(--g4);margin-bottom:6px}
+.login-sub{font-size:12px;color:var(--text3);margin-bottom:28px}
+.login-field{display:flex;flex-direction:column;gap:5px;margin-bottom:16px}
+.login-label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.login-input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:14px;padding:10px 12px;width:100%;transition:border-color .15s}
+.login-input:focus{outline:none;border-color:var(--g3)}
+.login-btn{width:100%;background:var(--g2);border:none;border-radius:var(--radius-sm);color:white;font-family:var(--display);font-size:14px;font-weight:600;padding:12px;cursor:pointer;margin-top:8px;transition:background .15s}
+.login-btn:hover{background:var(--g3)}
+.login-error{font-size:12px;color:var(--coral);margin-top:8px;display:none;text-align:center}
+
 </style>
 </head>
 <body>
 
 <!-- TOP BAR -->
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">JS/Sistema</div>
+    <div class="login-sub">Sistema Operacional — JS Mentoria</div>
+    <div class="login-field">
+      <div class="login-label">E-mail</div>
+      <input class="login-input" type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="login-field">
+      <div class="login-label">Senha</div>
+      <input class="login-input" type="password" id="loginSenha" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Entrar</button>
+    <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
+  </div>
+</div>
+
 <div class="topbar">
   <div class="logo">JS<span>/</span>Sistema</div>
   <nav class="nav">
@@ -1545,6 +1578,39 @@ function updateTpCalc(){
   document.getElementById('tp-cpb').textContent=v&&comp?(v/comp).toFixed(2):'—';
   document.getElementById('tp-roas-calc').textContent=v&&fat?(fat/v).toFixed(2)+'x':'—';
 }
+
+// ══════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════
+const USERS = [
+  { email: 'jessicasandifdm@gmail.com', senha: 'Jesa2011@', nome: 'Jéssica' }
+];
+
+function checkSession(){
+  const s = sessionStorage.getItem('js_logged');
+  if(s === 'true'){
+    document.getElementById('loginOverlay').style.display = 'none';
+  }
+}
+
+function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const senha = document.getElementById('loginSenha').value;
+  const errEl = document.getElementById('loginError');
+  const user = USERS.find(u => u.email === email && u.senha === senha);
+  if(user){
+    sessionStorage.setItem('js_logged','true');
+    document.getElementById('loginOverlay').style.display='none';
+    errEl.style.display='none';
+  } else {
+    errEl.style.display='block';
+    document.getElementById('loginSenha').value='';
+    document.getElementById('loginSenha').focus();
+  }
+}
+
+checkSession();
+
 </script>
 </body>
 </html>
