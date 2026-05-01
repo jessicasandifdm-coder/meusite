@@ -1155,10 +1155,15 @@ async function supaGet(table, filters={}){
 }
 
 async function supaUpsert(table, data){
-  const r=await fetch(SUPA_URL+'/rest/v1/'+table,{
+  // Determine conflict column based on table
+  let onConflict='data_reg';
+  if(table==='metas_mensais'||table==='trafego_pago') onConflict='ano,mes';
+  const url=SUPA_URL+'/rest/v1/'+table+'?on_conflict='+onConflict;
+  const r=await fetch(url,{
     method:'POST',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,
-      'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},
+      'Content-Type':'application/json',
+      'Prefer':'resolution=merge-duplicates,return=minimal'},
     body:JSON.stringify(data)
   });
   if(!r.ok){const t=await r.text();throw new Error('HTTP '+r.status+': '+t);}
