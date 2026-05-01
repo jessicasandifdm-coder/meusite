@@ -708,15 +708,21 @@ button{font-family:var(--font)}
       <tbody id="metasTableBody"></tbody>
     </table>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:8px">
-    <div class="field-group"><div class="field-label">Abordagens</div><input class="field-input" type="number" id="meta_abord" placeholder="ex: 600" onchange="saveMetas()" oninput="saveMetas()"></div>
-    <div class="field-group"><div class="field-label">Reuniões</div><input class="field-input" type="number" id="meta_reun" placeholder="ex: 30" onchange="saveMetas()" oninput="saveMetas()"></div>
-    <div class="field-group"><div class="field-label">Vendas ment. (qtd)</div><input class="field-input" type="number" id="meta_vendas" placeholder="ex: 5" onchange="saveMetas()" oninput="saveMetas()"></div>
-    <div class="field-group"><div class="field-label">Fat. ment. (R$)</div><input class="field-input" type="number" id="meta_fat" placeholder="ex: 15000" onchange="saveMetas()" oninput="saveMetas()"></div>
-    <div class="field-group"><div class="field-label">Vendas curso (qtd)</div><input class="field-input" type="number" id="meta_vcurso" placeholder="ex: 10" onchange="saveMetas()" oninput="saveMetas()"></div>
-    <div class="field-group"><div class="field-label">Fat. curso (R$)</div><input class="field-input" type="number" id="meta_fcurso" placeholder="ex: 3000" onchange="saveMetas()" oninput="saveMetas()"></div>
+  <div id="metasForm" style="background:var(--surface2);border-radius:var(--radius);padding:16px 20px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+      <div class="field-group"><div class="field-label">Abordagens/mês</div><input class="field-input" type="number" id="meta_abord" placeholder="ex: 600"></div>
+      <div class="field-group"><div class="field-label">Reuniões/mês</div><input class="field-input" type="number" id="meta_reun" placeholder="ex: 30"></div>
+      <div class="field-group"><div class="field-label">Vendas mentoria (qtd)</div><input class="field-input" type="number" id="meta_vendas" placeholder="ex: 5"></div>
+      <div class="field-group"><div class="field-label">Fat. mentoria (R$)</div><input class="field-input" type="number" id="meta_fat" placeholder="ex: 15000"></div>
+      <div class="field-group"><div class="field-label">Vendas curso (qtd)</div><input class="field-input" type="number" id="meta_vcurso" placeholder="ex: 10"></div>
+      <div class="field-group"><div class="field-label">Fat. curso (R$)</div><input class="field-input" type="number" id="meta_fcurso" placeholder="ex: 3000"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn-save" onclick="saveMetas()" id="btnSalvarMetas">Salvar metas</button>
+      <span id="metasSaveStatus" style="font-size:12px;color:var(--text3);display:none"></span>
+    </div>
   </div>
-  <p style="font-size:11px;color:var(--text3);margin-bottom:20px">Preencha os valores-alvo acima. O sistema calcula % atingido e quanto falta automaticamente.</p>
+  <p style="font-size:11px;color:var(--text3);margin-bottom:20px">Defina as metas do mês. Após salvar, os campos ficam bloqueados — clique em "Editar metas" para alterar.</p>
 
 </div>
 
@@ -1462,13 +1468,47 @@ async function saveMetas(){
     const el=document.getElementById('meta_'+k);
     if(el)dados[k]=el.value||'';
   });
+  const btn=document.getElementById('btnSalvarMetas');
+  const status=document.getElementById('metasSaveStatus');
+  if(btn){btn.textContent='Salvando...';btn.disabled=true;}
   try{
     await apiPost('save_metas',{ano:currentYear,mes:m,dados});
+    // Lock fields after save
+    lockMetasFields(true);
+    if(btn){btn.textContent='Editar metas';btn.disabled=false;btn.onclick=()=>lockMetasFields(false);}
+    if(status){status.textContent='✓ Metas salvas';status.style.color='var(--g4)';status.style.display='inline';}
+    setTimeout(()=>{if(status)status.style.display='none';},3000);
     showSaved();
-    // Refresh table after short delay to not interrupt typing
-    clearTimeout(window._metasTimer);
-    window._metasTimer=setTimeout(()=>renderMetasTable(),800);
-  }catch(e){showError('Erro ao salvar metas.');}
+    setTimeout(()=>renderMetasTable(),300);
+  }catch(e){
+    if(btn){btn.textContent='Salvar metas';btn.disabled=false;}
+    showError('Erro ao salvar metas.');
+  }
+}
+
+function lockMetasFields(locked){
+  ['abord','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
+    const el=document.getElementById('meta_'+k);
+    if(el){
+      el.readOnly=locked;
+      el.style.opacity=locked?'0.6':'1';
+      el.style.cursor=locked?'not-allowed':'text';
+    }
+  });
+  const btn=document.getElementById('btnSalvarMetas');
+  if(btn){
+    if(locked){
+      btn.textContent='Editar metas';
+      btn.onclick=()=>lockMetasFields(false);
+      btn.style.background='var(--surface3)';
+      btn.style.color='var(--text2)';
+    } else {
+      btn.textContent='Salvar metas';
+      btn.onclick=()=>saveMetas();
+      btn.style.background='';
+      btn.style.color='';
+    }
+  }
 }
 
 async function renderMetasTable(){
@@ -1485,6 +1525,10 @@ async function renderMetasTable(){
   const metaFat=parseFloat(metasData.fat)||0;
   const metaVC=parseFloat(metasData.vcurso)||0;
   const metaFC=parseFloat(metasData.fcurso)||0;
+  // Lock fields if metas already saved
+  const hasSavedMetas=metaAbord||metaReun||metaVend||metaFat;
+  if(hasSavedMetas) lockMetasFields(true);
+  else lockMetasFields(false);
   function metaRow(label,meta,real,isMoney){
     if(!meta)return`<tr><td>${label}</td><td style="color:var(--text3)">—</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>`;
     const pct_val=meta?Math.round(real/meta*100):0;
