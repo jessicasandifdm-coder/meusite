@@ -977,9 +977,9 @@ function showTab(id){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   event.target.classList.add('active');
-  if(id==='mensal') renderMensal();
-  if(id==='anual') renderAnual();
-  if(id==='trafego') renderTrafego();
+  if(id==='mensal'){renderMensal();}
+  if(id==='anual'){renderAnual();}
+  if(id==='trafego'){renderTrafego();}
 }
 
 function toggleFunil(card){card.classList.toggle('open')}
@@ -1425,17 +1425,26 @@ async function renderMensal(){
 
   // ── METAS VS REAL ──
   const m=currentMonth;
-  const metaKeys=['abord','reun','vendas','fat','vcurso','fcurso'];
-  metaKeys.forEach(k=>{
+  let metasData={};
+  try{
+    const mr=await apiGet({action:'get_metas',ano:currentYear,mes:m});
+    metasData=mr.dados||{};
+  }catch(e){console.error('Erro ao carregar metas:',e);}
+  // Preenche os campos com os valores salvos
+  ['abord','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
     const el=document.getElementById('meta_'+k);
-    if(el)el.value=localStorage.getItem('meta_'+k+'_'+m)||'';
+    if(el)el.value=metasData[k]||'';
   });
-  const metaAbord=parseInt(localStorage.getItem('meta_abord_'+m))||0;
-  const metaReun=parseInt(localStorage.getItem('meta_reun_'+m))||0;
-  const metaVend=parseInt(localStorage.getItem('meta_vendas_'+m))||0;
-  const metaFat=parseFloat(localStorage.getItem('meta_fat_'+m))||0;
-  const metaVC=parseInt(localStorage.getItem('meta_vcurso_'+m))||0;
-  const metaFC=parseFloat(localStorage.getItem('meta_fcurso_'+m))||0;
+  // Bloqueia campos se já tem metas salvas
+  const metaAbord=parseFloat(metasData.abord)||0;
+  const metaReun=parseFloat(metasData.reun)||0;
+  const metaVend=parseFloat(metasData.vendas)||0;
+  const metaFat=parseFloat(metasData.fat)||0;
+  const metaVC=parseFloat(metasData.vcurso)||0;
+  const metaFC=parseFloat(metasData.fcurso)||0;
+  const hasSavedMetas=metaAbord||metaReun||metaVend||metaFat;
+  if(hasSavedMetas)lockMetasFields(true);
+  else lockMetasFields(false);
   const realFat=agg.valor||0;
   const realFC=agg.vcurso_val||0;
 
@@ -1512,10 +1521,17 @@ function lockMetasFields(locked){
 }
 
 async function renderMetasTable(){
-  // Only re-render the metas table, not the entire dashboard
   const m=currentMonth;
   let metasData={};
-  try{const mr=await apiGet({action:'get_metas',ano:currentYear,mes:m});metasData=mr.dados||{};}catch(e){}
+  try{
+    const mr=await apiGet({action:'get_metas',ano:currentYear,mes:m});
+    metasData=mr.dados||{};
+    // Populate input fields with saved values
+    ['abord','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
+      const el=document.getElementById('meta_'+k);
+      if(el&&metasData[k])el.value=metasData[k];
+    });
+  }catch(e){console.error('Erro ao carregar metas:',e);}
   const allDays=await getAllDaysAsync(currentYear);
   const monthDays=allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===currentMonth;});
   const agg=aggregateDays(monthDays);
