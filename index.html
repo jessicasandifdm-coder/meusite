@@ -522,6 +522,7 @@ button{font-family:var(--font)}
       <div class="field-group"><div class="field-label">Preencheram form.</div><input class="field-input" type="number" id="bv_form" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="bv_sdr" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="bv_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="bv_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="bv_reunioes" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="bv_vendas" min="0" oninput="updateSummary()"></div>
     </div>
@@ -553,6 +554,7 @@ button{font-family:var(--font)}
       <div class="field-group"><div class="field-label">SDR/JS contactou</div><input class="field-input" type="number" id="st_sdr" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Conv. iniciadas</div><input class="field-input" type="number" id="st_conv" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="st_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="st_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="st_reunioes" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="st_vendas" min="0" oninput="updateSummary()"></div>
     </div>
@@ -565,6 +567,7 @@ button{font-family:var(--font)}
       <div class="field-group"><div class="field-label">Retomadas</div><input class="field-input" type="number" id="fu_retom" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="fu_resp" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="fu_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="fu_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="fu_reunioes" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="fu_vendas" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Valor ment. (R$)</div><input class="field-input" type="number" id="fu_valor" min="0"></div>
@@ -580,8 +583,10 @@ button{font-family:var(--font)}
       <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="re_abord" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="re_resp" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="re_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="re_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="re_reunioes" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="re_vendas" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Valor mentoria (R$)</div><input class="field-input" type="number" id="re_valor" min="0"></div>
     </div>
   </div>
 
@@ -593,6 +598,7 @@ button{font-family:var(--font)}
       <div class="field-group"><div class="field-label">Iscas entregues</div><input class="field-input" type="number" id="is_entregues" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="is_sdr" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="is_convites" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="is_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="is_reunioes" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="is_vendas" min="0" oninput="updateSummary()"></div>
     </div>
@@ -634,11 +640,15 @@ button{font-family:var(--font)}
   </div>
 
   <!-- KPIs topo -->
-  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
     <div class="kpi-card"><div class="kpi-val" id="kpi-abord">—</div><div class="kpi-lbl">Abordagens</div></div>
     <div class="kpi-card"><div class="kpi-val" id="kpi-resp">—</div><div class="kpi-lbl">Respostas</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="kpi-conv">—</div><div class="kpi-lbl">Convites</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="kpi-reun">—</div><div class="kpi-lbl">Reuniões</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-conv">—</div><div class="kpi-lbl">Convites p/ reunião</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-agend">—</div><div class="kpi-lbl">Reuniões agendadas</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+    <div class="kpi-card"><div class="kpi-val" id="kpi-reun">—</div><div class="kpi-lbl">Reuniões realizadas</div></div>
+    <div class="kpi-card" style="border-color:var(--coral-dim);background:rgba(224,112,112,.06)"><div class="kpi-val" style="color:var(--coral)" id="kpi-noshow">—</div><div class="kpi-lbl">No-show<span id="kpi-noshow-pct" style="font-size:11px;font-weight:400;color:var(--text3);display:block"></span></div></div>
     <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="kpi-vendas">—</div><div class="kpi-lbl">Vendas ment.</div></div>
     <div class="kpi-card" style="border-color:var(--amber-dim);background:rgba(233,168,76,.06)"><div class="kpi-val" style="color:var(--amber)" id="kpi-vcurso">—</div><div class="kpi-lbl">Vendas curso</div></div>
   </div>
@@ -649,7 +659,9 @@ button{font-family:var(--font)}
     <div class="fr-body">
       <div class="fr-item"><div class="fr-pct" id="taxa-resp" style="color:var(--amber)">—</div><div class="fr-lbl">Taxa de resposta</div><div style="font-size:10px;color:var(--text3);margin-top:3px">resposta / abordagem</div></div>
       <div class="fr-item"><div class="fr-pct" id="taxa-convite" style="color:var(--teal)">—</div><div class="fr-lbl">Conv → Convite</div><div style="font-size:10px;color:var(--text3);margin-top:3px">convite / resposta</div></div>
-      <div class="fr-item"><div class="fr-pct" id="taxa-reun" style="color:var(--g4)">—</div><div class="fr-lbl">Convite → Reunião</div><div style="font-size:10px;color:var(--text3);margin-top:3px">reunião / convite</div></div>
+      <div class="fr-item"><div class="fr-pct" id="taxa-agend" style="color:var(--g4)">—</div><div class="fr-lbl">Convite → Agendamento</div><div style="font-size:10px;color:var(--text3);margin-top:3px">agendadas / convites</div></div>
+      <div class="fr-item"><div class="fr-pct" id="taxa-noshow" style="color:var(--coral)">—</div><div class="fr-lbl">No-show</div><div style="font-size:10px;color:var(--text3);margin-top:3px">não compareceram / agendadas</div></div>
+      <div class="fr-item"><div class="fr-pct" id="taxa-reun" style="color:var(--g4)">—</div><div class="fr-lbl">Agend. → Realizada</div><div style="font-size:10px;color:var(--text3);margin-top:3px">realizada / agendada</div></div>
       <div class="fr-item"><div class="fr-pct" id="taxa-fech" style="color:var(--purple)">—</div><div class="fr-lbl">Fechamento</div><div style="font-size:10px;color:var(--text3);margin-top:3px">venda ment. / reunião</div></div>
     </div>
   </div>
@@ -664,7 +676,9 @@ button{font-family:var(--font)}
           <th>Abordagens</th>
           <th>Respostas</th>
           <th>Convites</th>
-          <th>Reuniões</th>
+          <th>Agendadas</th>
+          <th>Realizadas</th>
+          <th>No-show</th>
           <th>V.Mentoria</th>
           <th>Fat.Ment (R$)</th>
           <th>V.Curso</th>
@@ -758,54 +772,103 @@ button{font-family:var(--font)}
 <!-- ═══════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-trafego">
 
-  <p class="page-title">Tráfego Pago</p>
-  <p class="page-sub">Alimentado por Jéssica · separado dos funis orgânicos</p>
-
-  <div class="tp-note">
-    <b style="color:var(--purple)">Objetivo:</b> o produto de baixo ticket paga o tráfego → a lista de compradores cresce → os qualificados viram mentoradas.<br>
-    CPM, CPC e ROAS são calculados automaticamente a partir dos dados que você preenche.
-  </div>
-
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-    <div class="period-tabs" id="tpMonthTabs"></div>
-    <button class="btn-save" onclick="saveTrafego()">Salvar</button>
-  </div>
-
-  <!-- KPIs tráfego -->
-  <div class="kpi-grid" style="margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="tp-verba" style="color:var(--coral)">R$ —</div><div class="kpi-lbl">Verba investida</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="tp-comp">—</div><div class="kpi-lbl">Compradores</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="tp-roas" style="color:var(--g4)">—</div><div class="kpi-lbl">ROAS</div></div>
-    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.1)"><div class="kpi-val" style="color:var(--g4)" id="tp-reun">—</div><div class="kpi-lbl">Reuniões geradas</div></div>
-  </div>
-
-  <!-- Registro mensal tráfego -->
-  <div class="tp-section">
-    <div class="tp-head"><div class="tp-title" id="tpMonthTitle">Mês atual</div></div>
-    <div class="tp-fields">
-      <div class="field-group"><div class="field-label" style="color:var(--purple)">Verba gasta (R$)</div><input class="field-input" type="number" id="tp_verba" min="0" oninput="updateTpCalc()"></div>
-      <div class="field-group"><div class="field-label">Impressões</div><input class="field-input" type="number" id="tp_imp" min="0" oninput="updateTpCalc()"></div>
-      <div class="field-group"><div class="field-label">Cliques</div><input class="field-input" type="number" id="tp_cliq" min="0" oninput="updateTpCalc()"></div>
-      <div class="field-group"><div class="field-label">Compradores produto</div><input class="field-input" type="number" id="tp_comp" min="0" oninput="updateTpCalc()"></div>
-      <div class="field-group"><div class="field-label">Fat. produto (R$)</div><input class="field-input" type="number" id="tp_fat" min="0" oninput="updateTpCalc()"></div>
-      <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="tp_sdr" min="0"></div>
-      <div class="field-group"><div class="field-label">Qualificados</div><input class="field-input" type="number" id="tp_qual" min="0"></div>
-      <div class="field-group"><div class="field-label">Reuniões geradas</div><input class="field-input" type="number" id="tp_reun" min="0" oninput="updateTpCalc()"></div>
-      <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="tp_vend" min="0"></div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <p class="page-title">Tráfego Pago</p>
+      <p class="page-sub">Gerencie campanhas · atualize diariamente · resumo mensal automático</p>
     </div>
-    <div style="padding:0 20px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
-      <div class="tp-auto"><div class="tp-auto-val" id="tp-cpm">—</div><div class="tp-auto-lbl">CPM (R$)</div></div>
-      <div class="tp-auto"><div class="tp-auto-val" id="tp-cpc">—</div><div class="tp-auto-lbl">CPC (R$)</div></div>
-      <div class="tp-auto"><div class="tp-auto-val" id="tp-cpb">—</div><div class="tp-auto-lbl">Custo/comprador (R$)</div></div>
-      <div class="tp-auto"><div class="tp-auto-val" id="tp-roas-calc">—</div><div class="tp-auto-lbl">ROAS</div></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="period-tabs" id="tpMonthTabs"></div>
+      <button class="btn-save" onclick="showNovaCampanha()">+ Nova campanha</button>
     </div>
+  </div>
+
+  <!-- KPIs do mês -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px">
+    <div class="kpi-card"><div class="kpi-val" id="tp-total-verba" style="color:var(--coral)">R$ —</div><div class="kpi-lbl">Total investido</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-total-leads">—</div><div class="kpi-lbl">Total leads</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-total-reun">—</div><div class="kpi-lbl">Reuniões geradas</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-total-vendas">—</div><div class="kpi-lbl">Vendas totais</div></div>
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="tp-total-roas">—</div><div class="kpi-lbl">ROAS geral</div></div>
+  </div>
+
+  <!-- Modal nova campanha -->
+  <div id="modalCampanha" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div style="font-family:var(--display);font-size:16px;font-weight:600;color:var(--text)" id="modalTitle">Nova campanha</div>
+        <button onclick="fecharModal()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <input type="hidden" id="camp_id">
+        <div class="field-group"><div class="field-label">Nome da campanha</div><input class="field-input" type="text" id="camp_nome" placeholder="ex: WhatsApp — Vídeo 1"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field-group"><div class="field-label">Tipo de criativo</div>
+            <select class="field-input" id="camp_criativo" style="cursor:pointer">
+              <option value="video">Vídeo</option>
+              <option value="foto">Foto</option>
+              <option value="carrossel">Carrossel</option>
+              <option value="stories">Stories</option>
+              <option value="texto">Texto</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+          <div class="field-group"><div class="field-label">Objetivo</div>
+            <select class="field-input" id="camp_objetivo" style="cursor:pointer">
+              <option value="whatsapp">WhatsApp</option>
+              <option value="conversao">Conversão</option>
+              <option value="trafego">Tráfego</option>
+              <option value="leads">Leads</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field-group"><div class="field-label">Data início</div><input class="field-input" type="date" id="camp_inicio"></div>
+          <div class="field-group"><div class="field-label">Data fim (deixe vazio se ativa)</div><input class="field-input" type="date" id="camp_fim"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field-group"><div class="field-label">Orçamento diário (R$)</div><input class="field-input" type="number" id="camp_orcamento" placeholder="ex: 30"></div>
+          <div class="field-group"><div class="field-label">Total gasto até agora (R$)</div><input class="field-input" type="number" id="camp_gasto" placeholder="ex: 210"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field-group"><div class="field-label">Leads / conversas</div><input class="field-input" type="number" id="camp_leads" placeholder="ex: 15"></div>
+          <div class="field-group"><div class="field-label">Reuniões geradas</div><input class="field-input" type="number" id="camp_reunioes" placeholder="ex: 3"></div>
+        </div>
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border2)">
+          <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Vendas</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div class="field-group"><div class="field-label">Vendas diretas no WhatsApp (qtd)</div><input class="field-input" type="number" id="camp_venda_direta_qtd" placeholder="ex: 2"></div>
+            <div class="field-group"><div class="field-label">Valor vendas diretas (R$)</div><input class="field-input" type="number" id="camp_venda_direta_val" placeholder="ex: 497"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="field-group"><div class="field-label">Vendas via reunião (qtd)</div><input class="field-input" type="number" id="camp_venda_reun_qtd" placeholder="ex: 1"></div>
+            <div class="field-group"><div class="field-label">Valor vendas via reunião (R$)</div><input class="field-input" type="number" id="camp_venda_reun_val" placeholder="ex: 3500"></div>
+          </div>
+        </div>
+        <div class="field-group"><div class="field-label">Status</div>
+          <select class="field-input" id="camp_status" style="cursor:pointer">
+            <option value="ativa">Ativa</option>
+            <option value="pausada">Pausada</option>
+            <option value="encerrada">Encerrada</option>
+          </select>
+        </div>
+        <div class="field-group"><div class="field-label">Observações / atualizações</div><textarea class="obs-field" id="camp_obs" placeholder="ex: Dia 7 pausei o vídeo 2. Dia 10 encerrrei toda a campanha..." style="min-height:70px"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn-save" onclick="salvarCampanha()" style="flex:1">Salvar campanha</button>
+        <button id="btnExcluirCamp" onclick="excluirCampanha()" style="display:none;background:rgba(224,112,112,.15);border:1px solid var(--coral);border-radius:var(--radius-sm);color:var(--coral);font-size:13px;padding:8px 16px;cursor:pointer">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de campanhas -->
+  <div class="sh"><span class="sh-label">Campanhas do mês</span><div class="sh-line"></div></div>
+  <div id="listaCampanhas" style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+    <div class="empty-state">Nenhuma campanha criada ainda. Clique em "+ Nova campanha" para começar.</div>
   </div>
 
 </div>
 
-<!-- ═══════════════════════════════════════════════ -->
-<!-- SCRIPTS -->
-<!-- ═══════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-scripts">
 
   <p class="page-title">Scripts</p>
@@ -1001,12 +1064,12 @@ const MONTHS_PT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','No
 // ══════════════════════════════════════════
 // REGISTRO DIÁRIO
 // ══════════════════════════════════════════
-const FIELDS=['seg_total','seg_novos','seg_perdidos','bv_auto','bv_video','bv_form','bv_sdr','bv_convites','bv_reunioes','bv_vendas','bv_valor','bv_vcurso','bv_vcurso_val',
+const FIELDS=['seg_total','seg_novos','seg_perdidos','bv_auto','bv_video','bv_form','bv_sdr','bv_convites','bv_agend','bv_reunioes','bv_vendas','bv_valor','bv_vcurso','bv_vcurso_val',
   'pc_abord','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val','pc_seguidores',
-  'st_inter','st_sdr','st_conv','st_convites','st_reunioes','st_vendas',
-  'fu_retom','fu_resp','fu_convites','fu_reunioes','fu_vendas','fu_valor','fu_vcurso','fu_vcurso_val',
-  're_abord','re_resp','re_convites','re_reunioes','re_vendas',
-  'is_leads','is_entregues','is_sdr','is_convites','is_reunioes','is_vendas',
+  'st_inter','st_sdr','st_conv','st_convites','st_agend','st_reunioes','st_vendas',
+  'fu_retom','fu_resp','fu_convites','fu_agend','fu_reunioes','fu_vendas','fu_valor','fu_vcurso','fu_vcurso_val',
+  're_abord','re_resp','re_convites','re_agend','re_reunioes','re_vendas','re_valor',
+  'is_leads','is_entregues','is_sdr','is_convites','is_agend','is_reunioes','is_vendas',
   'obs_dia'];
 
 async function saveDay(){
@@ -1255,9 +1318,10 @@ function aggregateDays(days){
     resp: days.reduce((s,d)=>s+getN(d,'pc_resp')+getN(d,'re_resp')+getN(d,'fu_resp')+getN(d,'st_sdr'),0),
     conv: days.reduce((s,d)=>s+getN(d,'pc_conv')+getN(d,'st_conv')+getN(d,'bv_form'),0),
     convites: days.reduce((s,d)=>s+getN(d,'pc_convites')+getN(d,'st_convites')+getN(d,'bv_convites')+getN(d,'fu_convites')+getN(d,'re_convites')+getN(d,'is_convites'),0),
+    agendadas: days.reduce((s,d)=>s+getN(d,'pc_agend')+getN(d,'st_agend')+getN(d,'bv_agend')+getN(d,'fu_agend')+getN(d,'re_agend')+getN(d,'is_agend'),0),
     reunioes: days.reduce((s,d)=>s+getN(d,'pc_reunioes')+getN(d,'st_reunioes')+getN(d,'bv_reunioes')+getN(d,'fu_reunioes')+getN(d,'re_reunioes')+getN(d,'is_reunioes'),0),
     vendas: days.reduce((s,d)=>s+getN(d,'pc_vendas')+getN(d,'st_vendas')+getN(d,'bv_vendas')+getN(d,'fu_vendas')+getN(d,'re_vendas')+getN(d,'is_vendas'),0),
-    valor: days.reduce((s,d)=>s+getN(d,'pc_valor')+getN(d,'fu_valor'),0),
+    valor: days.reduce((s,d)=>s+getN(d,'pc_valor')+getN(d,'fu_valor')+getN(d,'re_valor'),0),
     vcurso: days.reduce((s,d)=>s+getN(d,'pc_vcurso')+getN(d,'bv_vcurso')+getN(d,'fu_vcurso'),0),
     vcurso_val: days.reduce((s,d)=>s+getN(d,'pc_vcurso_val')+getN(d,'bv_vcurso_val')+getN(d,'fu_vcurso_val'),0),
     // por canal
@@ -1265,7 +1329,7 @@ function aggregateDays(days){
     pc:{abord:days.reduce((s,d)=>s+getN(d,'pc_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'pc_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'pc_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'pc_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'pc_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'pc_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'pc_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'pc_vcurso'),0)},
     st:{inter:days.reduce((s,d)=>s+getN(d,'st_inter'),0),sdr:days.reduce((s,d)=>s+getN(d,'st_sdr'),0),conv:days.reduce((s,d)=>s+getN(d,'st_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'st_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'st_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'st_vendas'),0)},
     fu:{ret:days.reduce((s,d)=>s+getN(d,'fu_retom'),0),resp:days.reduce((s,d)=>s+getN(d,'fu_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'fu_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'fu_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'fu_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'fu_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'fu_vcurso'),0)},
-    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0)},
+    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),agend:days.reduce((s,d)=>s+getN(d,'re_agend'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'re_valor'),0)},
     is:{leads:days.reduce((s,d)=>s+getN(d,'is_leads'),0),sdr:days.reduce((s,d)=>s+getN(d,'is_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'is_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'is_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'is_vendas'),0)},
   };
 }
@@ -1302,14 +1366,23 @@ async function renderMensal(){
   document.getElementById('kpi-abord').textContent=agg.abord||0;
   document.getElementById('kpi-resp').textContent=agg.resp||0;
   document.getElementById('kpi-conv').textContent=agg.convites||0;
+  document.getElementById('kpi-agend').textContent=agg.agendadas||0;
   document.getElementById('kpi-reun').textContent=agg.reunioes||0;
+  const noshow=Math.max(0,(agg.agendadas||0)-(agg.reunioes||0));
+  const noshowPct=agg.agendadas>0?Math.round(noshow/agg.agendadas*100):0;
+  document.getElementById('kpi-noshow').textContent=noshow||0;
+  const nsPctEl=document.getElementById('kpi-noshow-pct');
+  if(nsPctEl)nsPctEl.textContent=agg.agendadas>0?noshowPct+'% das agendadas':'';
   document.getElementById('kpi-vendas').textContent=agg.vendas||0;
   document.getElementById('kpi-vcurso').textContent=agg.vcurso||0;
 
   // Taxas
   document.getElementById('taxa-resp').textContent=pct(agg.resp,agg.abord);
   document.getElementById('taxa-convite').textContent=pct(agg.convites,agg.resp);
-  document.getElementById('taxa-reun').textContent=pct(agg.reunioes,agg.convites);
+  document.getElementById('taxa-agend').textContent=pct(agg.agendadas||0,agg.convites);
+  const noshowTaxa=Math.max(0,(agg.agendadas||0)-(agg.reunioes||0));
+  document.getElementById('taxa-noshow').textContent=pct(noshowTaxa,agg.agendadas||0);
+  document.getElementById('taxa-reun').textContent=pct(agg.reunioes,agg.agendadas||agg.convites);
   document.getElementById('taxa-fech').textContent=pct(agg.vendas,agg.reunioes);
 
   // ── COMPARATIVO SEMANA A SEMANA ──
@@ -1337,7 +1410,9 @@ async function renderMensal(){
       <td>${sa.abord||0}</td>
       <td>${sa.resp||0}</td>
       <td>${sa.convites||0}</td>
+      <td>${sa.agendadas||0}</td>
       <td>${sa.reunioes||0}</td>
+      <td>${Math.max(0,(sa.agendadas||0)-(sa.reunioes||0))}</td>
       <td>${sa.vendas||0}</td>
       <td>${sa.valor?'R$ '+sa.valor.toLocaleString('pt-BR'):'R$ 0,00'}</td>
       <td>${sa.vcurso||0}</td>
@@ -1590,59 +1665,197 @@ async function renderAnual(){
 }
 
 // ══════════════════════════════════════════
-// TRÁFEGO PAGO
+// TRÁFEGO PAGO — CAMPANHAS
 // ══════════════════════════════════════════
 let tpMonth=new Date().getMonth();
+let tpYear=new Date().getFullYear();
+let campanhas=[];
+let editingCampId=null;
+
+function gerarId(){return 'c_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);}
 
 async function renderTrafego(){
+  // Month tabs
   const tabs=document.getElementById('tpMonthTabs');
-  tabs.innerHTML='';
-  MONTHS_PT.forEach((m,i)=>{
-    const btn=document.createElement('button');
-    btn.className='period-tab'+(i===tpMonth?' active':'');
-    btn.textContent=m;
-    btn.onclick=()=>{tpMonth=i;renderTrafego();};
-    tabs.appendChild(btn);
-  });
-  document.getElementById('tpMonthTitle').textContent=MONTHS_PT[tpMonth]+'/26 — Tráfego Pago';
-  let tpData={};
-  try{const tr=await apiGet({action:'get_trafego',ano:currentYear,mes:tpMonth});tpData=tr.dados||{};}catch(e){}
-  ['verba','imp','cliq','comp','fat','sdr','qual','reun','vend'].forEach(f=>{
-    const el=document.getElementById('tp_'+f);
-    if(el)el.value=tpData[f]||'';
-  });
-  updateTpCalc();
+  if(tabs){
+    tabs.innerHTML='';
+    MONTHS_PT.forEach((m,i)=>{
+      const btn=document.createElement('button');
+      btn.className='period-tab'+(i===tpMonth?' active':'');
+      btn.textContent=m;
+      btn.onclick=()=>{tpMonth=i;renderTrafego();};
+      tabs.appendChild(btn);
+    });
+  }
+  await carregarCampanhas();
+  renderListaCampanhas();
+  calcularKpisTrafego();
 }
 
-async function saveTrafego(){
-  const dados={};
-  ['verba','imp','cliq','comp','fat','sdr','qual','reun','vend'].forEach(f=>{
-    const el=document.getElementById('tp_'+f);
-    if(el)dados[f]=el.value||'';
-  });
+async function carregarCampanhas(){
   try{
-    await apiPost('save_trafego',{ano:currentYear,mes:tpMonth,dados});
+    const res=await apiGet({action:'get_trafego',ano:tpYear,mes:tpMonth});
+    campanhas=(res.dados&&res.dados.campanhas)||[];
+  }catch(e){
+    console.error('Erro ao carregar campanhas:',e);
+    campanhas=[];
+  }
+}
+
+async function persistirCampanhas(){
+  try{
+    await apiPost('save_trafego',{ano:tpYear,mes:tpMonth,dados:{campanhas}});
     showSaved();
-  }catch(e){showError('Erro ao salvar tráfego.');}
+  }catch(e){showError('Erro ao salvar campanha.');}
 }
 
-function updateTpCalc(){
-  const v=parseFloat(document.getElementById('tp_verba')?.value)||0;
-  const imp=parseFloat(document.getElementById('tp_imp')?.value)||0;
-  const cliq=parseFloat(document.getElementById('tp_cliq')?.value)||0;
-  const comp=parseFloat(document.getElementById('tp_comp')?.value)||0;
-  const fat=parseFloat(document.getElementById('tp_fat')?.value)||0;
-  const reun=parseFloat(document.getElementById('tp_reun')?.value)||0;
+function calcularKpisTrafego(){
+  const totalVerba=campanhas.reduce((s,c)=>s+(parseFloat(c.gasto)||0),0);
+  const totalLeads=campanhas.reduce((s,c)=>s+(parseInt(c.leads)||0),0);
+  const totalReun=campanhas.reduce((s,c)=>s+(parseInt(c.reunioes)||0),0);
+  const totalVendas=campanhas.reduce((s,c)=>s+(parseInt(c.venda_direta_qtd)||0)+(parseInt(c.venda_reun_qtd)||0),0);
+  const totalFat=campanhas.reduce((s,c)=>s+(parseFloat(c.venda_direta_val)||0)+(parseFloat(c.venda_reun_val)||0),0);
+  const roas=totalVerba>0?(totalFat/totalVerba).toFixed(2)+'x':'—';
 
-  document.getElementById('tp-verba').textContent=v?'R$ '+v.toLocaleString('pt-BR'):'R$ —';
-  document.getElementById('tp-comp').textContent=comp||'—';
-  document.getElementById('tp-roas').textContent=v&&fat?(fat/v).toFixed(1)+'x':'—';
-  document.getElementById('tp-reun').textContent=reun||'—';
-  document.getElementById('tp-cpm').textContent=v&&imp?(v/imp*1000).toFixed(2):'—';
-  document.getElementById('tp-cpc').textContent=v&&cliq?(v/cliq).toFixed(2):'—';
-  document.getElementById('tp-cpb').textContent=v&&comp?(v/comp).toFixed(2):'—';
-  document.getElementById('tp-roas-calc').textContent=v&&fat?(fat/v).toFixed(2)+'x':'—';
+  document.getElementById('tp-total-verba').textContent=totalVerba?'R$ '+totalVerba.toLocaleString('pt-BR'):'R$ —';
+  document.getElementById('tp-total-leads').textContent=totalLeads||'—';
+  document.getElementById('tp-total-reun').textContent=totalReun||'—';
+  document.getElementById('tp-total-vendas').textContent=totalVendas||'—';
+  document.getElementById('tp-total-roas').textContent=roas;
 }
+
+function renderListaCampanhas(){
+  const lista=document.getElementById('listaCampanhas');
+  if(!lista)return;
+  if(!campanhas.length){
+    lista.innerHTML='<div class="empty-state">Nenhuma campanha criada ainda. Clique em "+ Nova campanha" para começar.</div>';
+    return;
+  }
+  const statusColor={ativa:'var(--g4)',pausada:'var(--amber)',encerrada:'var(--text3)'};
+  const statusBg={ativa:'rgba(45,106,79,.15)',pausada:'rgba(233,168,76,.1)',encerrada:'var(--surface2)'};
+  lista.innerHTML=campanhas.map(c=>{
+    const gasto=parseFloat(c.gasto)||0;
+    const fat=(parseFloat(c.venda_direta_val)||0)+(parseFloat(c.venda_reun_val)||0);
+    const roas=gasto>0?(fat/gasto).toFixed(2)+'x':'—';
+    const vendas=(parseInt(c.venda_direta_qtd)||0)+(parseInt(c.venda_reun_qtd)||0);
+    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="editarCampanha('${c.id}')">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text)">${c.nome||'Sem nome'}</span>
+            <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:${statusBg[c.status||'ativa']};color:${statusColor[c.status||'ativa']};font-weight:500">${c.status||'ativa'}</span>
+            <span class="badge badge-x" style="font-size:9px">${c.criativo||'vídeo'}</span>
+            <span class="badge badge-x" style="font-size:9px">${c.objetivo||'whatsapp'}</span>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--text3)">${c.inicio||'—'} ${c.fim?'→ '+c.fim:'→ ativa'}</span>
+            ${c.orcamento?`<span style="font-size:11px;color:var(--text3)">Orç: R$ ${c.orcamento}/dia</span>`:''}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center;flex-shrink:0">
+          <div><div style="font-size:14px;font-weight:600;color:var(--coral)">R$ ${gasto.toLocaleString('pt-BR')}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Gasto</div></div>
+          <div><div style="font-size:14px;font-weight:600;color:var(--teal)">${c.leads||0}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Leads</div></div>
+          <div><div style="font-size:14px;font-weight:600;color:var(--g4)">${vendas}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Vendas</div></div>
+          <div><div style="font-size:14px;font-weight:600;color:var(--purple)">${roas}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">ROAS</div></div>
+        </div>
+        <div style="font-size:18px;color:var(--text3)">›</div>
+      </div>
+      ${c.obs?`<div style="padding:0 18px 12px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:8px;margin-top:0">${c.obs}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function showNovaCampanha(){
+  editingCampId=null;
+  document.getElementById('modalTitle').textContent='Nova campanha';
+  document.getElementById('btnExcluirCamp').style.display='none';
+  const campos=['camp_id','camp_nome','camp_inicio','camp_fim','camp_orcamento','camp_gasto',
+    'camp_leads','camp_reunioes','camp_venda_direta_qtd','camp_venda_direta_val',
+    'camp_venda_reun_qtd','camp_venda_reun_val','camp_obs'];
+  campos.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('camp_criativo').value='video';
+  document.getElementById('camp_objetivo').value='whatsapp';
+  document.getElementById('camp_status').value='ativa';
+  // Set today as start date
+  document.getElementById('camp_inicio').value=today();
+  const modal=document.getElementById('modalCampanha');
+  modal.style.display='flex';
+}
+
+function editarCampanha(id){
+  const c=campanhas.find(x=>x.id===id);
+  if(!c)return;
+  editingCampId=id;
+  document.getElementById('modalTitle').textContent='Editar campanha';
+  document.getElementById('btnExcluirCamp').style.display='block';
+  document.getElementById('camp_id').value=c.id||'';
+  document.getElementById('camp_nome').value=c.nome||'';
+  document.getElementById('camp_criativo').value=c.criativo||'video';
+  document.getElementById('camp_objetivo').value=c.objetivo||'whatsapp';
+  document.getElementById('camp_inicio').value=c.inicio||'';
+  document.getElementById('camp_fim').value=c.fim||'';
+  document.getElementById('camp_orcamento').value=c.orcamento||'';
+  document.getElementById('camp_gasto').value=c.gasto||'';
+  document.getElementById('camp_leads').value=c.leads||'';
+  document.getElementById('camp_reunioes').value=c.reunioes||'';
+  document.getElementById('camp_venda_direta_qtd').value=c.venda_direta_qtd||'';
+  document.getElementById('camp_venda_direta_val').value=c.venda_direta_val||'';
+  document.getElementById('camp_venda_reun_qtd').value=c.venda_reun_qtd||'';
+  document.getElementById('camp_venda_reun_val').value=c.venda_reun_val||'';
+  document.getElementById('camp_status').value=c.status||'ativa';
+  document.getElementById('camp_obs').value=c.obs||'';
+  document.getElementById('modalCampanha').style.display='flex';
+}
+
+async function salvarCampanha(){
+  const campos={
+    id:document.getElementById('camp_id').value||gerarId(),
+    nome:document.getElementById('camp_nome').value,
+    criativo:document.getElementById('camp_criativo').value,
+    objetivo:document.getElementById('camp_objetivo').value,
+    inicio:document.getElementById('camp_inicio').value,
+    fim:document.getElementById('camp_fim').value,
+    orcamento:document.getElementById('camp_orcamento').value,
+    gasto:document.getElementById('camp_gasto').value,
+    leads:document.getElementById('camp_leads').value,
+    reunioes:document.getElementById('camp_reunioes').value,
+    venda_direta_qtd:document.getElementById('camp_venda_direta_qtd').value,
+    venda_direta_val:document.getElementById('camp_venda_direta_val').value,
+    venda_reun_qtd:document.getElementById('camp_venda_reun_qtd').value,
+    venda_reun_val:document.getElementById('camp_venda_reun_val').value,
+    status:document.getElementById('camp_status').value,
+    obs:document.getElementById('camp_obs').value,
+    atualizado:new Date().toISOString().split('T')[0]
+  };
+  if(!campos.nome){showError('Informe o nome da campanha.');return;}
+  const idx=campanhas.findIndex(c=>c.id===campos.id);
+  if(idx>=0)campanhas[idx]=campos;
+  else campanhas.push(campos);
+  await persistirCampanhas();
+  fecharModal();
+  renderListaCampanhas();
+  calcularKpisTrafego();
+}
+
+async function excluirCampanha(){
+  if(!editingCampId)return;
+  if(!confirm('Excluir esta campanha?'))return;
+  campanhas=campanhas.filter(c=>c.id!==editingCampId);
+  await persistirCampanhas();
+  fecharModal();
+  renderListaCampanhas();
+  calcularKpisTrafego();
+}
+
+function fecharModal(){
+  document.getElementById('modalCampanha').style.display='none';
+  editingCampId=null;
+}
+
+// Fechar modal clicando fora
+document.getElementById('modalCampanha').addEventListener('click',function(e){
+  if(e.target===this)fecharModal();
+});
 
 // ══════════════════════════════════════════
 // LOGIN
