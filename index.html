@@ -276,6 +276,19 @@ button{font-family:var(--font)}
 .login-btn:hover{background:var(--g3)}
 .login-error{font-size:12px;color:var(--coral);margin-top:8px;display:none;text-align:center}
 
+
+/* ── SCRIPT EDITOR ── */
+.script-editor-wrap{padding:20px}
+.script-editor-label{font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.script-textarea{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;line-height:1.7;padding:14px 16px;resize:vertical;min-height:300px;transition:border-color .15s}
+.script-textarea:focus{outline:none;border-color:var(--g3)}
+.script-editor-footer{display:flex;align-items:center;gap:10px;margin-top:10px}
+.script-save-btn{background:var(--g2);border:none;border-radius:var(--radius-sm);color:white;font-family:var(--font);font-size:12px;font-weight:500;padding:7px 18px;cursor:pointer;transition:background .15s}
+.script-save-btn:hover{background:var(--g3)}
+.script-save-status{font-size:11px;font-family:var(--mono);color:var(--text3);opacity:0;transition:opacity .3s}
+.script-save-status.show{opacity:1;color:var(--g4)}
+.script-save-status.err{opacity:1;color:var(--coral)}
+.script-tip{font-size:11px;color:var(--text3);flex:1;text-align:right}
 </style>
 </head>
 <body>
@@ -911,110 +924,120 @@ button{font-family:var(--font)}
 <div class="tab-content" id="tab-scripts">
 
   <p class="page-title">Scripts</p>
-  <p class="page-sub">Roteiros de abordagem para cada funil</p>
+  <p class="page-sub">Roteiros de abordagem — edite e salve por funil</p>
 
-  <!-- PC COMPLETO -->
-  <div class="script-card open">
+  <!-- PC OUTBOUND -->
+  <div class="script-card open" id="script-card-pc_outbound">
     <div class="script-head" onclick="toggleScript(this)">
       <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-t">Funil 2</span><span class="script-name">PC — Outbound</span></div>
-      <span class="script-status done">Completo</span>
+      <span class="script-status done" id="status-pc_outbound">Completo</span>
     </div>
     <div class="script-body">
-      <div class="script-step">
-        <div class="script-step-label">1. Abordagem</div>
-        <div class="script-msg">"Oi! Vi seu conteúdo no explorar e adorei a forma como você [cita algo específico: ex. mostra as peças / conduz o provador]. Sou mentora de lojistas e analiso muitos perfis, mas o seu me chamou atenção pela dedicação... parabéns!"<br><br><i style="font-size:11px;color:var(--text3)">(Aguardar agradecimento)</i></div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">2. Gancho</div>
-        <div class="script-msg">"Imagina! Posso te fazer uma única pergunta sobre o Instagram da sua loja?"<br><br><i style="font-size:11px;color:var(--text3)">(Lojista diz que sim)</i></div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">3. Pergunta espelho — qualificação</div>
-        <div class="script-msg">"Sendo bem sincera: com tudo o que você já faz hoje, você sente que tem clareza e previsibilidade do faturamento, ou sente que está sempre correndo em círculos, dependendo demais do seu esforço de postar para a meta acontecer?"</div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">4. Respostas — árvore</div>
-        <div class="script-case case-green">
-          <div class="case-title">Confirmou a dor</div>
-          <div class="case-text">"Perfeito, então hoje você até vende, mas sente que tudo depende muito de você no dia a dia." + complemento: "e aí acaba ficando muito no esforço" <br><br>"Topa que eu te mostre como organizar isso aplicando na sua loja, sem precisar fazer mais do que você já faz?"<br><br>Se SIM → "Em 15 minutinhos te mostro isso na prática. Amanhã tenho X ou Y horário — qual fica melhor?"</div>
-        </div>
-        <div class="script-case case-amber" style="margin-top:6px">
-          <div class="case-title">Diz que já tem clareza / vende bem</div>
-          <div class="case-text">"Isso já te coloca na frente de muita gente. Então o próximo passo é fazer acontecer com mais consistência sem depender tanto de você."<br><br>"Topa que eu te mostre como ajustar isso pra escalar com mais leveza?" — Se SIM → agendamento normal</div>
-        </div>
-        <div class="script-case case-red" style="margin-top:6px">
-          <div class="case-title">Não é perfil</div>
-          <div class="case-text">"Entendi! Quando começar a estruturar isso com mais frequência, faz sentido a gente falar." → encerrar</div>
-        </div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">5. Follow-up (some no meio)</div>
-        <div class="script-msg">FU1: "Fiquei pensando no que você falou sobre seu Instagram… ainda está desse jeito por aí?"<br><br>FU2 (último): "Se fizer sentido retomar isso depois, me chama."</div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">6. Objeções</div>
-        <div class="script-msg">"Pode falar por aqui?" → "Até posso te dar uma direção, mas pra te mostrar exatamente onde ajustar no seu caso, preciso ver contigo rapidinho — fica muito mais claro."<br><br>"É curso?" → "Não, é mentoria mesmo — eu te ajudo a organizar isso no teu cenário."<br><br>"Sem tempo" → "Super entendo — por isso a ideia é ser bem direto, em 15 minutinhos já te mostro o principal."</div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">7. Pré-aquecimento</div>
-        <div class="script-msg">1 dia antes: "Passando pra confirmar nossa conversa amanhã. Já dei uma olhada no teu perfil."<br><br>No dia: "Daqui a pouco a gente se fala! Se puder entrar com o Instagram aberto já ajuda bastante."</div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">Filtro interno — SDR não pergunta, observa</div>
-        <div class="rules-row">
-          <div class="rules-col"><div class="rules-col-title yes">Perfil ideal</div><span class="rule-pill">já posta</span><span class="rule-pill">já vende</span><span class="rule-pill">faz stories</span><span class="rule-pill">esforço sem estrutura</span></div>
-          <div class="rules-col"><div class="rules-col-title no">Não ideal</div><span class="rule-pill">iniciante total</span><span class="rule-pill">não usa Instagram</span><span class="rule-pill">não vende nada</span></div>
-        </div>
-      </div>
-      <div class="script-step">
-        <div class="script-step-label">Regras de ouro</div>
-        <div class="rules-row">
-          <div class="rules-col"><div class="rules-col-title no">Nunca</div><span class="rule-pill">texto longo</span><span class="rule-pill">explicar demais</span><span class="rule-pill">dar aula na DM</span><span class="rule-pill">5 perguntas seguidas</span></div>
-          <div class="rules-col"><div class="rules-col-title yes">Sempre</div><span class="rule-pill">frases curtas</span><span class="rule-pill">1 pergunta por vez</span><span class="rule-pill">responder rápido</span><span class="rule-pill">conduzir sempre</span></div>
+      <div class="script-editor-wrap">
+        <div class="script-editor-label">Roteiro de abordagem — edite diretamente</div>
+        <textarea class="script-textarea" id="editor-pc_outbound" placeholder="Escreva o script aqui..."></textarea>
+        <div class="script-editor-footer">
+          <button class="script-save-btn" onclick="saveScript('pc_outbound')">Salvar</button>
+          <span class="script-save-status" id="save-status-pc_outbound">✓ salvo</span>
+          <span class="script-tip">Ctrl+Enter para salvar rapidamente</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Scripts pendentes -->
-  <div class="script-card">
+  <!-- BV AUTOMÁTICO -->
+  <div class="script-card" id="script-card-bv_automatico">
     <div class="script-head" onclick="toggleScript(this)">
       <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-g">Funil 1</span><span class="script-name">BV Automático — Mensagem de automação</span></div>
-      <span class="script-status pending">A adicionar</span>
+      <span class="script-status pending" id="status-bv_automatico">A adicionar</span>
     </div>
-    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+    <div class="script-body">
+      <div class="script-editor-wrap">
+        <div class="script-editor-label">Roteiro de abordagem — edite diretamente</div>
+        <textarea class="script-textarea" id="editor-bv_automatico" placeholder="Cole ou escreva o script aqui..."></textarea>
+        <div class="script-editor-footer">
+          <button class="script-save-btn" onclick="saveScript('bv_automatico')">Salvar</button>
+          <span class="script-save-status" id="save-status-bv_automatico">✓ salvo</span>
+          <span class="script-tip">Ctrl+Enter para salvar rapidamente</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="script-card">
+  <!-- STORIES -->
+  <div class="script-card" id="script-card-stories_engagement">
     <div class="script-head" onclick="toggleScript(this)">
       <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-g">Funil 3</span><span class="script-name">Stories — Abordagem após interação</span></div>
-      <span class="script-status pending">A adicionar</span>
+      <span class="script-status pending" id="status-stories_engagement">A adicionar</span>
     </div>
-    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+    <div class="script-body">
+      <div class="script-editor-wrap">
+        <div class="script-editor-label">Roteiro de abordagem — edite diretamente</div>
+        <textarea class="script-textarea" id="editor-stories_engagement" placeholder="Cole ou escreva o script aqui..."></textarea>
+        <div class="script-editor-footer">
+          <button class="script-save-btn" onclick="saveScript('stories_engagement')">Salvar</button>
+          <span class="script-save-status" id="save-status-stories_engagement">✓ salvo</span>
+          <span class="script-tip">Ctrl+Enter para salvar rapidamente</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="script-card">
+  <!-- ISCA -->
+  <div class="script-card" id="script-card-isca_digital">
     <div class="script-head" onclick="toggleScript(this)">
       <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-a">Funil 4</span><span class="script-name">Isca — Abordagem pós-captura</span></div>
-      <span class="script-status pending">A adicionar</span>
+      <span class="script-status pending" id="status-isca_digital">A adicionar</span>
     </div>
-    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+    <div class="script-body">
+      <div class="script-editor-wrap">
+        <div class="script-editor-label">Roteiro de abordagem — edite diretamente</div>
+        <textarea class="script-textarea" id="editor-isca_digital" placeholder="Cole ou escreva o script aqui..."></textarea>
+        <div class="script-editor-footer">
+          <button class="script-save-btn" onclick="saveScript('isca_digital')">Salvar</button>
+          <span class="script-save-status" id="save-status-isca_digital">✓ salvo</span>
+          <span class="script-tip">Ctrl+Enter para salvar rapidamente</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="script-card">
+  <!-- FOLLOW-UP -->
+  <div class="script-card" id="script-card-followup_reativacao">
     <div class="script-head" onclick="toggleScript(this)">
       <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-x">Funil 5</span><span class="script-name">Follow-up — Retomada de conversa</span></div>
-      <span class="script-status pending">A adicionar</span>
+      <span class="script-status pending" id="status-followup_reativacao">A adicionar</span>
     </div>
-    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+    <div class="script-body">
+      <div class="script-editor-wrap">
+        <div class="script-editor-label">Roteiro de abordagem — edite diretamente</div>
+        <textarea class="script-textarea" id="editor-followup_reativacao" placeholder="Cole ou escreva o script aqui..."></textarea>
+        <div class="script-editor-footer">
+          <button class="script-save-btn" onclick="saveScript('followup_reativacao')">Salvar</button>
+          <span class="script-save-status" id="save-status-followup_reativacao">✓ salvo</span>
+          <span class="script-tip">Ctrl+Enter para salvar rapidamente</span>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="script-card">
+  <!-- REATIVAÇÃO -->
+  <div class="script-card" id="script-card-reativacao">
     <div class="script-head" onclick="toggleScript(this)">
       <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-a">Funil 5</span><span class="script-name">Reativação — Quem caiu em algo e sumiu</span></div>
-      <span class="script-status pending">A adicionar</span>
+      <span class="script-status pending" id="status-reativacao">A adicionar</span>
     </div>
-    <div class="script-body"><div class="script-pending">Script a ser adicionado quando Jéssica enviar.</div></div>
+    <div class="script-body">
+      <div class="script-editor-wrap">
+        <div class="script-editor-label">Roteiro de abordagem — edite diretamente</div>
+        <textarea class="script-textarea" id="editor-reativacao" placeholder="Cole ou escreva o script aqui..."></textarea>
+        <div class="script-editor-footer">
+          <button class="script-save-btn" onclick="saveScript('reativacao')">Salvar</button>
+          <span class="script-save-status" id="save-status-reativacao">✓ salvo</span>
+          <span class="script-tip">Ctrl+Enter para salvar rapidamente</span>
+        </div>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -1266,6 +1289,7 @@ async function supaUpsert(table, data){
   // Determine conflict column based on table
   let onConflict='data_reg';
   if(table==='metas_mensais'||table==='trafego_pago') onConflict='ano,mes';
+  if(table==='scripts_funis') onConflict='funil';
   const url=SUPA_URL+'/rest/v1/'+table+'?on_conflict='+onConflict;
   const r=await fetch(url,{
     method:'POST',
@@ -1938,6 +1962,153 @@ function doLogin(){
 }
 
 checkSession();
+
+
+// ══════════════════════════════════════════
+// SCRIPTS DOS FUNIS — EDITOR EDITÁVEL
+// ══════════════════════════════════════════
+const SCRIPTS_FUNIS = ['bv_automatico','pc_outbound','stories_engagement','isca_digital','followup_reativacao','reativacao'];
+
+const PC_DEFAULT_CONTENT = `1. ABORDAGEM
+"Oi! Vi seu conteúdo no explorar e adorei a forma como você [cita algo específico: ex. mostra as peças / conduz o provador]. Sou mentora de lojistas e analiso muitos perfis, mas o seu me chamou atenção pela dedicação... parabéns!"
+(Aguardar agradecimento)
+
+2. GANCHO
+"Imagina! Posso te fazer uma única pergunta sobre o Instagram da sua loja?"
+(Lojista diz que sim)
+
+3. PERGUNTA ESPELHO — QUALIFICAÇÃO
+"Sendo bem sincera: com tudo o que você já faz hoje, você sente que tem clareza e previsibilidade do faturamento, ou sente que está sempre correndo em círculos, dependendo demais do seu esforço de postar para a meta acontecer?"
+
+4. RESPOSTAS — ÁRVORE
+✅ Confirmou a dor:
+"Perfeito, então hoje você até vende, mas sente que tudo depende muito de você no dia a dia."
+"Topa que eu te mostre como organizar isso aplicando na sua loja, sem precisar fazer mais do que você já faz?"
+Se SIM → "Em 15 minutinhos te mostro isso na prática. Amanhã tenho X ou Y horário — qual fica melhor?"
+
+🟡 Diz que já tem clareza / vende bem:
+"Isso já te coloca na frente de muita gente. Então o próximo passo é fazer acontecer com mais consistência sem depender tanto de você."
+"Topa que eu te mostre como ajustar isso pra escalar com mais leveza?" → Se SIM → agendamento normal
+
+🔴 Não é perfil:
+"Entendi! Quando começar a estruturar isso com mais frequência, faz sentido a gente falar." → encerrar
+
+5. FOLLOW-UP (some no meio)
+FU1: "Fiquei pensando no que você falou sobre seu Instagram… ainda está desse jeito por aí?"
+FU2 (último): "Se fizer sentido retomar isso depois, me chama."
+
+6. OBJEÇÕES
+"Pode falar por aqui?" → "Até posso te dar uma direção, mas pra te mostrar exatamente onde ajustar no seu caso, preciso ver contigo rapidinho — fica muito mais claro."
+"É curso?" → "Não, é mentoria mesmo — eu te ajudo a organizar isso no teu cenário."
+"Sem tempo" → "Super entendo — por isso a ideia é ser bem direto, em 15 minutinhos já te mostro o principal."
+
+7. PRÉ-AQUECIMENTO
+1 dia antes: "Passando pra confirmar nossa conversa amanhã. Já dei uma olhada no teu perfil."
+No dia: "Daqui a pouco a gente se fala! Se puder entrar com o Instagram aberto já ajuda bastante."
+
+FILTRO INTERNO — SDR não pergunta, observa
+✅ Perfil ideal: já posta · já vende · faz stories · esforço sem estrutura
+❌ Não ideal: iniciante total · não usa Instagram · não vende nada
+
+REGRAS DE OURO
+Nunca: texto longo · explicar demais · dar aula na DM · 5 perguntas seguidas
+Sempre: frases curtas · 1 pergunta por vez · responder rápido · conduzir sempre`;
+
+async function loadScripts(){
+  for(const funil of SCRIPTS_FUNIS){
+    try{
+      const rows = await supaGet('scripts_funis', {funil});
+      const conteudo = rows.length ? rows[0].conteudo : '';
+      const el = document.getElementById('editor-'+funil);
+      if(el){
+        if(funil === 'pc_outbound' && !conteudo){
+          el.value = PC_DEFAULT_CONTENT;
+        } else {
+          el.value = conteudo || '';
+        }
+        updateScriptStatus(funil, el.value);
+      }
+    }catch(e){
+      console.error('Erro ao carregar script:', funil, e);
+      const el = document.getElementById('editor-'+funil);
+      if(el && funil === 'pc_outbound' && !el.value) el.value = PC_DEFAULT_CONTENT;
+    }
+  }
+}
+
+function updateScriptStatus(funil, conteudo){
+  const statusEl = document.getElementById('status-'+funil);
+  if(!statusEl) return;
+  const tem = conteudo && conteudo.trim().length > 10;
+  if(tem){
+    statusEl.textContent = 'Completo';
+    statusEl.className = 'script-status done';
+  } else {
+    statusEl.textContent = 'A adicionar';
+    statusEl.className = 'script-status pending';
+  }
+}
+
+async function saveScript(funil){
+  const el = document.getElementById('editor-'+funil);
+  const statusEl = document.getElementById('save-status-'+funil);
+  if(!el) return;
+  const conteudo = el.value;
+  if(statusEl){ statusEl.textContent = 'salvando...'; statusEl.className = 'script-save-status show'; }
+  try{
+    const url = SUPA_URL+'/rest/v1/scripts_funis?funil=eq.'+encodeURIComponent(funil);
+    const r = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer '+SUPA_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({conteudo, updated_at: new Date().toISOString()})
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    updateScriptStatus(funil, conteudo);
+    if(statusEl){ statusEl.textContent = '✓ salvo'; statusEl.className = 'script-save-status show'; setTimeout(()=>statusEl.classList.remove('show'), 2000); }
+    showSaved();
+  }catch(e){
+    console.error('Erro ao salvar script:', e);
+    if(statusEl){ statusEl.textContent = '⚠ erro ao salvar'; statusEl.className = 'script-save-status err'; setTimeout(()=>{ if(statusEl){statusEl.className='script-save-status';} }, 3000); }
+  }
+}
+
+// Ctrl+Enter salva o textarea focado
+document.addEventListener('keydown', function(e){
+  if((e.ctrlKey || e.metaKey) && e.key === 'Enter'){
+    const active = document.activeElement;
+    if(active && active.classList.contains('script-textarea')){
+      e.preventDefault();
+      const funil = active.id.replace('editor-', '');
+      saveScript(funil);
+    }
+  }
+});
+
+// Adiciona registro de funis no Supabase se não existir (garante os 6 registros)
+async function ensureScriptRows(){
+  const funis = ['bv_automatico','pc_outbound','stories_engagement','isca_digital','followup_reativacao','reativacao'];
+  for(const funil of funis){
+    try{
+      const url = SUPA_URL+'/rest/v1/scripts_funis?funil=eq.'+encodeURIComponent(funil);
+      const r = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+      const rows = await r.json();
+      if(!rows.length){
+        await fetch(SUPA_URL+'/rest/v1/scripts_funis', {
+          method:'POST',
+          headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+          body: JSON.stringify({funil, conteudo:''})
+        });
+      }
+    }catch(e){ console.warn('ensureScriptRows:', funil, e); }
+  }
+}
+
+ensureScriptRows().then(() => loadScripts());
 
 </script>
 </body>
