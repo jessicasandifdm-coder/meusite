@@ -538,6 +538,7 @@ button{font-family:var(--font)}
       <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="bv_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="bv_reunioes" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Vendas mentoria</div><input class="field-input" type="number" id="bv_vendas" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Valor venda (R$)</div><input class="field-input" type="number" id="bv_valor" min="0" oninput="updateSummary()"></div>
     </div>
   </div>
 
@@ -595,6 +596,7 @@ button{font-family:var(--font)}
     <div class="canal-fields">
       <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="re_abord" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="re_resp" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Conversas iniciadas</div><input class="field-input" type="number" id="re_conv" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="re_convites" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="re_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="re_reunioes" min="0" oninput="updateSummary()"></div>
@@ -664,6 +666,26 @@ button{font-family:var(--font)}
     <div class="kpi-card" style="border-color:var(--coral-dim);background:rgba(224,112,112,.06)"><div class="kpi-val" style="color:var(--coral)" id="kpi-noshow">—</div><div class="kpi-lbl">No-show<span id="kpi-noshow-pct" style="font-size:11px;font-weight:400;color:var(--text3);display:block"></span></div></div>
     <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="kpi-vendas">—</div><div class="kpi-lbl">Vendas ment.</div></div>
     <div class="kpi-card" style="border-color:var(--amber-dim);background:rgba(233,168,76,.06)"><div class="kpi-val" style="color:var(--amber)" id="kpi-vcurso">—</div><div class="kpi-lbl">Vendas curso</div></div>
+  </div>
+
+  <!-- Seguidores do mês -->
+  <div class="sh"><span class="sh-label">Crescimento de seguidores no mês</span><div class="sh-line"></div></div>
+  <div class="grid-3" style="margin-bottom:24px">
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)">
+      <div class="kpi-val" style="color:var(--g4)" id="kpi-seg-novos">—</div>
+      <div class="kpi-lbl">Novos seguidores no mês</div>
+      <div class="kpi-sub" id="kpi-seg-perdidos-sub">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" id="kpi-seg-pc">—</div>
+      <div class="kpi-lbl">Vindos do PC — Outbound</div>
+      <div class="kpi-sub" id="kpi-seg-pc-pct">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-val" id="kpi-seg-outros">—</div>
+      <div class="kpi-lbl">Vindos de outras origens</div>
+      <div class="kpi-sub">Conteúdo, indicação, tráfego, etc.</div>
+    </div>
   </div>
 
   <!-- Taxas do funil -->
@@ -1130,7 +1152,7 @@ const FIELDS=['seg_total','seg_novos','seg_perdidos','bv_auto','bv_video','bv_fo
   'pc_abord','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val','pc_seguidores',
   'st_inter','st_sdr','st_conv','st_convites','st_agend','st_reunioes','st_vendas',
   'fu_retom','fu_resp','fu_convites','fu_agend','fu_reunioes','fu_vendas','fu_valor','fu_vcurso','fu_vcurso_val',
-  're_abord','re_resp','re_convites','re_agend','re_reunioes','re_vendas','re_valor',
+  're_abord','re_resp','re_conv','re_convites','re_agend','re_reunioes','re_vendas','re_valor',
   'is_leads','is_entregues','is_sdr','is_convites','is_agend','is_reunioes','is_vendas',
   'obs_dia'];
 
@@ -1237,7 +1259,7 @@ function getNum(id){return parseInt(document.getElementById(id)?.value)||0;}
 
 function updateSummary(){
   const abord=getNum('pc_abord')+getNum('re_abord')+getNum('bv_sdr')+getNum('st_inter')+getNum('fu_retom')+getNum('is_sdr');
-  const conv=getNum('pc_conv')+getNum('st_conv')+getNum('bv_form');
+  const conv=getNum('pc_conv')+getNum('st_conv')+getNum('bv_form')+getNum('re_conv');
   const convites=getNum('pc_convites')+getNum('st_convites')+getNum('bv_convites')+getNum('fu_convites')+getNum('re_convites')+getNum('is_convites');
   const reunioes=getNum('pc_reunioes')+getNum('st_reunioes')+getNum('bv_reunioes')+getNum('fu_reunioes')+getNum('re_reunioes')+getNum('is_reunioes');
   const vendas=getNum('pc_vendas')+getNum('st_vendas')+getNum('bv_vendas')+getNum('fu_vendas')+getNum('re_vendas')+getNum('is_vendas');
@@ -1384,15 +1406,18 @@ function aggregateDays(days){
     agendadas: days.reduce((s,d)=>s+getN(d,'pc_agend')+getN(d,'st_agend')+getN(d,'bv_agend')+getN(d,'fu_agend')+getN(d,'re_agend')+getN(d,'is_agend'),0),
     reunioes: days.reduce((s,d)=>s+getN(d,'pc_reunioes')+getN(d,'st_reunioes')+getN(d,'bv_reunioes')+getN(d,'fu_reunioes')+getN(d,'re_reunioes')+getN(d,'is_reunioes'),0),
     vendas: days.reduce((s,d)=>s+getN(d,'pc_vendas')+getN(d,'st_vendas')+getN(d,'bv_vendas')+getN(d,'fu_vendas')+getN(d,'re_vendas')+getN(d,'is_vendas'),0),
-    valor: days.reduce((s,d)=>s+getN(d,'pc_valor')+getN(d,'fu_valor')+getN(d,'re_valor'),0),
+    valor: days.reduce((s,d)=>s+getN(d,'pc_valor')+getN(d,'fu_valor')+getN(d,'re_valor')+getN(d,'bv_valor'),0),
     vcurso: days.reduce((s,d)=>s+getN(d,'pc_vcurso')+getN(d,'bv_vcurso')+getN(d,'fu_vcurso'),0),
     vcurso_val: days.reduce((s,d)=>s+getN(d,'pc_vcurso_val')+getN(d,'bv_vcurso_val')+getN(d,'fu_vcurso_val'),0),
+    seg_novos: days.reduce((s,d)=>s+getN(d,'seg_novos'),0),
+    seg_perdidos: days.reduce((s,d)=>s+getN(d,'seg_perdidos'),0),
+    pc_seguidores: days.reduce((s,d)=>s+getN(d,'pc_seguidores'),0),
     // por canal
     bv:{auto:days.reduce((s,d)=>s+getN(d,'bv_auto'),0),sdr:days.reduce((s,d)=>s+getN(d,'bv_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'bv_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'bv_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'bv_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'bv_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'bv_vcurso'),0)},
     pc:{abord:days.reduce((s,d)=>s+getN(d,'pc_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'pc_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'pc_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'pc_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'pc_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'pc_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'pc_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'pc_vcurso'),0)},
     st:{inter:days.reduce((s,d)=>s+getN(d,'st_inter'),0),sdr:days.reduce((s,d)=>s+getN(d,'st_sdr'),0),conv:days.reduce((s,d)=>s+getN(d,'st_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'st_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'st_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'st_vendas'),0)},
     fu:{ret:days.reduce((s,d)=>s+getN(d,'fu_retom'),0),resp:days.reduce((s,d)=>s+getN(d,'fu_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'fu_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'fu_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'fu_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'fu_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'fu_vcurso'),0)},
-    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),agend:days.reduce((s,d)=>s+getN(d,'re_agend'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'re_valor'),0)},
+    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'re_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),agend:days.reduce((s,d)=>s+getN(d,'re_agend'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'re_valor'),0)},
     is:{leads:days.reduce((s,d)=>s+getN(d,'is_leads'),0),sdr:days.reduce((s,d)=>s+getN(d,'is_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'is_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'is_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'is_vendas'),0)},
   };
 }
@@ -1438,6 +1463,19 @@ async function renderMensal(){
   if(nsPctEl)nsPctEl.textContent=agg.agendadas>0?noshowPct+'% das agendadas':'';
   document.getElementById('kpi-vendas').textContent=agg.vendas||0;
   document.getElementById('kpi-vcurso').textContent=agg.vcurso||0;
+
+  // Seguidores do mês
+  const segNovosMes=agg.seg_novos||0;
+  const segPerdidosMes=agg.seg_perdidos||0;
+  const segPcMes=agg.pc_seguidores||0;
+  const segOutrosMes=Math.max(0,segNovosMes-segPcMes);
+  document.getElementById('kpi-seg-novos').textContent=segNovosMes||'0';
+  const segPerdSub=document.getElementById('kpi-seg-perdidos-sub');
+  if(segPerdSub)segPerdSub.textContent=segPerdidosMes?('−'+segPerdidosMes+' perdidos no mês'):'sem perdas registradas';
+  document.getElementById('kpi-seg-pc').textContent=segPcMes||'0';
+  const segPcPct=document.getElementById('kpi-seg-pc-pct');
+  if(segPcPct)segPcPct.textContent=segNovosMes>0?pct(segPcMes,segNovosMes)+' do total ganho':'—';
+  document.getElementById('kpi-seg-outros').textContent=segOutrosMes||'0';
 
   // Taxas
   document.getElementById('taxa-resp').textContent=pct(agg.resp,agg.abord);
