@@ -289,6 +289,65 @@ button{font-family:var(--font)}
 .script-save-status.show{opacity:1;color:var(--g4)}
 .script-save-status.err{opacity:1;color:var(--coral)}
 .script-tip{font-size:11px;color:var(--text3);flex:1;text-align:right}
+
+/* ── MATERIAIS ── */
+.material-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:12px}
+.material-head{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;border-bottom:1px solid transparent}
+.material-card.open .material-head{border-bottom-color:var(--border)}
+.material-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(--surface2);color:var(--text2)}
+.material-title-wrap{flex:1;min-width:0}
+.material-name{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.material-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.material-toggle{font-size:14px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.material-card.open .material-toggle{transform:rotate(180deg)}
+.material-body{padding:0 18px 18px;display:none}
+.material-card.open .material-body{display:block}
+.material-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.material-grid-full{grid-column:1/-1}
+.material-link-row{display:flex;gap:8px;align-items:center}
+.material-link-row input{flex:1}
+.material-open-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--g4);font-size:12px;padding:8px 12px;cursor:pointer;white-space:nowrap;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center}
+.material-open-btn:hover{border-color:var(--g3);background:rgba(45,106,79,.1)}
+.material-actions{display:flex;gap:8px;align-items:center;margin-top:14px}
+.material-status-select{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;cursor:pointer}
+.material-delete-btn{background:rgba(224,112,112,.1);border:1px solid rgba(224,112,112,.25);border-radius:var(--radius-sm);color:var(--coral);font-size:12px;padding:7px 14px;cursor:pointer;transition:all .15s}
+.material-delete-btn:hover{background:rgba(224,112,112,.2)}
+.material-save-status{font-size:11px;font-family:var(--mono);color:var(--text3);opacity:0;transition:opacity .3s;margin-left:auto}
+.material-save-status.show{opacity:1;color:var(--g4)}
+.material-save-status.err{opacity:1;color:var(--coral)}
+.status-pill{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;flex-shrink:0}
+.status-pill.ativa{background:rgba(45,106,79,.2);color:var(--g4)}
+.status-pill.pausada{background:rgba(233,168,76,.15);color:var(--amber)}
+.add-material-btn{background:var(--g2);border:none;border-radius:var(--radius-sm);color:white;font-family:var(--font);font-size:13px;font-weight:500;padding:9px 18px;cursor:pointer;transition:background .15s}
+.add-material-btn:hover{background:var(--g3)}
+.material-script-note{background:rgba(155,114,207,.08);border:1px solid rgba(155,114,207,.2);border-radius:var(--radius);padding:14px 18px;font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.6;display:flex;align-items:center;gap:10px}
+.material-script-note a{color:var(--purple);cursor:pointer;font-weight:500}
+
+/* ── ICP / CLIENTE IDEAL ── */
+.icp-block{margin-bottom:10px}
+.icp-toggle-head{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s}
+.icp-toggle-head:hover{border-color:var(--border2)}
+.icp-toggle-head.open{border-bottom-left-radius:0;border-bottom-right-radius:0;border-color:var(--border2)}
+.icp-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.icp-dot.green{background:var(--g4)}
+.icp-dot.red{background:var(--coral)}
+.icp-toggle-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);flex:1}
+.icp-chevron{font-size:12px;color:var(--text3);transition:transform .2s}
+.icp-toggle-head.open .icp-chevron{transform:rotate(180deg)}
+.icp-toggle-body{display:none;background:var(--surface);border:1px solid var(--border2);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:20px 22px}
+.icp-toggle-head.open + .icp-toggle-body{display:block}
+.icp-sub{font-size:12px;font-weight:600;color:var(--g4);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px}
+.icp-sub:first-child{margin-top:0}
+.icp-list{list-style:none;padding:0;margin:0 0 4px}
+.icp-list li{font-size:12px;color:var(--text2);line-height:1.6;padding-left:14px;position:relative;margin-bottom:4px}
+.icp-list li::before{content:'–';position:absolute;left:0;color:var(--text3)}
+.icp-quote{font-size:12px;color:var(--text2);font-style:italic;background:var(--surface2);border-left:2px solid var(--border2);padding:8px 12px;margin-bottom:6px;line-height:1.5}
+.icp-table-wrap{overflow-x:auto;margin-top:6px}
+.icp-note-box{background:rgba(155,114,207,.08);border:1px solid rgba(155,114,207,.2);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--purple);margin-top:10px;line-height:1.5}
+.objecao-search{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:10px 14px;margin-bottom:14px}
+.objecao-search:focus{outline:none;border-color:var(--g3)}
+.objecao-row{display:none}
+.objecao-row.visible{display:table-row}
 </style>
 </head>
 <body>
@@ -322,6 +381,7 @@ button{font-family:var(--font)}
     <button class="nav-btn" onclick="showTab('anual')">Dashboard Anual</button>
     <button class="nav-btn" onclick="showTab('trafego')">Tráfego Pago</button>
     <button class="nav-btn" onclick="showTab('scripts')">Scripts</button>
+    <button class="nav-btn" onclick="showTab('materiais')">Materiais</button>
     <button class="nav-btn" onclick="showTab('guia')">Guia de Uso</button>
   </nav>
   <div class="topbar-right">
@@ -1065,6 +1125,28 @@ button{font-family:var(--font)}
 </div>
 
 <!-- ═══════════════════════════════════════════════ -->
+<!-- MATERIAIS -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-materiais">
+
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <p class="page-title">Materiais</p>
+      <p class="page-sub">Iscas, PDFs, ebooks e páginas de captura — tudo centralizado aqui</p>
+    </div>
+    <button class="add-material-btn" onclick="addMaterial()">+ Novo material</button>
+  </div>
+
+  <div class="material-script-note">
+    <span>💬</span>
+    <span>O script de abordagem pós-captura para esses materiais está na aba <a onclick="showTabByName('scripts')">Scripts → Isca Digital</a>.</span>
+  </div>
+
+  <div id="materiaisLista"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
 <!-- GUIA DE USO -->
 <!-- ═══════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-guia">
@@ -1111,6 +1193,285 @@ button{font-family:var(--font)}
     <div class="guia-row"><div class="guia-key">Acesso da SDR</div><div class="guia-val">Compartilhe o link do site com a SDR. Ela preenche, você abre e os dados já aparecem em tempo real.</div></div>
   </div>
 
+  <div class="guia-section">
+    <div class="guia-title">Cliente Ideal — ICP</div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:14px;line-height:1.5">Referência completa de quem é (e quem não é) a cliente ideal, dores, desejos, diagnóstico estratégico e quebra de objeções. Use durante a qualificação e nas reuniões.</p>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">Quem É a Cliente Ideal</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-sub">Perfil geral (lojista)</div>
+        <ul class="icp-list">
+          <li>Mulher empreendedora, lojista (segmento principal: moda)</li>
+          <li>Possui loja física, online ou híbrida</li>
+          <li>Faturamento mínimo: <b style="color:var(--text)">R$15.000/mês</b></li>
+          <li>Faturamento ideal: <b style="color:var(--text)">R$25.000/mês ou mais</b></li>
+          <li>Já tem operação rodando, mas sem estrutura clara de escala</li>
+        </ul>
+        <div class="icp-sub">Estrutura atual da loja</div>
+        <ul class="icp-list">
+          <li>Possui pelo menos 1 funcionária</li>
+          <li>Realiza provador, atendimento e vendas</li>
+          <li>Grande parte das vendas e do conteúdo depende da própria dona</li>
+          <li>A funcionária executa, mas sem autonomia estratégica</li>
+        </ul>
+        <div class="icp-sub">Momento do negócio</div>
+        <ul class="icp-list">
+          <li>Já investe em fotos profissionais e estética do feed</li>
+          <li>Cria coleções, faz lançamentos e organiza postagens</li>
+          <li>Tem programação de feed e certa constância nos stories</li>
+          <li>Executa o "básico bem feito", mas sem estratégia de conversão</li>
+          <li>Conteúdo morre no feed ou nos stories sem próximo passo claro</li>
+          <li>Vendas dependem de: aparecer diariamente nos stories · coleção nova · live pontual · movimento da loja física ou grupo de WhatsApp</li>
+        </ul>
+        <div class="icp-sub">Principais gargalos invisíveis</div>
+        <ul class="icp-list">
+          <li>Confunde organização de conteúdo com estratégia de vendas</li>
+          <li>Não tem clareza da intenção de cada conteúdo</li>
+          <li>Não usa o conteúdo para criar funis (aquecer, conduzir, converter)</li>
+          <li>Não aproveita posts para automatizações, grupos de WhatsApp, lives, aceleração de decisão</li>
+          <li>Em dias que não aparece, o Instagram não trabalha por ela</li>
+        </ul>
+        <div class="icp-sub">Desejo central</div>
+        <ul class="icp-list">
+          <li>Transformar conteúdo em sistema de vendas, não só presença digital</li>
+          <li>Usar feed, reels e stories com objetivos diferentes e complementares</li>
+          <li>Criar caminhos claros: conteúdo → próximo passo → venda</li>
+          <li>Estruturar vendas mesmo sem aparecer todos os dias</li>
+          <li>Aproveitar melhor tudo o que já produz (sem fazer mais, e sim melhor)</li>
+        </ul>
+        <div class="icp-sub">Mentalidade</div>
+        <ul class="icp-list">
+          <li>Já entende que "postar bonito" não é suficiente</li>
+          <li>Sente que está deixando dinheiro na mesa</li>
+          <li>Busca clareza estratégica, não mais volume de conteúdo</li>
+          <li>Quer inteligência comercial aplicada ao Instagram</li>
+          <li>Aberta a aprender e implementar</li>
+          <li>Reconhece que o problema não é falta de esforço</li>
+          <li>Entende que precisa de método, estrutura e processos</li>
+          <li>Valoriza acompanhamento, clareza e visão estratégica</li>
+        </ul>
+        <div class="icp-sub">Comportamentos e sinais positivos</div>
+        <ul class="icp-list">
+          <li>Questiona como organizar, delegar e padronizar</li>
+          <li>Busca estrutura antes de crescer mais</li>
+          <li>Já tentou fazer sozinha e percebeu o limite</li>
+          <li>Assume responsabilidade pelos resultados</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">Dores, Desejos e Necessidades</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-sub">Dores (o que ela sente no dia a dia)</div>
+        <ul class="icp-list">
+          <li>Sensação de fazer muito e aproveitar pouco</li>
+          <li>Dependência excessiva da própria presença para vender</li>
+          <li>Cansaço de ser o "centro" do operacional (provador, stories, atendimento)</li>
+          <li>Insegurança se está usando o Instagram da melhor forma</li>
+          <li>Frustração por investir em fotos, conteúdo e ainda assim não ter previsibilidade</li>
+        </ul>
+        <div class="icp-sub">Desejos (o que ela quer conquistar)</div>
+        <ul class="icp-list">
+          <li>Ter vendas acontecendo mesmo quando não aparece</li>
+          <li>Delegar operacional sem perder controle</li>
+          <li>Clareza de estratégia (saber o porquê de cada ação)</li>
+          <li>Transformar conteúdo em ativo de vendas</li>
+          <li>Crescer com mais leveza e menos improviso</li>
+        </ul>
+        <div class="icp-sub">Necessidades reais (o que ela precisa, mesmo sem saber)</div>
+        <ul class="icp-list">
+          <li>Estrutura de funis aplicados ao Instagram</li>
+          <li>Clareza de intenção por tipo de conteúdo (atração, engajamento, conversão)</li>
+          <li>Processos para delegar stories, atendimento e rotina</li>
+          <li>Planejamento comercial conectado a campanhas e calendário</li>
+          <li>Leitura estratégica de dados e ajustes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot red"></span>
+        <span class="icp-toggle-title">Quem NÃO É a Cliente Ideal</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-sub" style="color:var(--coral)">Perfil geral</div>
+        <ul class="icp-list">
+          <li>Empreendedora iniciante ou em situação financeira crítica</li>
+          <li>Negócio endividado, buscando solução emergencial</li>
+          <li>Vê a mentoria como "bote salva-vidas"</li>
+        </ul>
+        <div class="icp-sub" style="color:var(--coral)">Comportamentos comuns</div>
+        <ul class="icp-list">
+          <li>Usa apenas fotos de fornecedor</li>
+          <li>Não produz conteúdo próprio</li>
+          <li>Tem vergonha ou resistência extrema em aparecer</li>
+          <li>Não está disposta a estruturar processos</li>
+        </ul>
+        <div class="icp-sub" style="color:var(--coral)">Mentalidade desalinhada</div>
+        <ul class="icp-list">
+          <li>Busca solução rápida para apagar incêndio</li>
+          <li>Espera que alguém resolva o problema por ela</li>
+          <li>Não tem espaço mental ou financeiro para estratégia</li>
+          <li>Quer resultado sem base</li>
+        </ul>
+        <div class="icp-sub" style="color:var(--coral)">Sinais claros de desqualificação</div>
+        <div class="icp-quote">"Tô desesperada, preciso vender urgente"</div>
+        <div class="icp-quote">"Se isso não vender rápido, não dá pra mim"</div>
+        <div class="icp-quote">"Não posso investir agora, mas se der resultado eu pago depois"</div>
+        <ul class="icp-list">
+          <li>Endividamento alto sem organização mínima</li>
+          <li>Falta total de estrutura operacional</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">Frases Típicas</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-sub">Cliente ideal</div>
+        <div class="icp-quote">"Eu posto, mas não sei o que cada conteúdo deveria gerar"</div>
+        <div class="icp-quote">"Quando não apareço, as vendas caem"</div>
+        <div class="icp-quote">"Sinto que faço muita coisa, mas não aproveito tudo"</div>
+        <div class="icp-quote">"Quero transformar meu Instagram num canal de vendas de verdade"</div>
+        <div class="icp-sub" style="color:var(--coral)">Cliente NÃO ideal</div>
+        <div class="icp-quote">"Só queria ideias de post"</div>
+        <div class="icp-quote">"Meu problema é só engajamento"</div>
+        <div class="icp-quote">"Quero algo bem simples, sem muita estratégia"</div>
+        <div class="icp-quote">"Depois eu vejo isso"</div>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">Diagnóstico Estratégico (Visão Comercial)</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-table-wrap">
+        <table class="canal-table">
+          <thead><tr><th>O que ela fala / acredita</th><th>O que realmente está acontecendo</th><th>Impacto no negócio</th><th>Direção estratégica correta</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:left">"Meu Instagram não vende como poderia"</td><td style="text-align:left">Conteúdo sem sistema e sem funis</td><td style="text-align:left">Vendas instáveis e imprevisíveis</td><td style="text-align:left">Estruturar conteúdo como canal de vendas</td></tr>
+            <tr><td style="text-align:left">"Posto e não vejo retorno"</td><td style="text-align:left">Falta de intenção por tipo de conteúdo</td><td style="text-align:left">Esforço alto com pouco resultado</td><td style="text-align:left">Definir objetivos claros: atrair, engajar, vender</td></tr>
+            <tr><td style="text-align:left">"Quando não apareço, as vendas caem"</td><td style="text-align:left">Dependência da presença da dona</td><td style="text-align:left">Negócio não escala</td><td style="text-align:left">Criar processos e ativos que vendem sem presença</td></tr>
+            <tr><td style="text-align:left">"Tem muita concorrência"</td><td style="text-align:left">Posicionamento pouco diferenciado</td><td style="text-align:left">Comparação por preço</td><td style="text-align:left">Clareza de proposta de valor</td></tr>
+            <tr><td style="text-align:left">"As pessoas só perguntam preço"</td><td style="text-align:left">Comunicação não sustenta valor</td><td style="text-align:left">Leads desqualificados</td><td style="text-align:left">Posicionamento + filtragem de público</td></tr>
+            <tr><td style="text-align:left">"Só vendo para os mesmos clientes"</td><td style="text-align:left">Atua em um único funil (conversão)</td><td style="text-align:left">Não entra cliente novo</td><td style="text-align:left">Estratégia de aquisição contínua</td></tr>
+            <tr><td style="text-align:left">"Tudo muda muito rápido no Instagram"</td><td style="text-align:left">Falta de base estratégica</td><td style="text-align:left">Sensação de instabilidade</td><td style="text-align:left">Estratégia acima de tendência</td></tr>
+            <tr><td style="text-align:left">"Não tenho tempo para pensar em estratégia"</td><td style="text-align:left">Falta de estrutura e processos</td><td style="text-align:left">Atuação sempre reativa</td><td style="text-align:left">Sistema simples e replicável</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">Níveis de Consciência</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-table-wrap">
+        <table class="canal-table">
+          <thead><tr><th>Nível</th><th>Como ela pensa</th><th>O que ela ainda não vê</th><th>Papel do comercial</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:left;font-weight:500">Inconsciente</td><td style="text-align:left">Acha que é engajamento ou algoritmo</td><td style="text-align:left">Falta de estratégia</td><td style="text-align:left">Provocar reflexão</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Consciente do problema</td><td style="text-align:left">Sente que algo não encaixa</td><td style="text-align:left">Onde está o gargalo real</td><td style="text-align:left">Nomear a causa</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Consciente da solução (parcial)</td><td style="text-align:left">Já ouviu falar em funil e estratégia</td><td style="text-align:left">Como aplicar</td><td style="text-align:left">Mostrar o caminho</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Consciente da transformação</td><td style="text-align:left">Busca estrutura e método</td><td style="text-align:left">Implementação guiada</td><td style="text-align:left">Convidar para a mentoria</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="icp-note-box">Função do diagnóstico: não convencer, e sim gerar clareza para a decisão consciente.</div>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">O Que Ela Precisa Enxergar Antes de Comprar</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-table-wrap">
+        <table class="canal-table">
+          <thead><tr><th>Crença atual</th><th>Nova consciência necessária</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:left">Postar mais resolve</td><td style="text-align:left">Estratégia vale mais que volume</td></tr>
+            <tr><td style="text-align:left">Organização é suficiente</td><td style="text-align:left">Organização sem funil não escala</td></tr>
+            <tr><td style="text-align:left">Stories vendem sozinhos</td><td style="text-align:left">Conteúdo precisa conduzir</td></tr>
+            <tr><td style="text-align:left">Funil é complexo</td><td style="text-align:left">Funil simplifica decisões</td></tr>
+            <tr><td style="text-align:left">Delegar é perder controle</td><td style="text-align:left">Processo gera autonomia</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">Diagnóstico Estratégico — Por Área</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <div class="icp-table-wrap">
+        <table class="canal-table">
+          <thead><tr><th>Área</th><th>Sintoma visível</th><th>Problema real (raiz)</th><th>Consciência a destravar</th></tr></thead>
+          <tbody>
+            <tr><td style="text-align:left;font-weight:500">Operação da loja</td><td style="text-align:left">Não consegue sair da loja sem "dar ruim"</td><td style="text-align:left">Tudo está centralizado nela</td><td style="text-align:left">Loja não é negócio, é autoemprego</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Funcionária</td><td style="text-align:left">Pergunta tudo antes de agir</td><td style="text-align:left">Falta de processos claros</td><td style="text-align:left">Delegar sem processo gera caos</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Vendas</td><td style="text-align:left">Vende bem quando está presente</td><td style="text-align:left">Venda depende da dona</td><td style="text-align:left">Venda precisa de método, não de pessoa</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Provador</td><td style="text-align:left">Funciona só quando ela atende</td><td style="text-align:left">Experiência não é padronizada</td><td style="text-align:left">Experiência de venda é treinável</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Instagram / Digital</td><td style="text-align:left">Stories só funcionam quando ela aparece</td><td style="text-align:left">Comunicação não é replicável</td><td style="text-align:left">Marca precisa falar além da dona</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Conteúdo</td><td style="text-align:left">Posta quando dá tempo</td><td style="text-align:left">Falta rotina e intenção estratégica</td><td style="text-align:left">Conteúdo não é hobby, é ativo</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Agenda</td><td style="text-align:left">Vive apagando incêndio</td><td style="text-align:left">Não existe planejamento</td><td style="text-align:left">Quem não planeja, reage</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Faturamento</td><td style="text-align:left">Fatura, mas não escala</td><td style="text-align:left">Estrutura trava crescimento</td><td style="text-align:left">Crescer exige sistema, não esforço</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Decisões</td><td style="text-align:left">Decide tudo sozinha</td><td style="text-align:left">Falta visão de liderança</td><td style="text-align:left">Liderar é organizar, não executar tudo</td></tr>
+            <tr><td style="text-align:left;font-weight:500">Cansaço</td><td style="text-align:left">Vive cansada e sobrecarregada</td><td style="text-align:left">Modelo insustentável</td><td style="text-align:left">Sucesso sem estrutura cobra um preço</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="icp-block">
+      <div class="icp-toggle-head" onclick="toggleIcp(this)">
+        <span class="icp-dot green"></span>
+        <span class="icp-toggle-title">Quebra de Objeções — 30 objeções mapeadas</span>
+        <span class="icp-chevron">▾</span>
+      </div>
+      <div class="icp-toggle-body">
+        <input type="text" class="objecao-search" id="objecaoSearch" placeholder="Buscar objeção... ex: preço, tempo, marido" oninput="filterObjecoes()">
+        <div class="icp-table-wrap">
+        <table class="canal-table" id="objecaoTable">
+          <thead><tr><th style="width:16%">Objeção declarada</th><th style="width:18%">O que está por trás</th><th style="width:42%">Quebra de consciência (copiável)</th><th style="width:24%">Direcionamento</th></tr></thead>
+          <tbody id="objecaoTableBody"></tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 </div><!-- /main -->
@@ -1127,6 +1488,20 @@ function showTab(id){
   if(id==='mensal'){renderMensal();}
   if(id==='anual'){renderAnual();}
   if(id==='trafego'){renderTrafego();}
+  if(id==='materiais'){renderMateriais();}
+}
+
+function showTabByName(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')===`showTab('${id}')`) b.classList.add('active');
+  });
+  if(id==='mensal'){renderMensal();}
+  if(id==='anual'){renderAnual();}
+  if(id==='trafego'){renderTrafego();}
+  if(id==='materiais'){renderMateriais();}
 }
 
 function toggleFunil(card){card.classList.toggle('open')}
@@ -2000,6 +2375,253 @@ function doLogin(){
 }
 
 checkSession();
+
+// ══════════════════════════════════════════
+// ICP — CLIENTE IDEAL
+// ══════════════════════════════════════════
+function toggleIcp(head){
+  head.classList.toggle('open');
+}
+
+const OBJECOES = [
+  ['Vou pensar mais um pouco','Medo de errar / insegurança','Faz sentido querer pensar. Mas deixa eu te perguntar: o que exatamente você espera mudar sozinha nesse tempo que ainda não mudou até agora?','Avançar para diagnóstico'],
+  ['Agora não é o momento','Falta de prioridade clara','Normalmente o momento nunca fica perfeito. O que muda é a clareza. Hoje, o que está te impedindo de estruturar isso agora?','Reancorar prioridade'],
+  ['Tô sem tempo','Excesso de operacional','A falta de tempo geralmente é consequência da falta de estrutura. O método existe justamente pra organizar isso.','Mostrar ganho de tempo'],
+  ['Preciso falar com meu marido','Transferência de decisão','Claro. Pra essa conversa ser objetiva, o que você precisa ter claro agora sobre retorno e aplicação?','Preparar fechamento'],
+  ['Achei caro','Não vê retorno','O valor pesa quando o retorno ainda não está claro. Posso te mostrar onde esse investimento volta na prática?','Mostrar ROI'],
+  ['Não posso investir agora','Medo financeiro','Entendo. Mas hoje você já investe tempo, energia e estoque sem previsibilidade. Isso também é custo.','Comparar custo oculto'],
+  ['Já fiz mentoria','Trauma / frustração','Muitas mentorias entregam informação, não estrutura aplicada. Aqui o foco é execução guiada.','Diferenciar método'],
+  ['Já tive social media','Confusão de papéis','Social media executa. Sem estratégia, só publica. Primeiro estrutura, depois delega.','Educar sobre estratégia'],
+  ['Tenho medo de não dar certo','Autossabotagem','O medo geralmente aparece quando não existe clareza de caminho. Estrutura reduz risco.','Acolher + segurança'],
+  ['Meu problema não é conteúdo','Consciência parcial','Concordo. O problema não é postar, é usar o conteúdo com intenção comercial.','Elevar consciência'],
+  ['Já tenho planejamento','Planejamento raso','Planejamento sem funis vira organização sem venda. A diferença está na intenção.','Refinar entendimento'],
+  ['Meu Instagram é pequeno','Crença limitante','Estrutura funciona com qualquer tamanho quando bem aplicada. Clareza vence volume.','Quebrar crença'],
+  ['Tem muita concorrência','Medo de saturação','Concorrência alta mostra que o mercado compra. O diferencial é posicionamento.','Reposicionar'],
+  ['Só perguntam preço','Público desqualificado','Quando só perguntam preço, o posicionamento não está filtrando corretamente.','Ajustar posicionamento'],
+  ['Só vendo pros mesmos clientes','Funil único','Você está ativando sempre o mesmo funil. Falta estrutura de atração.','Mostrar oportunidade'],
+  ['Se eu não apareço, não vende','Dependência pessoal','Isso mostra que o negócio depende mais de você do que de processos.','Mostrar delegação'],
+  ['Já tentei de tudo','Cansaço','Normalmente são variações do mesmo erro, sem estrutura central.','Reset estratégico'],
+  ['Vou contratar uma agência','Fuga da decisão','Agência executa o que você manda. Sem estratégia, não resolve o problema.','Redirecionar'],
+  ['Vou focar só na loja física','Visão limitada','Hoje o digital não substitui a loja física, ele potencializa.','Expandir visão'],
+  ['Quero algo mais simples','Medo de complexidade','Estrutura organiza e simplifica. Improviso é o que cansa.','Tranquilizar'],
+  ['Tenho vergonha de aparecer','Bloqueio pessoal','Hoje existem funis que não dependem só da sua imagem.','Ampliar possibilidades'],
+  ['Quero resultado rápido','Expectativa irreal','Picos rápidos não sustentam. Estrutura cria previsibilidade.','Alinhar expectativa'],
+  ['Estou endividada','Busca solução salvadora','Nesse momento, talvez o foco seja organização antes de expansão.','Desqualificar com respeito'],
+  ['Meu caso é diferente','Ego / defesa','A estratégia se adapta à sua realidade. O método não é engessado.','Validar + adaptar'],
+  ['Não sei se é pra mim','Insegurança','Vamos entender se seu momento encaixa no método antes de decidir.','Qualificação'],
+  ['Tenho funcionária, mas tudo passa por mim','Gargalo claro','Esse é exatamente o gargalo que impede crescimento saudável.','Conectar à solução'],
+  ['Faço stories todos os dias','Falsa produtividade','Frequência sem intenção estratégica não gera escala.','Ajustar uso'],
+  ['Posto certinho, mas não vende','Falta de funil','Conteúdo sem condução não leva à decisão de compra.','Introduzir funis'],
+  ['Vou tentar sozinha mais um pouco','Autossuficiência','Fazer sozinha te trouxe até aqui. Pra ir além, precisa de método.','Encaminhar decisão'],
+];
+
+function renderObjecoes(){
+  const tbody = document.getElementById('objecaoTableBody');
+  if(!tbody) return;
+  tbody.innerHTML = OBJECOES.map(o => `
+    <tr class="objecao-row visible" data-search="${(o[0]+' '+o[1]).toLowerCase()}">
+      <td style="text-align:left;font-weight:500">${o[0]}</td>
+      <td style="text-align:left;color:var(--text3)">${o[1]}</td>
+      <td style="text-align:left;line-height:1.5">${o[2]}</td>
+      <td style="text-align:left"><span class="badge badge-g" style="font-size:9px">${o[3]}</span></td>
+    </tr>
+  `).join('');
+}
+
+function filterObjecoes(){
+  const term = (document.getElementById('objecaoSearch')?.value || '').toLowerCase().trim();
+  document.querySelectorAll('#objecaoTableBody tr').forEach(row => {
+    const match = !term || row.getAttribute('data-search').includes(term);
+    row.classList.toggle('visible', match);
+    row.style.display = match ? '' : 'none';
+  });
+}
+
+renderObjecoes();
+
+
+// ══════════════════════════════════════════
+// MATERIAIS — ISCAS, PDFs, EBOOKS, CAPTURAS
+// ══════════════════════════════════════════
+let materiais = [];
+
+const TIPO_ICON = {pdf:'📄', ebook:'📘', pagina_captura:'🔗', outro:'📦'};
+const TIPO_LABEL = {pdf:'PDF', ebook:'Ebook', pagina_captura:'Página de captura', outro:'Outro'};
+
+function gerarMaterialId(){return 'mat_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);}
+
+async function carregarMateriais(){
+  try{
+    const url = SUPA_URL+'/rest/v1/materiais?order=ordem.asc,criado_em.asc';
+    const r = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    materiais = await r.json();
+  }catch(e){
+    console.error('Erro ao carregar materiais:', e);
+    materiais = [];
+  }
+}
+
+async function renderMateriais(){
+  await carregarMateriais();
+  const lista = document.getElementById('materiaisLista');
+  if(!lista) return;
+  if(!materiais.length){
+    lista.innerHTML = '<div class="empty-state">Nenhum material cadastrado ainda. Clique em "+ Novo material" para começar.</div>';
+    return;
+  }
+  lista.innerHTML = materiais.map(m => `
+    <div class="material-card" id="material-${m.id}">
+      <div class="material-head" onclick="toggleMaterial('${m.id}')">
+        <div class="material-icon">${TIPO_ICON[m.tipo]||'📦'}</div>
+        <div class="material-title-wrap">
+          <div class="material-name">${escapeHtml(m.nome) || 'Sem nome'}</div>
+          <div class="material-meta">${TIPO_LABEL[m.tipo]||'Outro'}</div>
+        </div>
+        <span class="status-pill ${m.status||'ativa'}">${m.status==='pausada'?'Pausada':'Ativa'}</span>
+        <span class="material-toggle">▾</span>
+      </div>
+      <div class="material-body">
+        <div class="material-grid">
+          <div class="field-group">
+            <div class="field-label">Nome do material</div>
+            <input class="field-input" type="text" id="mat_nome_${m.id}" value="${escapeAttr(m.nome)}" style="text-align:left;font-family:var(--font);font-size:13px">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Tipo</div>
+            <select class="field-input" id="mat_tipo_${m.id}" style="text-align:left;font-family:var(--font);font-size:13px;cursor:pointer">
+              <option value="pdf" ${m.tipo==='pdf'?'selected':''}>PDF</option>
+              <option value="ebook" ${m.tipo==='ebook'?'selected':''}>Ebook</option>
+              <option value="pagina_captura" ${m.tipo==='pagina_captura'?'selected':''}>Página de captura</option>
+              <option value="outro" ${m.tipo==='outro'?'selected':''}>Outro</option>
+            </select>
+          </div>
+          <div class="field-group material-grid-full">
+            <div class="field-label">Link</div>
+            <div class="material-link-row">
+              <input class="field-input" type="text" id="mat_link_${m.id}" value="${escapeAttr(m.link)}" placeholder="https://..." style="text-align:left;font-family:var(--font);font-size:13px">
+              ${m.link?`<a class="material-open-btn" href="${escapeAttr(m.link)}" target="_blank" rel="noopener">Abrir ↗</a>`:''}
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Status</div>
+            <select class="field-input material-status-select" id="mat_status_${m.id}" style="width:100%;text-align:left;font-family:var(--font)">
+              <option value="ativa" ${m.status==='ativa'?'selected':''}>Ativa</option>
+              <option value="pausada" ${m.status==='pausada'?'selected':''}>Pausada</option>
+            </select>
+          </div>
+          <div class="field-group material-grid-full">
+            <div class="field-label">Observações</div>
+            <textarea class="obs-field" id="mat_obs_${m.id}" placeholder="Para quem é essa isca, contexto de uso, datas de campanha...">${escapeHtml(m.observacoes)}</textarea>
+          </div>
+        </div>
+        <div class="material-actions">
+          <button class="script-save-btn" onclick="salvarMaterial('${m.id}')">Salvar</button>
+          <button class="material-delete-btn" onclick="excluirMaterial('${m.id}')">Excluir</button>
+          <span class="material-save-status" id="mat_save_status_${m.id}">✓ salvo</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function escapeHtml(str){
+  if(!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+function escapeAttr(str){
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function toggleMaterial(id){
+  const card = document.getElementById('material-'+id);
+  if(card) card.classList.toggle('open');
+}
+
+async function addMaterial(){
+  const novo = {
+    id: gerarMaterialId(),
+    nome: '',
+    tipo: 'pdf',
+    link: '',
+    status: 'ativa',
+    observacoes: '',
+    ordem: materiais.length
+  };
+  try{
+    const r = await fetch(SUPA_URL+'/rest/v1/materiais', {
+      method: 'POST',
+      headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body: JSON.stringify(novo)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    await renderMateriais();
+    // Abre o card recém-criado automaticamente
+    const card = document.getElementById('material-'+novo.id);
+    if(card) card.classList.add('open');
+    showSaved();
+  }catch(e){
+    console.error('Erro ao criar material:', e);
+    showError('Erro ao criar material.');
+  }
+}
+
+async function salvarMaterial(id){
+  const statusEl = document.getElementById('mat_save_status_'+id);
+  const dados = {
+    nome: document.getElementById('mat_nome_'+id)?.value || '',
+    tipo: document.getElementById('mat_tipo_'+id)?.value || 'pdf',
+    link: document.getElementById('mat_link_'+id)?.value || '',
+    status: document.getElementById('mat_status_'+id)?.value || 'ativa',
+    observacoes: document.getElementById('mat_obs_'+id)?.value || ''
+  };
+  if(statusEl){statusEl.textContent='salvando...';statusEl.className='material-save-status show';}
+  try{
+    const url = SUPA_URL+'/rest/v1/materiais?id=eq.'+encodeURIComponent(id);
+    const r = await fetch(url, {
+      method: 'PATCH',
+      headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body: JSON.stringify(dados)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(statusEl){statusEl.textContent='✓ salvo';statusEl.className='material-save-status show';setTimeout(()=>statusEl.classList.remove('show'),2000);}
+    showSaved();
+    // Atualiza nome/tipo/status exibidos no cabeçalho do card sem fechar o accordion
+    const idx = materiais.findIndex(m=>m.id===id);
+    if(idx>=0) materiais[idx] = {...materiais[idx], ...dados};
+    const card = document.getElementById('material-'+id);
+    const wasOpen = card && card.classList.contains('open');
+    await renderMateriais();
+    if(wasOpen){
+      const newCard = document.getElementById('material-'+id);
+      if(newCard) newCard.classList.add('open');
+    }
+  }catch(e){
+    console.error('Erro ao salvar material:', e);
+    if(statusEl){statusEl.textContent='⚠ erro';statusEl.className='material-save-status err';setTimeout(()=>{if(statusEl)statusEl.className='material-save-status';},3000);}
+  }
+}
+
+async function excluirMaterial(id){
+  if(!confirm('Excluir este material? Essa ação não pode ser desfeita.')) return;
+  try{
+    const url = SUPA_URL+'/rest/v1/materiais?id=eq.'+encodeURIComponent(id);
+    const r = await fetch(url, {
+      method: 'DELETE',
+      headers: {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    await renderMateriais();
+    showSaved();
+  }catch(e){
+    console.error('Erro ao excluir material:', e);
+    showError('Erro ao excluir material.');
+  }
+}
+
 
 
 // ══════════════════════════════════════════
