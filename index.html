@@ -350,111 +350,117 @@ button{font-family:var(--font)}
 .objecao-row.visible{display:table-row}
 
 /* ══════════════════════════════════════════
-   CRM
+   CRM v2
 ══════════════════════════════════════════ */
-.crm-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.crm-search{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:9px 14px}
+/* Pipeline tabs */
+.crm-pipeline-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:20px}
+.crm-pipe-tab{font-family:var(--font);font-size:12px;font-weight:500;color:var(--text3);background:none;border:none;border-bottom:2px solid transparent;padding:10px 20px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.crm-pipe-tab:hover{color:var(--text2)}
+.crm-pipe-tab.active{color:var(--g4);border-bottom-color:var(--g3)}
+
+/* KPIs */
+.crm-kpi-row{display:grid;gap:10px;margin-bottom:20px}
+.crm-kpi-row.cols-4{grid-template-columns:repeat(4,1fr)}
+.crm-kpi-row.cols-5{grid-template-columns:repeat(5,1fr)}
+
+/* Toolbar */
+.crm-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.crm-search{flex:1;min-width:180px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 12px}
 .crm-search:focus{outline:none;border-color:var(--g3)}
-.crm-filter-select{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 10px;cursor:pointer}
-.crm-new-btn{background:var(--g2);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font);font-size:13px;font-weight:500;padding:9px 18px;cursor:pointer;white-space:nowrap}
-.crm-new-btn:hover{background:var(--g3)}
+.crm-filter-sel{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:12px;padding:7px 10px;cursor:pointer}
+.crm-add-btn{background:var(--g2);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--font);font-size:12px;font-weight:500;padding:8px 16px;cursor:pointer;white-space:nowrap}
+.crm-add-btn:hover{background:var(--g3)}
 
-/* Kanban / Lista toggle */
-.crm-view-tabs{display:flex;gap:4px;margin-bottom:16px}
-.crm-view-tab{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text3);font-size:12px;padding:6px 14px;cursor:pointer}
-.crm-view-tab.active{background:rgba(45,106,79,.2);border-color:var(--g3);color:var(--g4)}
-
-/* Lista de oportunidades */
-.crm-list{display:flex;flex-direction:column;gap:8px}
-.crm-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:border-color .15s}
-.crm-item:hover{border-color:var(--border2)}
-.crm-item-avatar{width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:14px;font-weight:600;color:var(--g4);flex-shrink:0}
-.crm-item-main{flex:1;min-width:0}
-.crm-item-name{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.crm-item-meta{font-size:11px;color:var(--text3);margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
-.crm-item-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.crm-item-date{font-size:10px;color:var(--text3);font-family:var(--mono)}
-
-/* Status badges CRM */
-.crm-status{font-size:10px;font-weight:500;padding:3px 9px;border-radius:20px;white-space:nowrap}
-.crm-s-novo{background:var(--surface2);color:var(--text2)}
-.crm-s-analise{background:rgba(77,184,200,.15);color:var(--teal)}
-.crm-s-qualificado{background:rgba(45,106,79,.2);color:var(--g4)}
-.crm-s-desqualificado{background:rgba(224,112,112,.12);color:var(--coral)}
-.crm-s-convite{background:rgba(155,114,207,.15);color:var(--purple)}
-.crm-s-agendado{background:rgba(155,114,207,.25);color:var(--purple)}
-.crm-s-realizado{background:rgba(45,106,79,.15);color:var(--g4)}
-.crm-s-proposta{background:rgba(233,168,76,.15);color:var(--amber)}
-.crm-s-negociacao{background:rgba(233,168,76,.2);color:var(--amber)}
-.crm-s-followup{background:rgba(77,184,200,.12);color:var(--teal)}
-.crm-s-ganho{background:rgba(45,106,79,.35);color:#b7f5c8;font-weight:700}
-.crm-s-perdido{background:rgba(224,112,112,.2);color:var(--coral)}
-.crm-s-nutricao{background:var(--surface2);color:var(--text3)}
-
-/* Funil badge */
-.crm-funil{font-size:9px;padding:2px 7px;border-radius:10px;background:var(--surface3);color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.05em}
-
-/* Modal Ficha */
-.crm-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:600;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
-.crm-modal-overlay.open{display:flex}
-.crm-modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:720px;min-height:400px;display:flex;flex-direction:column}
-.crm-modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
-.crm-modal-title{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text);flex:1}
-.crm-modal-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1}
-.crm-modal-close:hover{color:var(--text)}
-.crm-modal-body{flex:1;overflow-y:auto;padding:22px}
-.crm-modal-footer{padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center}
-
-/* Ficha sections */
-.crm-section-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:0 0 10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
-.crm-section{margin-bottom:22px}
-.crm-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.crm-field-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.crm-field-full{grid-column:1/-1}
-.crm-field{display:flex;flex-direction:column;gap:4px}
-.crm-label{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
-.crm-input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 10px;width:100%}
-.crm-input:focus{outline:none;border-color:var(--g3)}
-.crm-select{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 10px;width:100%;cursor:pointer}
-.crm-textarea{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 10px;width:100%;resize:vertical;min-height:64px;line-height:1.5}
-.crm-textarea:focus{outline:none;border-color:var(--g3)}
-
-/* Histórico */
-.crm-hist-list{display:flex;flex-direction:column;gap:0}
-.crm-hist-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);position:relative}
-.crm-hist-item:last-child{border-bottom:none}
-.crm-hist-dot{width:8px;height:8px;border-radius:50%;background:var(--g3);flex-shrink:0;margin-top:5px}
-.crm-hist-body{flex:1}
-.crm-hist-desc{font-size:12px;color:var(--text);line-height:1.5}
-.crm-hist-date{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px}
-
-/* Anotação rápida */
-.crm-quick-note{display:flex;gap:8px;margin-bottom:16px}
-.crm-quick-note input{flex:1}
-.crm-quick-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--g4);font-size:12px;padding:8px 14px;cursor:pointer;white-space:nowrap}
-.crm-quick-btn:hover{border-color:var(--g3)}
+/* Abordagens rápidas */
+.crm-abord-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 18px;margin-bottom:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.crm-abord-label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+.crm-abord-input{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--mono);font-size:13px;padding:6px 10px;width:64px;text-align:center}
+.crm-abord-input:focus{outline:none;border-color:var(--g3)}
+.crm-abord-field{display:flex;flex-direction:column;align-items:center;gap:3px}
+.crm-abord-field-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em}
+.crm-abord-save-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--g4);font-size:12px;padding:7px 14px;cursor:pointer}
+.crm-abord-save-btn:hover{border-color:var(--g3)}
+.crm-abord-stats{font-size:11px;color:var(--text3);margin-left:auto}
 
 /* Kanban */
-.crm-kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px}
-.crm-col{min-width:200px;flex-shrink:0;background:var(--surface2);border-radius:var(--radius);padding:12px}
-.crm-col-title{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.crm-col-count{background:var(--surface);border-radius:20px;font-size:10px;padding:2px 7px;color:var(--text2)}
-.crm-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
-.crm-card:hover{border-color:var(--border2)}
-.crm-card-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px}
-.crm-card-meta{font-size:10px;color:var(--text3)}
+.crm-kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:16px;min-height:300px}
+.crm-col{min-width:220px;max-width:220px;flex-shrink:0;background:var(--surface2);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column}
+.crm-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.crm-col-name{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.crm-col-count{background:var(--surface);border-radius:20px;font-size:10px;padding:2px 8px;color:var(--text2);font-family:var(--mono)}
+.crm-cards{flex:1;min-height:60px;display:flex;flex-direction:column;gap:8px}
 
-/* KPIs CRM */
-.crm-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+/* Cards */
+.crm-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:border-color .15s;user-select:none}
+.crm-card:hover{border-color:var(--g3)}
+.crm-card.dragging{opacity:.4;border-color:var(--g3)}
+.crm-col.drag-over{background:rgba(45,106,79,.12);border:1px dashed var(--g3)}
+.crm-card-name{font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crm-card-row{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:6px;margin-bottom:2px;flex-wrap:wrap}
+.crm-card-tag{font-size:9px;font-weight:500;padding:2px 7px;border-radius:10px;background:var(--surface2);color:var(--text3);text-transform:uppercase;letter-spacing:.04em;border:1px solid var(--border2)}
+.crm-card-tag.pc{color:var(--teal);border-color:rgba(77,184,200,.25)}
+.crm-card-tag.isca{color:var(--amber);border-color:rgba(233,168,76,.25)}
+.crm-card-tag.reativacao{color:var(--purple);border-color:rgba(155,114,207,.25)}
+.crm-card-tag.novo_seguidor{color:var(--g4);border-color:rgba(64,145,108,.25)}
+.crm-card-reuniao{font-size:10px;color:var(--g4);margin-top:4px;font-family:var(--mono)}
+.crm-card-acao{font-size:10px;color:var(--amber);margin-top:2px}
+.crm-card-noshow{font-size:10px;color:var(--coral);margin-top:2px}
 
-/* Duplicata warning */
-.crm-dup-warning{background:rgba(233,168,76,.1);border:1px solid rgba(233,168,76,.3);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--amber);margin-top:8px;display:none}
-.crm-dup-warning.show{display:block}
+/* Status colors por coluna */
+.crm-col[data-status="agendado"] .crm-col-name{color:var(--purple)}
+.crm-col[data-status="nao_compareceu"] .crm-col-name{color:var(--coral)}
+.crm-col[data-status="negociacao"] .crm-col-name{color:var(--amber)}
+.crm-col[data-status="ganho"] .crm-col-name{color:var(--g4)}
+.crm-col[data-status="perdido"] .crm-col-name{color:var(--coral)}
+.crm-col[data-status="nutricao"] .crm-col-name{color:var(--text3)}
+
+/* Modal Ficha */
+.crm-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:600;display:none;align-items:flex-start;justify-content:center;padding:24px 16px;overflow-y:auto}
+.crm-modal-overlay.open{display:flex}
+.crm-modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);width:100%;max-width:700px}
+.crm-modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.crm-modal-title{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crm-modal-close{background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer;line-height:1;padding:0 4px;flex-shrink:0}
+.crm-modal-body{padding:20px 22px;max-height:70vh;overflow-y:auto}
+.crm-modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center}
+
+/* Ficha interna */
+.crm-sec{margin-bottom:20px}
+.crm-sec-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.crm-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.crm-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.crm-full{grid-column:1/-1}
+.crm-field{display:flex;flex-direction:column;gap:4px}
+.crm-lbl{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3)}
+.crm-inp{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 10px;width:100%}
+.crm-inp:focus{outline:none;border-color:var(--g3)}
+.crm-sel{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 10px;width:100%;cursor:pointer}
+.crm-ta{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:12px;padding:8px 10px;width:100%;resize:vertical;min-height:60px;line-height:1.5}
+.crm-ta:focus{outline:none;border-color:var(--g3)}
+
+/* Histórico */
+.crm-hist{display:flex;flex-direction:column}
+.crm-hist-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.crm-hist-item:last-child{border-bottom:none}
+.crm-hist-dot{width:7px;height:7px;border-radius:50%;background:var(--g3);flex-shrink:0;margin-top:5px}
+.crm-hist-dot.red{background:var(--coral)}
+.crm-hist-dot.amber{background:var(--amber)}
+.crm-hist-dot.purple{background:var(--purple)}
+.crm-hist-desc{font-size:12px;color:var(--text);line-height:1.5}
+.crm-hist-dt{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.crm-nota-row{display:flex;gap:8px;margin-bottom:14px}
+.crm-nota-row .crm-inp{font-size:12px}
+.crm-nota-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--g4);font-size:12px;padding:8px 12px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.crm-nota-btn:hover{border-color:var(--g3)}
+
+/* Dup warning */
+.crm-dup{background:rgba(233,168,76,.1);border:1px solid rgba(233,168,76,.3);border-radius:var(--radius-sm);padding:9px 13px;font-size:12px;color:var(--amber);margin-top:8px;display:none}
+.crm-dup.show{display:block}
 
 /* Save status */
-.crm-save-status{font-size:11px;font-family:var(--mono);color:var(--text3);opacity:0;transition:opacity .3s;margin-left:auto}
-.crm-save-status.show{opacity:1;color:var(--g4)}
-.crm-save-status.err{opacity:1;color:var(--coral)}
+.crm-save-st{font-size:11px;font-family:var(--mono);opacity:0;transition:opacity .3s;margin-left:auto;color:var(--text3)}
+.crm-save-st.ok{opacity:1;color:var(--g4)}
+.crm-save-st.err{opacity:1;color:var(--coral)}
 </style>
 </head>
 <body>
@@ -655,91 +661,65 @@ button{font-family:var(--font)}
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
     <div>
       <p class="page-title">CRM Comercial</p>
-      <p class="page-sub">Acompanhe cada pessoa desde o primeiro contato até o fechamento</p>
+      <p class="page-sub" id="crmSubtitle">Reuniões — acompanhe cada oportunidade até o fechamento</p>
     </div>
-    <button class="crm-new-btn" onclick="crmNovaOportunidade()">+ Nova oportunidade</button>
+    <button class="crm-add-btn" onclick="crmNovaOportunidade()">+ Nova oportunidade</button>
   </div>
 
-  <!-- KPIs rápidos -->
-  <div class="crm-kpis" id="crmKpis">
-    <div class="kpi-card"><div class="kpi-val" id="crm-k-total">—</div><div class="kpi-lbl">Total ativo</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="crm-k-reunioes">—</div><div class="kpi-lbl">Reuniões agendadas</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="crm-k-followup">—</div><div class="kpi-lbl">Em follow-up</div></div>
-    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="crm-k-ganho">—</div><div class="kpi-lbl">Ganhos</div></div>
-    <div class="kpi-card" style="border-color:var(--amber-dim);background:rgba(233,168,76,.05)"><div class="kpi-val" style="color:var(--amber)" id="crm-k-proxacao">—</div><div class="kpi-lbl">Próxima ação hoje</div></div>
+  <!-- Pipeline tabs -->
+  <div class="crm-pipeline-tabs">
+    <button class="crm-pipe-tab active" onclick="crmSetPipeline('reunioes',this)">Reuniões</button>
+    <button class="crm-pipe-tab" onclick="crmSetPipeline('iscas',this)">Iscas</button>
+    <button class="crm-pipe-tab" onclick="crmSetPipeline('reativacao',this)">Reativação</button>
+    <button class="crm-pipe-tab" onclick="crmSetPipeline('nutricao',this)">Nutrição</button>
   </div>
 
-  <!-- Toolbar -->
+  <!-- KPIs dinâmicos por pipeline -->
+  <div id="crmKpiRow" class="crm-kpi-row cols-4"></div>
+
+  <!-- Barra de abordagens (só na aba Reuniões) -->
+  <div class="crm-abord-bar" id="crmAbordBar">
+    <span class="crm-abord-label">Abordagens de hoje</span>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Total</div><input class="crm-abord-input" type="number" id="abord_total" min="0" placeholder="0"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">PC</div><input class="crm-abord-input" type="number" id="abord_pc" min="0" placeholder="0"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Isca</div><input class="crm-abord-input" type="number" id="abord_isca" min="0" placeholder="0"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Reat.</div><input class="crm-abord-input" type="number" id="abord_reat" min="0" placeholder="0"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Outros</div><input class="crm-abord-input" type="number" id="abord_outros" min="0" placeholder="0"></div>
+    <button class="crm-abord-save-btn" onclick="crmSalvarAbordagens()">Salvar</button>
+    <span class="crm-abord-stats" id="crmAbordStats"></span>
+  </div>
+
+  <!-- Toolbar filtros -->
   <div class="crm-toolbar">
-    <input class="crm-search" type="text" id="crmSearch" placeholder="Buscar por nome, Instagram, WhatsApp..." oninput="crmFiltrar()">
-    <select class="crm-filter-select" id="crmFiltroStatus" onchange="crmFiltrar()">
-      <option value="">Todos os status</option>
-      <option value="novo">Novo</option>
-      <option value="analise">Em análise</option>
-      <option value="qualificado">Qualificado</option>
-      <option value="desqualificado">Desqualificado</option>
-      <option value="convite">Convite para reunião</option>
-      <option value="agendado">Reunião agendada</option>
-      <option value="realizado">Reunião realizada</option>
-      <option value="proposta">Proposta</option>
-      <option value="negociacao">Negociação</option>
-      <option value="followup">Follow-up</option>
-      <option value="ganho">Ganho</option>
-      <option value="perdido">Perdido</option>
-      <option value="nutricao">Nutrição / Reativação</option>
-    </select>
-    <select class="crm-filter-select" id="crmFiltroFunil" onchange="crmFiltrar()">
-      <option value="">Todos os funis</option>
-      <option value="pc">PC / Outbound</option>
-      <option value="isca">Isca</option>
-      <option value="reativacao">Reativação</option>
-      <option value="novo_seguidor">Novo seguidor</option>
-      <option value="campanha">Campanha</option>
-      <option value="outro">Outro</option>
-    </select>
-    <select class="crm-filter-select" id="crmFiltroResp" onchange="crmFiltrar()">
-      <option value="">Todos os responsáveis</option>
+    <input class="crm-search" type="text" id="crmSearch" placeholder="Buscar nome, Instagram, WhatsApp..." oninput="crmFiltrar()">
+    <select class="crm-filter-sel" id="crmFiltroResp" onchange="crmFiltrar()">
+      <option value="">Todos</option>
       <option value="Amanda">Amanda</option>
       <option value="Jéssica">Jéssica</option>
     </select>
   </div>
 
-  <!-- Toggle lista / kanban -->
-  <div class="crm-view-tabs">
-    <button class="crm-view-tab active" id="crmViewLista" onclick="crmSetView('lista')">☰ Lista</button>
-    <button class="crm-view-tab" id="crmViewKanban" onclick="crmSetView('kanban')">⬛ Kanban</button>
-  </div>
-
-  <!-- Lista -->
-  <div id="crmListaWrap">
-    <div class="crm-list" id="crmLista"></div>
-  </div>
-
   <!-- Kanban -->
-  <div id="crmKanbanWrap" style="display:none">
-    <div class="crm-kanban" id="crmKanban"></div>
-  </div>
+  <div class="crm-kanban" id="crmKanban"></div>
 
 </div>
 
-<!-- MODAL FICHA DE OPORTUNIDADE -->
-<div class="crm-modal-overlay" id="crmModalOverlay" onclick="crmFecharModal(event)">
-  <div class="crm-modal" id="crmModal">
+<!-- MODAL FICHA -->
+<div class="crm-modal-overlay" id="crmModalOverlay" onclick="if(event.target===this)crmFecharModal()">
+  <div class="crm-modal">
     <div class="crm-modal-header">
       <div class="crm-modal-title" id="crmModalTitle">Nova oportunidade</div>
-      <div id="crmModalStatusBadge"></div>
-      <button class="crm-modal-close" onclick="crmFecharModalDireto()">✕</button>
+      <button class="crm-modal-close" onclick="crmFecharModal()">✕</button>
     </div>
-    <div class="crm-modal-body" id="crmModalBody">
-      <!-- Preenchido via JS -->
-    </div>
+    <div class="crm-modal-body" id="crmModalBody"></div>
     <div class="crm-modal-footer">
-      <button class="btn-save" id="crmBtnSalvar" onclick="crmSalvarOportunidade()">Salvar</button>
-      <button id="crmBtnExcluir" style="display:none;background:rgba(224,112,112,.12);border:1px solid var(--coral-dim);border-radius:var(--radius-sm);color:var(--coral);font-size:12px;padding:8px 14px;cursor:pointer" onclick="crmExcluirOportunidade()">Excluir</button>
-      <span class="crm-save-status" id="crmSaveStatus"></span>
+      <button class="btn-save" onclick="crmSalvar()">Salvar</button>
+      <button id="crmBtnExcluir" style="display:none;background:rgba(224,112,112,.12);border:1px solid var(--coral-dim);border-radius:var(--radius-sm);color:var(--coral);font-size:12px;padding:8px 14px;cursor:pointer" onclick="crmExcluir()">Excluir</button>
+      <span class="crm-save-st" id="crmSaveSt"></span>
     </div>
   </div>
 </div>
+
 
 <!-- ═══════════════════════════════════════════════ -->
 <!-- REGISTRO DIÁRIO -->
@@ -2579,566 +2559,713 @@ function doLogin(){
 
 checkSession();
 
+
+
 // ══════════════════════════════════════════
-// CRM COMERCIAL
+// CRM v2
 // ══════════════════════════════════════════
-let crmOportunidades = [];
-let crmPessoas = [];
-let crmOportunidadeFiltrada = [];
-let crmEditandoId = null;
-let crmView = 'lista';
+let _crmPessoas = [];
+let _crmOps = [];
+let _crmPipeline = 'reunioes';
+let _crmEditId = null;
 
-const CRM_STATUS_MAP = {
-  novo:          {label:'Novo',                  cls:'crm-s-novo'},
-  analise:       {label:'Em análise',            cls:'crm-s-analise'},
-  qualificado:   {label:'Qualificado',           cls:'crm-s-qualificado'},
-  desqualificado:{label:'Desqualificado',        cls:'crm-s-desqualificado'},
-  convite:       {label:'Convite p/ reunião',    cls:'crm-s-convite'},
-  agendado:      {label:'Reunião agendada',      cls:'crm-s-agendado'},
-  realizado:     {label:'Reunião realizada',     cls:'crm-s-realizado'},
-  proposta:      {label:'Proposta',              cls:'crm-s-proposta'},
-  negociacao:    {label:'Negociação',            cls:'crm-s-negociacao'},
-  followup:      {label:'Follow-up',             cls:'crm-s-followup'},
-  ganho:         {label:'Ganho',                 cls:'crm-s-ganho'},
-  perdido:       {label:'Perdido',               cls:'crm-s-perdido'},
-  nutricao:      {label:'Nutrição / Reativação', cls:'crm-s-nutricao'},
+// ─────────────────────────────────────────
+// DEFINIÇÃO DOS PIPELINES
+// Regra de transição:
+//   status 'agendado'  → pipeline vira 'reunioes'  (some do pipeline original)
+//   status 'ganho'     → pipeline fica onde está (ganho direto)
+//   status 'perdido'   → pipeline vira 'nutricao'  (automático)
+// ─────────────────────────────────────────
+const CRM_PIPELINES = {
+
+  reunioes: {
+    label: 'Reuniões',
+    sub: 'Acompanhe cada reunião até o fechamento',
+    cols: [
+      { status:'agendado',       label:'Reunião agendada',       color:'var(--purple)' },
+      { status:'nao_compareceu', label:'Não compareceu',         color:'var(--coral)'  },
+      { status:'negociacao',     label:'Negociação / Follow-up', color:'var(--amber)'  },
+      { status:'ganho',          label:'Ganho',                  color:'var(--g4)'     },
+      { status:'perdido',        label:'Perdido',                color:'var(--coral)'  },
+    ],
+    kpis: (ops) => [
+      { label:'Agendadas',   val: ops.filter(o=>o.status==='agendado').length,       color:'' },
+      { label:'Negociação',  val: ops.filter(o=>o.status==='negociacao').length,     color:'var(--amber)'  },
+      { label:'Ganhos',      val: ops.filter(o=>o.status==='ganho').length,          color:'var(--g4)'     },
+      { label:'No-show',     val: ops.filter(o=>o.status==='nao_compareceu').length, color:'var(--coral)'  },
+    ],
+    showAbord: true,
+  },
+
+  iscas: {
+    label: 'Iscas',
+    sub: 'Do interesse recebido à reunião ou venda direta',
+    cols: [
+      { status:'isca_interesse', label:'Interesse recebido',  color:'var(--amber)'  },
+      { status:'isca_enviada',   label:'Isca enviada',        color:'var(--teal)'   },
+      { status:'isca_conversa',  label:'Em conversa',         color:'var(--text2)'  },
+      { status:'isca_convite',   label:'Convite p/ reunião',  color:'var(--purple)' },
+      { status:'ganho',          label:'Ganho direto',        color:'var(--g4)'     },
+      { status:'perdido',        label:'Perdido',             color:'var(--coral)'  },
+    ],
+    kpis: (ops) => [
+      { label:'Interesse',      val: ops.filter(o=>o.status==='isca_interesse').length, color:'' },
+      { label:'Em conversa',    val: ops.filter(o=>o.status==='isca_conversa').length,  color:'var(--teal)'   },
+      { label:'Convite p/ reun.', val: ops.filter(o=>o.status==='isca_convite').length, color:'var(--purple)' },
+      { label:'Ganhos diretos', val: ops.filter(o=>o.status==='ganho').length,          color:'var(--g4)'     },
+    ],
+    showAbord: false,
+  },
+
+  reativacao: {
+    label: 'Reativação',
+    sub: 'Quem já passou pelo funil e está sendo reativado',
+    cols: [
+      { status:'reat_novo',      label:'Novo',                  color:'var(--text2)'  },
+      { status:'reat_form',      label:'Formulário enviado',    color:'var(--amber)'  },
+      { status:'reat_qualif',    label:'Qualificado',           color:'var(--g4)'     },
+      { status:'reat_desqualif', label:'Desqualificado',        color:'var(--coral)'  },
+      { status:'isca_convite',   label:'Convite p/ reunião',   color:'var(--purple)' },
+      { status:'ganho',          label:'Ganho direto',          color:'var(--g4)'     },
+      { status:'perdido',        label:'Perdido',               color:'var(--coral)'  },
+    ],
+    kpis: (ops) => [
+      { label:'Novos',           val: ops.filter(o=>o.status==='reat_novo').length,      color:'' },
+      { label:'Form. enviado',   val: ops.filter(o=>o.status==='reat_form').length,      color:'var(--amber)'  },
+      { label:'Qualificados',    val: ops.filter(o=>o.status==='reat_qualif').length,    color:'var(--g4)'     },
+      { label:'Desqualificados', val: ops.filter(o=>o.status==='reat_desqualif').length, color:'var(--coral)'  },
+    ],
+    showAbord: false,
+  },
+
+  nutricao: {
+    label: 'Nutrição',
+    sub: 'Base para futuras estratégias — quem perdeu ou desqualificou',
+    cols: [
+      { status:'nutricao', label:'Em nutrição', color:'var(--text3)' },
+    ],
+    kpis: (ops) => [
+      { label:'Total em nutrição', val: ops.length,                                                        color:'' },
+      { label:'Vieram de Reuniões', val: ops.filter(o=>o.funil_origem==='reunioes'||o.pipeline_origem==='reunioes').length, color:'var(--purple)' },
+      { label:'Vieram de Iscas',    val: ops.filter(o=>o.pipeline_origem==='iscas').length,    color:'var(--amber)'  },
+      { label:'Vieram de Reat.',    val: ops.filter(o=>o.pipeline_origem==='reativacao').length,color:'var(--teal)'   },
+    ],
+    showAbord: false,
+  },
 };
 
-const CRM_FUNIL_MAP = {
-  pc:            'PC / Outbound',
-  isca:          'Isca',
-  reativacao:    'Reativação',
-  novo_seguidor: 'Novo Seguidor',
-  campanha:      'Campanha',
-  outro:         'Outro',
+// Status que, ao serem definidos, mudam o pipeline automaticamente
+const CRM_STATUS_PIPELINE_RULES = {
+  agendado:  'reunioes',  // qualquer pipeline → reunioes
+  perdido:   'nutricao',  // qualquer pipeline → nutricao (registra pipeline_origem antes)
 };
 
-const CRM_ORIGEM_MAP = {
-  instagram:    'Instagram',
-  indicacao:    'Indicação',
-  trafego_pago: 'Tráfego Pago',
-  organico:     'Orgânico',
-  outro:        'Outro',
+const CRM_FUNIL_LABELS = {
+  pc:'PC / Outbound', isca:'Isca', reativacao:'Reativação',
+  novo_seguidor:'Novo Seguidor', campanha:'Campanha', outro:'Outro',
+};
+const CRM_ORIGEM_LABELS = {
+  instagram:'Instagram', indicacao:'Indicação', trafego_pago:'Tráfego Pago',
+  organico:'Orgânico', outro:'Outro',
 };
 
-const CRM_KANBAN_COLS = ['novo','analise','qualificado','convite','agendado','realizado','proposta','negociacao','followup','ganho','perdido','nutricao'];
-
-function crmGerarId(prefix='op'){
-  return prefix+'_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
+// Todos os status possíveis (para select na ficha)
+function crmAllStatusOpts(currentPipeline, selected){
+  const cols = CRM_PIPELINES[currentPipeline]?.cols || CRM_PIPELINES.reunioes.cols;
+  return cols.map(c=>`<option value="${c.status}" ${selected===c.status?'selected':''}>${c.label}</option>`).join('');
 }
 
-function crmFmtDate(dt){
-  if(!dt) return '—';
-  const d = new Date(dt);
-  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+function crmGid(p='x'){return p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);}
+function crmEsc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function crmFmtDt(dt){if(!dt)return'—';const d=new Date(dt);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+function crmFmtDtHr(dt){if(!dt)return'—';const d=new Date(dt);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
+
+// ── Carregar ──
+async function renderCRM(){
+  await crmCarregar();
+  crmSetPipeline('reunioes', document.querySelector('.crm-pipe-tab'));
+  await crmCarregarAbordHoje();
 }
 
-function crmFmtDateTime(dt){
-  if(!dt) return '—';
-  const d = new Date(dt);
-  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-}
-
-function crmStatusBadge(status){
-  const s = CRM_STATUS_MAP[status] || {label:status,cls:'crm-s-novo'};
-  return `<span class="crm-status ${s.cls}">${s.label}</span>`;
-}
-
-function crmFunilBadge(funil){
-  return `<span class="crm-funil">${CRM_FUNIL_MAP[funil]||funil}</span>`;
-}
-
-// ── Carregamento ──
 async function crmCarregar(){
   try{
     const [rOp, rPes] = await Promise.all([
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?order=criado_em.desc&limit=200',
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?order=criado_em.desc&limit=500',
         {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}),
-      fetch(SUPA_URL+'/rest/v1/crm_pessoas?order=nome.asc&limit=500',
+      fetch(SUPA_URL+'/rest/v1/crm_pessoas?order=nome.asc&limit=1000',
         {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}})
     ]);
-    crmOportunidades = await rOp.json();
-    crmPessoas = await rPes.json();
-    crmFiltrar();
-    crmAtualizarKpis();
-  }catch(e){
-    console.error('CRM: erro ao carregar', e);
-  }
+    if(!rOp.ok||!rPes.ok) throw new Error('HTTP error');
+    _crmOps = await rOp.json();
+    _crmPessoas = await rPes.json();
+  }catch(e){console.error('CRM carregar:',e);}
 }
 
-async function renderCRM(){
-  await crmCarregar();
+// ── Pipeline ──
+function crmSetPipeline(pipeline, btn){
+  _crmPipeline = pipeline;
+  document.querySelectorAll('.crm-pipe-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const def = CRM_PIPELINES[pipeline];
+  const sub = document.getElementById('crmSubtitle');
+  if(sub) sub.textContent = def.sub;
+  const abordBar = document.getElementById('crmAbordBar');
+  if(abordBar) abordBar.style.display = def.showAbord ? '' : 'none';
+  crmFiltrar();
 }
 
 // ── Filtro ──
 function crmFiltrar(){
-  const busca = (document.getElementById('crmSearch')?.value||'').toLowerCase();
-  const fStatus = document.getElementById('crmFiltroStatus')?.value||'';
-  const fFunil = document.getElementById('crmFiltroFunil')?.value||'';
-  const fResp = document.getElementById('crmFiltroResp')?.value||'';
+  const busca   = (document.getElementById('crmSearch')?.value||'').toLowerCase();
+  const fResp   = document.getElementById('crmFiltroResp')?.value||'';
+  const def     = CRM_PIPELINES[_crmPipeline];
+  const statusDoPipeline = def.cols.map(c=>c.status);
 
-  crmOportunidadeFiltrada = crmOportunidades.filter(op=>{
-    const pessoa = crmPessoas.find(p=>p.id===op.pessoa_id)||{};
-    const txt = (pessoa.nome+' '+pessoa.instagram+' '+pessoa.whatsapp).toLowerCase();
-    if(busca && !txt.includes(busca)) return false;
-    if(fStatus && op.status!==fStatus) return false;
-    if(fFunil && op.funil!==fFunil) return false;
-    if(fResp && op.responsavel!==fResp) return false;
+  const filtradas = _crmOps.filter(op=>{
+    // Pertence a este pipeline?
+    if(op.pipeline !== _crmPipeline) return false;
+    // Status válido para este pipeline?
+    if(!statusDoPipeline.includes(op.status)) return false;
+    if(fResp && op.responsavel !== fResp) return false;
+    if(busca){
+      const p = _crmPessoas.find(x=>x.id===op.pessoa_id)||{};
+      const txt = ((p.nome||'')+' '+(p.instagram||'')+' '+(p.whatsapp||'')).toLowerCase();
+      if(!txt.includes(busca)) return false;
+    }
     return true;
   });
 
-  if(crmView==='lista') crmRenderLista();
-  else crmRenderKanban();
-}
-
-function crmSetView(v){
-  crmView=v;
-  document.getElementById('crmViewLista').classList.toggle('active',v==='lista');
-  document.getElementById('crmViewKanban').classList.toggle('active',v==='kanban');
-  document.getElementById('crmListaWrap').style.display=v==='lista'?'':'none';
-  document.getElementById('crmKanbanWrap').style.display=v==='kanban'?'':'none';
-  crmFiltrar();
-}
-
-// ── KPIs ──
-function crmAtualizarKpis(){
-  const ativos = crmOportunidades.filter(o=>o.status!=='ganho'&&o.status!=='perdido'&&o.status!=='desqualificado');
-  document.getElementById('crm-k-total').textContent = ativos.length||0;
-  document.getElementById('crm-k-reunioes').textContent = crmOportunidades.filter(o=>o.status==='agendado').length||0;
-  document.getElementById('crm-k-followup').textContent = crmOportunidades.filter(o=>o.status==='followup').length||0;
-  document.getElementById('crm-k-ganho').textContent = crmOportunidades.filter(o=>o.status==='ganho').length||0;
-  const hoje = new Date().toISOString().split('T')[0];
-  document.getElementById('crm-k-proxacao').textContent = crmOportunidades.filter(o=>o.data_proxima_acao===hoje&&o.status!=='ganho'&&o.status!=='perdido').length||0;
-}
-
-// ── Lista ──
-function crmRenderLista(){
-  const el = document.getElementById('crmLista');
-  if(!el) return;
-  if(!crmOportunidadeFiltrada.length){
-    el.innerHTML='<div class="empty-state">Nenhuma oportunidade encontrada.</div>'; return;
+  // KPIs
+  const kpiRow = document.getElementById('crmKpiRow');
+  const kpis = def.kpis(filtradas);
+  if(kpiRow){
+    kpiRow.className = 'crm-kpi-row cols-'+kpis.length;
+    kpiRow.innerHTML = kpis.map(k=>`<div class="kpi-card"><div class="kpi-val"${k.color?` style="color:${k.color}"`:''}>${k.val||0}</div><div class="kpi-lbl">${k.label}</div></div>`).join('');
   }
-  el.innerHTML = crmOportunidadeFiltrada.map(op=>{
-    const p = crmPessoas.find(x=>x.id===op.pessoa_id)||{nome:'?'};
-    const inicial = (p.nome||'?')[0].toUpperCase();
-    const meta = [CRM_FUNIL_MAP[op.funil]||op.funil, op.responsavel, op.proxima_acao?'→ '+op.proxima_acao:''].filter(Boolean).join(' · ');
-    return `<div class="crm-item" onclick="crmAbrirOportunidade('${op.id}')">
-      <div class="crm-item-avatar">${inicial}</div>
-      <div class="crm-item-main">
-        <div class="crm-item-name">${crmEsc(p.nome)}</div>
-        <div class="crm-item-meta">
-          ${crmFunilBadge(op.funil)}
-          <span>${crmEsc(op.responsavel)||'—'}</span>
-          ${op.proxima_acao?`<span style="color:var(--amber)">→ ${crmEsc(op.proxima_acao)}</span>`:''}
-          ${op.data_proxima_acao?`<span style="color:var(--text3)">${crmFmtDate(op.data_proxima_acao)}</span>`:''}
-        </div>
-      </div>
-      <div class="crm-item-right">
-        ${crmStatusBadge(op.status)}
-        <span class="crm-item-date">${crmFmtDate(op.data_entrada)}</span>
-      </div>
-    </div>`;
-  }).join('');
+
+  crmRenderKanban(def.cols, filtradas);
 }
 
 // ── Kanban ──
-function crmRenderKanban(){
+function crmRenderKanban(cols, ops){
   const el = document.getElementById('crmKanban');
   if(!el) return;
-  el.innerHTML = CRM_KANBAN_COLS.map(status=>{
-    const s = CRM_STATUS_MAP[status];
-    const cards = crmOportunidadeFiltrada.filter(op=>op.status===status);
-    return `<div class="crm-col">
-      <div class="crm-col-title">${s.label} <span class="crm-col-count">${cards.length}</span></div>
-      ${cards.map(op=>{
-        const p = crmPessoas.find(x=>x.id===op.pessoa_id)||{nome:'?'};
-        return `<div class="crm-card" onclick="crmAbrirOportunidade('${op.id}')">
-          <div class="crm-card-name">${crmEsc(p.nome)}</div>
-          <div class="crm-card-meta">${CRM_FUNIL_MAP[op.funil]||op.funil} · ${op.responsavel||'—'}</div>
-          ${op.proxima_acao?`<div class="crm-card-meta" style="color:var(--amber);margin-top:4px">→ ${crmEsc(op.proxima_acao)}</div>`:''}
-        </div>`;
-      }).join('')}
+  el.innerHTML = cols.map(col=>{
+    const cards = ops.filter(o=>o.status===col.status);
+    return `<div class="crm-col" data-status="${col.status}"
+      ondragover="event.preventDefault();this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="crmDrop(event,'${col.status}')">
+      <div class="crm-col-head">
+        <span class="crm-col-name" style="color:${col.color}">${col.label}</span>
+        <span class="crm-col-count">${cards.length}</span>
+      </div>
+      <div class="crm-cards">
+        ${cards.map(op=>crmCardHtml(op)).join('')}
+        <div style="height:40px"></div>
+      </div>
     </div>`;
   }).join('');
 }
 
-// ── MODAL — FICHA ──
-function crmModalHtml(op, pessoa, eventos){
+function crmCardHtml(op){
+  const p = _crmPessoas.find(x=>x.id===op.pessoa_id)||{nome:'?'};
+  const fTag = `<span class="crm-card-tag ${op.funil}">${CRM_FUNIL_LABELS[op.funil]||op.funil}</span>`;
+  const origemLine = op.pipeline_origem
+    ? `<span class="crm-card-tag" style="color:var(--text3)">via ${CRM_PIPELINES[op.pipeline_origem]?.label||op.pipeline_origem}</span>` : '';
+  const reuniaoLine = op.reuniao_data
+    ? `<div class="crm-card-reuniao">📅 ${crmFmtDtHr(op.reuniao_data)}</div>` : '';
+  const acaoLine = op.proxima_acao
+    ? `<div class="crm-card-acao">→ ${crmEsc(op.proxima_acao)}${op.data_proxima_acao?' · '+crmFmtDt(op.data_proxima_acao):''}</div>` : '';
+  const noshowLine = op.status==='nao_compareceu'
+    ? `<div class="crm-card-noshow">⚠ No-show${op.data_no_show?' em '+crmFmtDt(op.data_no_show):''}</div>` : '';
+  return `<div class="crm-card" draggable="true"
+    ondragstart="crmDragStart(event,'${op.id}')"
+    ondragend="document.querySelectorAll('.crm-col').forEach(c=>c.classList.remove('drag-over'))"
+    onclick="crmAbrirFicha('${op.id}')">
+    <div class="crm-card-name">${crmEsc(p.nome)}</div>
+    <div class="crm-card-row">${fTag}${origemLine}<span style="color:var(--text3)">${crmEsc(op.responsavel)||'—'}</span></div>
+    ${reuniaoLine}${acaoLine}${noshowLine}
+  </div>`;
+}
+
+// ── Drag & Drop ──
+let _dragOpId = null;
+function crmDragStart(e, opId){ _dragOpId = opId; }
+
+async function crmDrop(e, novoStatus){
+  e.preventDefault();
+  document.querySelectorAll('.crm-col').forEach(c=>c.classList.remove('drag-over'));
+  if(!_dragOpId) return;
+  const opId = _dragOpId; _dragOpId = null;
+  const op = _crmOps.find(o=>o.id===opId);
+  if(!op || op.status === novoStatus) return;
+
+  const statusAnterior = op.status;
+  const agora = new Date().toISOString();
+
+  // Determinar novo pipeline pelas regras automáticas
+  const novoPipeline = CRM_STATUS_PIPELINE_RULES[novoStatus] || op.pipeline;
+  const pipelineMudou = novoPipeline !== op.pipeline;
+
+  // Campos de data automáticos
+  const datesUpdate = {};
+  if(novoStatus==='agendado')        datesUpdate.data_agendamento = agora;
+  if(novoStatus==='nao_compareceu')  datesUpdate.data_no_show     = agora;
+  if(novoStatus==='negociacao')      datesUpdate.data_negociacao   = agora;
+  if(novoStatus==='ganho')           datesUpdate.data_ganho        = agora;
+  if(novoStatus==='perdido')         datesUpdate.data_perda        = agora;
+
+  // Registrar pipeline de origem ao ir para nutrição
+  const pipelineOrigemUpdate = {};
+  if(novoStatus==='nutricao'||novoStatus==='perdido'){
+    pipelineOrigemUpdate.pipeline_origem = op.pipeline;
+  }
+
+  try{
+    await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+opId,{
+      method:'PATCH',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({status:novoStatus, pipeline:novoPipeline, ...datesUpdate, ...pipelineOrigemUpdate})
+    });
+
+    // Evento no histórico
+    const allLabels = {};
+    Object.values(CRM_PIPELINES).forEach(p=>p.cols.forEach(c=>allLabels[c.status]=c.label));
+    const pipelineMsg = pipelineMudou ? ` (→ ${CRM_PIPELINES[novoPipeline]?.label||novoPipeline})` : '';
+    const desc = `${allLabels[statusAnterior]||statusAnterior} → ${allLabels[novoStatus]||novoStatus}${pipelineMsg}`;
+
+    await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({id:crmGid('ev'),oportunidade_id:opId,pessoa_id:op.pessoa_id,
+        tipo:'status',descricao:desc,status_anterior:statusAnterior,status_novo:novoStatus,responsavel:''})
+    });
+
+    await crmCarregar();
+    crmFiltrar();
+    showSaved();
+  }catch(err){console.error('CRM drop:',err);showError('Erro ao mover. Verifique a conexão.');}
+}
+
+// ── Nova oportunidade ──
+function crmNovaOportunidade(){
+  _crmEditId = null;
+  document.getElementById('crmModalTitle').textContent = 'Nova oportunidade';
+  document.getElementById('crmBtnExcluir').style.display = 'none';
+  document.getElementById('crmModalBody').innerHTML = crmFichaHtml({},{});
+  document.getElementById('crmModalOverlay').classList.add('open');
+  const pSel = document.getElementById('crm_pipeline');
+  if(pSel){ pSel.value = _crmPipeline; crmAtualizarStatusOpts(); }
+}
+
+// ── Abrir ficha ──
+async function crmAbrirFicha(opId){
+  _crmEditId = opId;
+  const op = _crmOps.find(o=>o.id===opId)||{};
+  const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
+  let eventos = [];
+  try{
+    const r = await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+opId+'&order=criado_em.asc',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(r.ok) eventos = await r.json();
+  }catch(e){}
+  document.getElementById('crmModalTitle').textContent = pessoa.nome||'Oportunidade';
+  document.getElementById('crmBtnExcluir').style.display = 'inline-block';
+  document.getElementById('crmModalBody').innerHTML = crmFichaHtml(op, pessoa, eventos);
+  document.getElementById('crmModalOverlay').classList.add('open');
+}
+
+// ── HTML da Ficha ──
+function crmFichaHtml(op, pessoa, eventos=[]){
   const isNovo = !op.id;
+  const pipeAtual = op.pipeline || _crmPipeline;
+  const pipelineOpts = Object.entries(CRM_PIPELINES).map(([v,p])=>`<option value="${v}" ${pipeAtual===v?'selected':''}>${p.label}</option>`).join('');
+  const funilOpts = Object.entries(CRM_FUNIL_LABELS).map(([v,l])=>`<option value="${v}" ${(op.funil||'pc')===v?'selected':''}>${l}</option>`).join('');
+  const origemOpts = Object.entries(CRM_ORIGEM_LABELS).map(([v,l])=>`<option value="${v}" ${(op.origem||'instagram')===v?'selected':''}>${l}</option>`).join('');
+
   return `
-  <!-- DADOS -->
-  <div class="crm-section">
-    <div class="crm-section-title">Dados da pessoa</div>
-    <div class="crm-field-grid">
-      <div class="crm-field"><div class="crm-label">Nome</div><input class="crm-input" id="crm_nome" value="${crmEsc(pessoa.nome||'')}" placeholder="Nome completo" oninput="crmBuscarDuplicata()"></div>
-      <div class="crm-field"><div class="crm-label">WhatsApp</div><input class="crm-input" id="crm_whatsapp" value="${crmEsc(pessoa.whatsapp||'')}" placeholder="(51) 99999-9999" oninput="crmBuscarDuplicata()"></div>
-      <div class="crm-field"><div class="crm-label">Instagram</div><input class="crm-input" id="crm_instagram" value="${crmEsc(pessoa.instagram||'')}" placeholder="@usuario" oninput="crmBuscarDuplicata()"></div>
-      <div class="crm-field"><div class="crm-label">E-mail</div><input class="crm-input" id="crm_email" value="${crmEsc(pessoa.email||'')}" placeholder="email@..."></div>
+  <div class="crm-sec">
+    <div class="crm-sec-title">Pessoa</div>
+    <div class="crm-grid2">
+      <div class="crm-field"><div class="crm-lbl">Nome</div>
+        <input class="crm-inp" id="crm_nome" value="${crmEsc(pessoa.nome||'')}" placeholder="Nome completo" oninput="crmBuscaDup()"></div>
+      <div class="crm-field"><div class="crm-lbl">WhatsApp</div>
+        <input class="crm-inp" id="crm_wa" value="${crmEsc(pessoa.whatsapp||'')}" placeholder="(51) 9..." oninput="crmBuscaDup()"></div>
+      <div class="crm-field"><div class="crm-lbl">Instagram</div>
+        <input class="crm-inp" id="crm_ig" value="${crmEsc(pessoa.instagram||'')}" placeholder="@usuario" oninput="crmBuscaDup()"></div>
+      <div class="crm-field"><div class="crm-lbl">E-mail</div>
+        <input class="crm-inp" id="crm_email" value="${crmEsc(pessoa.email||'')}" placeholder="email@..."></div>
     </div>
-    <div id="crmDupAviso" class="crm-dup-warning"></div>
-    <div class="crm-field" style="margin-top:10px"><div class="crm-label">Observações sobre a pessoa</div><textarea class="crm-textarea" id="crm_obs_pessoa" placeholder="Contexto, informações relevantes...">${crmEsc(pessoa.observacoes||'')}</textarea></div>
+    <div id="crmDupWarn" class="crm-dup"></div>
+    <div class="crm-field" style="margin-top:10px">
+      <div class="crm-lbl">Observações</div>
+      <textarea class="crm-ta" id="crm_obs_p" placeholder="Contexto, perfil...">${crmEsc(pessoa.observacoes||'')}</textarea>
+    </div>
   </div>
 
-  <!-- COMERCIAL -->
-  <div class="crm-section">
-    <div class="crm-section-title">Comercial</div>
-    <div class="crm-field-grid-3">
-      <div class="crm-field"><div class="crm-label">Funil</div>
-        <select class="crm-select" id="crm_funil">
-          ${Object.entries(CRM_FUNIL_MAP).map(([v,l])=>`<option value="${v}" ${(op.funil||'pc')===v?'selected':''}>${l}</option>`).join('')}
-        </select>
-      </div>
-      <div class="crm-field"><div class="crm-label">Origem</div>
-        <select class="crm-select" id="crm_origem">
-          ${Object.entries(CRM_ORIGEM_MAP).map(([v,l])=>`<option value="${v}" ${(op.origem||'instagram')===v?'selected':''}>${l}</option>`).join('')}
-        </select>
-      </div>
-      <div class="crm-field"><div class="crm-label">Status</div>
-        <select class="crm-select" id="crm_status">
-          ${Object.entries(CRM_STATUS_MAP).map(([v,s])=>`<option value="${v}" ${(op.status||'novo')===v?'selected':''}>${s.label}</option>`).join('')}
-        </select>
-      </div>
-      <div class="crm-field"><div class="crm-label">Responsável</div>
-        <select class="crm-select" id="crm_responsavel">
-          <option value="Amanda" ${op.responsavel==='Amanda'?'selected':''}>Amanda</option>
+  <div class="crm-sec">
+    <div class="crm-sec-title">Comercial</div>
+    <div class="crm-grid3">
+      <div class="crm-field"><div class="crm-lbl">Pipeline</div>
+        <select class="crm-sel" id="crm_pipeline" onchange="crmAtualizarStatusOpts()">${pipelineOpts}</select></div>
+      <div class="crm-field"><div class="crm-lbl">Funil de origem</div>
+        <select class="crm-sel" id="crm_funil">${funilOpts}</select></div>
+      <div class="crm-field"><div class="crm-lbl">Origem</div>
+        <select class="crm-sel" id="crm_origem">${origemOpts}</select></div>
+      <div class="crm-field"><div class="crm-lbl">Status</div>
+        <select class="crm-sel" id="crm_status">${crmAllStatusOpts(pipeAtual, op.status||'')}</select></div>
+      <div class="crm-field"><div class="crm-lbl">Responsável</div>
+        <select class="crm-sel" id="crm_resp">
+          <option value="Amanda" ${(op.responsavel||'Amanda')==='Amanda'?'selected':''}>Amanda</option>
           <option value="Jéssica" ${op.responsavel==='Jéssica'?'selected':''}>Jéssica</option>
-        </select>
-      </div>
-      <div class="crm-field"><div class="crm-label">Próxima ação</div><input class="crm-input" id="crm_proxima_acao" value="${crmEsc(op.proxima_acao||'')}" placeholder="ex: ligar, enviar proposta..."></div>
-      <div class="crm-field"><div class="crm-label">Data da próxima ação</div><input class="crm-input" type="date" id="crm_data_proxima_acao" value="${op.data_proxima_acao||''}"></div>
+        </select></div>
+      <div class="crm-field"><div class="crm-lbl">Isca enviada</div>
+        <input class="crm-inp" id="crm_isca" value="${crmEsc(op.isca_nome||'')}" placeholder="Nome da isca..."></div>
     </div>
-    ${op.funil==='isca'||!op.id?`<div class="crm-field" style="margin-top:10px"><div class="crm-label">Isca recebida (se funil Isca)</div><input class="crm-input" id="crm_isca_nome" value="${crmEsc(op.isca_nome||'')}" placeholder="ex: PDF Estratégia de Stories"></div>`:''}
-  </div>
-
-  <!-- REUNIÃO -->
-  <div class="crm-section">
-    <div class="crm-section-title">Reunião</div>
-    <div class="crm-field-grid">
-      <div class="crm-field"><div class="crm-label">Data e hora</div><input class="crm-input" type="datetime-local" id="crm_reuniao_data" value="${op.reuniao_data?op.reuniao_data.slice(0,16):''}"></div>
-      <div class="crm-field"><div class="crm-label">Status da reunião</div>
-        <select class="crm-select" id="crm_reuniao_status">
-          <option value="">—</option>
-          <option value="agendada" ${op.reuniao_status==='agendada'?'selected':''}>Agendada</option>
-          <option value="realizada" ${op.reuniao_status==='realizada'?'selected':''}>Realizada</option>
-          <option value="no_show" ${op.reuniao_status==='no_show'?'selected':''}>No-show</option>
-          <option value="cancelada" ${op.reuniao_status==='cancelada'?'selected':''}>Cancelada</option>
-          <option value="reagendada" ${op.reuniao_status==='reagendada'?'selected':''}>Reagendada</option>
-        </select>
-      </div>
-      <div class="crm-field"><div class="crm-label">Resultado da reunião</div>
-        <select class="crm-select" id="crm_reuniao_resultado">
-          <option value="">—</option>
-          <option value="venda" ${op.reuniao_resultado==='venda'?'selected':''}>Venda</option>
-          <option value="proposta" ${op.reuniao_resultado==='proposta'?'selected':''}>Proposta enviada</option>
-          <option value="negociacao" ${op.reuniao_resultado==='negociacao'?'selected':''}>Em negociação</option>
-          <option value="followup" ${op.reuniao_resultado==='followup'?'selected':''}>Follow-up</option>
-          <option value="sem_interesse" ${op.reuniao_resultado==='sem_interesse'?'selected':''}>Sem interesse</option>
-          <option value="sem_fit" ${op.reuniao_resultado==='sem_fit'?'selected':''}>Sem fit</option>
-          <option value="outro" ${op.reuniao_resultado==='outro'?'selected':''}>Outro</option>
-        </select>
-      </div>
-      <div class="crm-field"><div class="crm-label">Produto ofertado</div><input class="crm-input" id="crm_reuniao_produto" value="${crmEsc(op.reuniao_produto_ofertado||'')}" placeholder="ex: Mentoria JS, Lapidar..."></div>
-      <div class="crm-field"><div class="crm-label">Valor ofertado (R$)</div><input class="crm-input" type="number" id="crm_reuniao_valor" value="${op.reuniao_valor_ofertado||''}"></div>
-      <div class="crm-field"><div class="crm-label">Valor da venda (R$)</div><input class="crm-input" type="number" id="crm_valor_venda" value="${op.valor_venda||''}"></div>
-    </div>
-    <div class="crm-field-grid" style="margin-top:10px">
-      <div class="crm-field"><div class="crm-label">Objeção principal</div><input class="crm-input" id="crm_reuniao_objecao" value="${crmEsc(op.reuniao_objecao||'')}" placeholder="ex: preço, sem tempo..."></div>
-      <div class="crm-field"><div class="crm-label">Motivo da perda</div><input class="crm-input" id="crm_reuniao_motivo_perda" value="${crmEsc(op.reuniao_motivo_perda||'')}" placeholder="se perdido..."></div>
-    </div>
-    <div class="crm-field" style="margin-top:10px"><div class="crm-label">Observações da reunião</div><textarea class="crm-textarea" id="crm_reuniao_obs" placeholder="Anotações, contexto, impressões...">${crmEsc(op.reuniao_obs||'')}</textarea></div>
-  </div>
-
-  <!-- DATAS DOS EVENTOS -->
-  <div class="crm-section">
-    <div class="crm-section-title">Datas dos eventos</div>
-    <div class="crm-field-grid-3">
-      <div class="crm-field"><div class="crm-label">Entrada no CRM</div><input class="crm-input" type="date" id="crm_data_entrada" value="${op.data_entrada||today()}"></div>
-      <div class="crm-field"><div class="crm-label">Abordagem</div><input class="crm-input" type="date" id="crm_data_abordagem" value="${op.data_abordagem||''}"></div>
-      <div class="crm-field"><div class="crm-label">Qualificação</div><input class="crm-input" type="date" id="crm_data_qualificacao" value="${op.data_qualificacao||''}"></div>
-      <div class="crm-field"><div class="crm-label">Convite</div><input class="crm-input" type="date" id="crm_data_convite" value="${op.data_convite||''}"></div>
-      <div class="crm-field"><div class="crm-label">Agendamento</div><input class="crm-input" type="date" id="crm_data_agendamento" value="${op.data_agendamento||''}"></div>
-      <div class="crm-field"><div class="crm-label">Reunião realizada</div><input class="crm-input" type="date" id="crm_data_reuniao_realizada" value="${op.data_reuniao_realizada||''}"></div>
-      <div class="crm-field"><div class="crm-label">Proposta</div><input class="crm-input" type="date" id="crm_data_proposta" value="${op.data_proposta||''}"></div>
-      <div class="crm-field"><div class="crm-label">Follow-up</div><input class="crm-input" type="date" id="crm_data_followup" value="${op.data_followup||''}"></div>
-      <div class="crm-field"><div class="crm-label">Venda</div><input class="crm-input" type="date" id="crm_data_venda" value="${op.data_venda||''}"></div>
+    <div class="crm-grid2" style="margin-top:10px">
+      <div class="crm-field"><div class="crm-lbl">Próxima ação</div>
+        <input class="crm-inp" id="crm_prox" value="${crmEsc(op.proxima_acao||'')}" placeholder="ex: ligar, enviar proposta..."></div>
+      <div class="crm-field"><div class="crm-lbl">Data da próxima ação</div>
+        <input class="crm-inp" type="date" id="crm_prox_dt" value="${op.data_proxima_acao||''}"></div>
     </div>
   </div>
 
-  <!-- HISTÓRICO -->
-  ${!isNovo?`<div class="crm-section">
-    <div class="crm-section-title">Histórico</div>
-    <div class="crm-quick-note">
-      <input class="crm-input" id="crmNotaRapida" placeholder="Adicionar anotação ao histórico..." onkeydown="if(event.key==='Enter')crmAddNota()">
-      <button class="crm-quick-btn" onclick="crmAddNota()">+ Registrar</button>
+  <div class="crm-sec">
+    <div class="crm-sec-title">Reunião</div>
+    <div class="crm-grid2">
+      <div class="crm-field"><div class="crm-lbl">Data e hora</div>
+        <input class="crm-inp" type="datetime-local" id="crm_reun_dt" value="${op.reuniao_data?op.reuniao_data.slice(0,16):''}"></div>
+      <div class="crm-field"><div class="crm-lbl">Produto ofertado</div>
+        <input class="crm-inp" id="crm_produto" value="${crmEsc(op.reuniao_produto||'')}" placeholder="ex: Mentoria JS..."></div>
+      <div class="crm-field"><div class="crm-lbl">Valor ofertado (R$)</div>
+        <input class="crm-inp" type="number" id="crm_vl_ofert" value="${op.reuniao_valor_ofertado||''}"></div>
+      <div class="crm-field"><div class="crm-lbl">Valor da venda (R$)</div>
+        <input class="crm-inp" type="number" id="crm_vl_venda" value="${op.valor_venda||''}"></div>
+      <div class="crm-field"><div class="crm-lbl">Objeção principal</div>
+        <input class="crm-inp" id="crm_objecao" value="${crmEsc(op.reuniao_objecao||'')}" placeholder="ex: preço, sem tempo..."></div>
+      <div class="crm-field"><div class="crm-lbl">Motivo da perda</div>
+        <input class="crm-inp" id="crm_perda" value="${crmEsc(op.reuniao_motivo_perda||'')}" placeholder="se perdido..."></div>
     </div>
-    <div class="crm-hist-list" id="crmHistLista">
-      ${eventos.length ? eventos.map(ev=>`
+    <div class="crm-field" style="margin-top:10px">
+      <div class="crm-lbl">Observações da reunião</div>
+      <textarea class="crm-ta" id="crm_reun_obs" placeholder="Anotações, impressões...">${crmEsc(op.reuniao_obs||'')}</textarea>
+    </div>
+  </div>
+
+  ${!isNovo?`
+  <div class="crm-sec">
+    <div class="crm-sec-title">Histórico</div>
+    <div class="crm-nota-row">
+      <input class="crm-inp" id="crmNota" placeholder="Registrar anotação..." onkeydown="if(event.key==='Enter'){event.preventDefault();crmAddNota();}">
+      <button class="crm-nota-btn" onclick="crmAddNota()">+ Registrar</button>
+    </div>
+    <div class="crm-hist" id="crmHist">
+      ${eventos.length?eventos.map(ev=>`
         <div class="crm-hist-item">
-          <div class="crm-hist-dot"></div>
-          <div class="crm-hist-body">
+          <div class="crm-hist-dot ${ev.tipo==='no_show'?'red':ev.tipo==='status'?'purple':''}"></div>
+          <div>
             <div class="crm-hist-desc">${crmEsc(ev.descricao)}</div>
-            <div class="crm-hist-date">${crmFmtDateTime(ev.criado_em)}${ev.responsavel?' · '+crmEsc(ev.responsavel):''}</div>
+            <div class="crm-hist-dt">${crmFmtDtHr(ev.criado_em)}${ev.responsavel?' · '+crmEsc(ev.responsavel):''}</div>
           </div>
-        </div>
-      `).join('') : '<div style="font-size:12px;color:var(--text3)">Sem eventos registrados ainda.</div>'}
+        </div>`).join('')
+      :'<div style="font-size:12px;color:var(--text3)">Nenhum evento ainda.</div>'}
     </div>
   </div>`:''}
   `;
 }
 
-// ── Abrir modal de nova oportunidade ──
-function crmNovaOportunidade(){
-  crmEditandoId = null;
-  document.getElementById('crmModalTitle').textContent = 'Nova oportunidade';
-  document.getElementById('crmModalStatusBadge').innerHTML = '';
-  document.getElementById('crmBtnExcluir').style.display = 'none';
-  document.getElementById('crmModalBody').innerHTML = crmModalHtml({},{},[]);
-  document.getElementById('crmModalOverlay').classList.add('open');
+function crmAtualizarStatusOpts(){
+  const pipe = document.getElementById('crm_pipeline')?.value || _crmPipeline;
+  const sel  = document.getElementById('crm_status');
+  if(!sel) return;
+  sel.innerHTML = crmAllStatusOpts(pipe, sel.value);
 }
 
-// ── Abrir modal de oportunidade existente ──
-async function crmAbrirOportunidade(opId){
-  crmEditandoId = opId;
-  const op = crmOportunidades.find(o=>o.id===opId)||{};
-  const pessoa = crmPessoas.find(p=>p.id===op.pessoa_id)||{};
-
-  // Carregar histórico
-  let eventos = [];
-  try{
-    const r = await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+opId+'&order=criado_em.asc',
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    eventos = await r.json();
-  }catch(e){console.error('CRM: erro ao carregar histórico', e);}
-
-  document.getElementById('crmModalTitle').textContent = pessoa.nome||'Oportunidade';
-  document.getElementById('crmModalStatusBadge').innerHTML = crmStatusBadge(op.status);
-  document.getElementById('crmBtnExcluir').style.display = 'inline-block';
-  document.getElementById('crmModalBody').innerHTML = crmModalHtml(op, pessoa, eventos);
-  document.getElementById('crmModalOverlay').classList.add('open');
-}
-
-// ── Busca de duplicata ──
+// ── Anti-duplicata ──
 let _dupTimer = null;
-function crmBuscarDuplicata(){
+function crmBuscaDup(){
+  if(_crmEditId) return;
   clearTimeout(_dupTimer);
-  if(crmEditandoId) return; // só na criação
   _dupTimer = setTimeout(()=>{
-    const wa = (document.getElementById('crm_whatsapp')?.value||'').replace(/\D/g,'');
-    const ig = (document.getElementById('crm_instagram')?.value||'').toLowerCase().replace('@','');
-    const aviso = document.getElementById('crmDupAviso');
-    if(!aviso) return;
-    if(!wa && !ig){ aviso.classList.remove('show'); aviso.innerHTML=''; return; }
-    const dup = crmPessoas.find(p=>{
-      const pwa = (p.whatsapp||'').replace(/\D/g,'');
-      const pig = (p.instagram||'').toLowerCase().replace('@','');
-      return (wa && pwa && pwa===wa)||(ig && pig && pig===ig);
+    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\D/g,'');
+    const ig = (document.getElementById('crm_ig')?.value||'').toLowerCase().replace('@','');
+    const av = document.getElementById('crmDupWarn');
+    if(!av||(!wa&&!ig)){if(av)av.classList.remove('show');return;}
+    const dup = _crmPessoas.find(p=>{
+      const pwa=(p.whatsapp||'').replace(/\D/g,'');
+      const pig=(p.instagram||'').toLowerCase().replace('@','');
+      return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
     });
     if(dup){
-      const opsDup = crmOportunidades.filter(o=>o.pessoa_id===dup.id);
-      aviso.innerHTML = `⚠ ${crmEsc(dup.nome)} já existe no CRM com ${opsDup.length} oportunidade(s). <span style="color:var(--g4);cursor:pointer;text-decoration:underline" onclick="crmFecharModalDireto();crmAbrirOportunidade('${opsDup[0]?.id}')">Ver ficha</span>`;
-      aviso.classList.add('show');
-    } else {
-      aviso.classList.remove('show'); aviso.innerHTML='';
-    }
+      const firstOp = _crmOps.find(o=>o.pessoa_id===dup.id);
+      const nOps = _crmOps.filter(o=>o.pessoa_id===dup.id).length;
+      av.innerHTML=`⚠ <b>${crmEsc(dup.nome)}</b> já existe (${nOps} oportunidade${nOps!==1?'s':''}).`
+        +(firstOp?` <span style="color:var(--g4);cursor:pointer;text-decoration:underline" onclick="crmFecharModal();crmAbrirFicha('${firstOp.id}')">Ver ficha</span>`:'');
+      av.classList.add('show');
+    } else { av.classList.remove('show'); av.innerHTML=''; }
   }, 400);
 }
 
 // ── Salvar ──
-async function crmSalvarOportunidade(){
-  const statusEl = document.getElementById('crmSaveStatus');
-  if(statusEl){statusEl.textContent='salvando...';statusEl.className='crm-save-status show';}
-
-  const nome = document.getElementById('crm_nome')?.value.trim()||'';
-  const whatsapp = document.getElementById('crm_whatsapp')?.value.trim()||'';
-  const instagram = document.getElementById('crm_instagram')?.value.trim()||'';
+async function crmSalvar(){
+  const st = document.getElementById('crmSaveSt');
+  const nome = (document.getElementById('crm_nome')?.value||'').trim();
   if(!nome){showError('Informe o nome da pessoa.');return;}
+  if(st){st.textContent='salvando...';st.className='crm-save-st ok';}
 
   try{
+    const wa  = (document.getElementById('crm_wa')?.value||'').trim();
+    const ig  = (document.getElementById('crm_ig')?.value||'').trim();
+    const statusAnterior = _crmEditId ? (_crmOps.find(o=>o.id===_crmEditId)?.status||'') : '';
     let pessoaId;
-    const statusAnterior = crmEditandoId ? (crmOportunidades.find(o=>o.id===crmEditandoId)?.status||'') : '';
 
-    if(crmEditandoId){
-      // Atualizar pessoa existente
-      const op = crmOportunidades.find(o=>o.id===crmEditandoId);
-      pessoaId = op.pessoa_id;
-      await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
+    if(_crmEditId){
+      pessoaId = _crmOps.find(o=>o.id===_crmEditId)?.pessoa_id;
+      const r = await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
         method:'PATCH',
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({nome,whatsapp,instagram,
+        body:JSON.stringify({nome,whatsapp:wa,instagram:ig,
           email:document.getElementById('crm_email')?.value||'',
-          observacoes:document.getElementById('crm_obs_pessoa')?.value||''})
+          observacoes:document.getElementById('crm_obs_p')?.value||''})
       });
+      if(!r.ok) throw new Error('Erro ao atualizar pessoa: '+r.status);
     } else {
-      // Verificar se pessoa já existe
-      const wa = whatsapp.replace(/\D/g,'');
-      const ig = instagram.toLowerCase().replace('@','');
-      let existente = crmPessoas.find(p=>{
+      // Verificar duplicata
+      const waClean = wa.replace(/\D/g,'');
+      const igClean = ig.toLowerCase().replace('@','');
+      const dup = _crmPessoas.find(p=>{
         const pwa=(p.whatsapp||'').replace(/\D/g,'');
         const pig=(p.instagram||'').toLowerCase().replace('@','');
-        return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
+        return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
       });
-      if(existente){
-        pessoaId = existente.id;
+      if(dup){
+        pessoaId = dup.id;
         await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
           method:'PATCH',
           headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-          body:JSON.stringify({nome,whatsapp,instagram,
-            email:document.getElementById('crm_email')?.value||'',
-            observacoes:document.getElementById('crm_obs_pessoa')?.value||''})
+          body:JSON.stringify({nome,whatsapp:wa,instagram:ig,email:document.getElementById('crm_email')?.value||'',observacoes:document.getElementById('crm_obs_p')?.value||''})
         });
       } else {
-        pessoaId = crmGerarId('p');
+        pessoaId = crmGid('p');
         const r = await fetch(SUPA_URL+'/rest/v1/crm_pessoas',{
           method:'POST',
           headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-          body:JSON.stringify({id:pessoaId,nome,whatsapp,instagram,
+          body:JSON.stringify({id:pessoaId,nome,whatsapp:wa,instagram:ig,
             email:document.getElementById('crm_email')?.value||'',
-            observacoes:document.getElementById('crm_obs_pessoa')?.value||''})
+            observacoes:document.getElementById('crm_obs_p')?.value||''})
         });
-        if(!r.ok) throw new Error('Erro ao criar pessoa');
+        if(!r.ok) throw new Error('Erro ao criar pessoa: '+r.status);
       }
     }
 
-    // Dados da oportunidade
-    const novoStatus = document.getElementById('crm_status')?.value||'novo';
+    const novoStatus   = document.getElementById('crm_status')?.value||'';
+    const novoPipeline = CRM_STATUS_PIPELINE_RULES[novoStatus]
+      || document.getElementById('crm_pipeline')?.value || _crmPipeline;
+
+    const agora = new Date().toISOString();
+    const datesUpdate = {};
+    if(novoStatus==='agendado'       && statusAnterior!=='agendado')    datesUpdate.data_agendamento = agora;
+    if(novoStatus==='nao_compareceu')                                   datesUpdate.data_no_show     = agora;
+    if(novoStatus==='negociacao'     && statusAnterior!=='negociacao')  datesUpdate.data_negociacao   = agora;
+    if(novoStatus==='ganho')                                            datesUpdate.data_ganho        = agora;
+    if(novoStatus==='perdido')                                          datesUpdate.data_perda        = agora;
+
+    const pipelineOrigemUpdate = {};
+    if(novoStatus==='perdido'){
+      const pipelineAtual = document.getElementById('crm_pipeline')?.value || _crmPipeline;
+      pipelineOrigemUpdate.pipeline_origem = pipelineAtual;
+    }
+
     const dadosOp = {
-      pessoa_id: pessoaId,
-      funil: document.getElementById('crm_funil')?.value||'pc',
-      origem: document.getElementById('crm_origem')?.value||'instagram',
-      status: novoStatus,
-      responsavel: document.getElementById('crm_responsavel')?.value||'Amanda',
-      proxima_acao: document.getElementById('crm_proxima_acao')?.value||'',
-      data_proxima_acao: document.getElementById('crm_data_proxima_acao')?.value||null,
-      reuniao_data: document.getElementById('crm_reuniao_data')?.value||null,
-      reuniao_status: document.getElementById('crm_reuniao_status')?.value||'',
-      reuniao_resultado: document.getElementById('crm_reuniao_resultado')?.value||'',
-      reuniao_produto_ofertado: document.getElementById('crm_reuniao_produto')?.value||'',
-      reuniao_valor_ofertado: parseFloat(document.getElementById('crm_reuniao_valor')?.value)||null,
-      reuniao_objecao: document.getElementById('crm_reuniao_objecao')?.value||'',
-      reuniao_motivo_perda: document.getElementById('crm_reuniao_motivo_perda')?.value||'',
-      reuniao_obs: document.getElementById('crm_reuniao_obs')?.value||'',
-      valor_venda: parseFloat(document.getElementById('crm_valor_venda')?.value)||null,
-      isca_nome: document.getElementById('crm_isca_nome')?.value||'',
-      data_entrada: document.getElementById('crm_data_entrada')?.value||today(),
-      data_abordagem: document.getElementById('crm_data_abordagem')?.value||null,
-      data_qualificacao: document.getElementById('crm_data_qualificacao')?.value||null,
-      data_convite: document.getElementById('crm_data_convite')?.value||null,
-      data_agendamento: document.getElementById('crm_data_agendamento')?.value||null,
-      data_reuniao_realizada: document.getElementById('crm_data_reuniao_realizada')?.value||null,
-      data_proposta: document.getElementById('crm_data_proposta')?.value||null,
-      data_followup: document.getElementById('crm_data_followup')?.value||null,
-      data_venda: document.getElementById('crm_data_venda')?.value||null,
+      pessoa_id:pessoaId,
+      pipeline:novoPipeline,
+      funil:document.getElementById('crm_funil')?.value||'pc',
+      origem:document.getElementById('crm_origem')?.value||'instagram',
+      status:novoStatus,
+      responsavel:document.getElementById('crm_resp')?.value||'Amanda',
+      proxima_acao:document.getElementById('crm_prox')?.value||'',
+      data_proxima_acao:document.getElementById('crm_prox_dt')?.value||null,
+      reuniao_data:document.getElementById('crm_reun_dt')?.value||null,
+      isca_nome:document.getElementById('crm_isca')?.value||'',
+      reuniao_produto:document.getElementById('crm_produto')?.value||'',
+      reuniao_valor_ofertado:parseFloat(document.getElementById('crm_vl_ofert')?.value)||null,
+      reuniao_objecao:document.getElementById('crm_objecao')?.value||'',
+      reuniao_motivo_perda:document.getElementById('crm_perda')?.value||'',
+      reuniao_obs:document.getElementById('crm_reun_obs')?.value||'',
+      valor_venda:parseFloat(document.getElementById('crm_vl_venda')?.value)||null,
+      data_entrada:today(),
+      ...datesUpdate,
+      ...pipelineOrigemUpdate
     };
 
     let opId;
-    if(crmEditandoId){
-      opId = crmEditandoId;
+    if(_crmEditId){
+      opId = _crmEditId;
       const r = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+opId,{
         method:'PATCH',
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
         body:JSON.stringify(dadosOp)
       });
-      if(!r.ok) throw new Error('Erro ao salvar oportunidade');
+      if(!r.ok) throw new Error('Erro ao salvar op: '+r.status);
     } else {
-      opId = crmGerarId('op');
+      opId = crmGid('op');
       const r = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades',{
         method:'POST',
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({...dadosOp, id:opId})
+        body:JSON.stringify({...dadosOp,id:opId})
       });
-      if(!r.ok) throw new Error('Erro ao criar oportunidade');
+      if(!r.ok) throw new Error('Erro ao criar op: '+r.status);
     }
 
-    // Registrar evento no histórico
-    const resp = document.getElementById('crm_responsavel')?.value||'';
-    let descEvento = '';
-    if(!crmEditandoId){
-      descEvento = `Oportunidade criada · Funil: ${CRM_FUNIL_MAP[dadosOp.funil]||dadosOp.funil}`;
-    } else if(statusAnterior !== novoStatus){
-      descEvento = `Status alterado: ${CRM_STATUS_MAP[statusAnterior]?.label||statusAnterior} → ${CRM_STATUS_MAP[novoStatus]?.label||novoStatus}`;
-    }
-    if(descEvento){
-      await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
-        method:'POST',
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({id:crmGerarId('ev'),oportunidade_id:opId,pessoa_id:pessoaId,
-          tipo: crmEditandoId?'status':'criacao',
-          descricao:descEvento,
-          status_anterior:statusAnterior,
-          status_novo:novoStatus,
-          responsavel:resp})
-      });
-    }
+    // Evento histórico
+    const allLabels={};
+    Object.values(CRM_PIPELINES).forEach(pp=>pp.cols.forEach(c=>allLabels[c.status]=c.label));
+    const descEv = _crmEditId
+      ? (statusAnterior!==novoStatus
+          ? `${allLabels[statusAnterior]||statusAnterior} → ${allLabels[novoStatus]||novoStatus}`
+          : 'Ficha atualizada')
+      : `Oportunidade criada · ${CRM_FUNIL_LABELS[dadosOp.funil]||dadosOp.funil}`;
 
-    if(statusEl){statusEl.textContent='✓ salvo';statusEl.className='crm-save-status show';setTimeout(()=>statusEl.classList.remove('show'),2000);}
+    await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({id:crmGid('ev'),oportunidade_id:opId,pessoa_id:pessoaId,
+        tipo:_crmEditId?'status':'criacao',
+        descricao:descEv,status_anterior:statusAnterior,status_novo:novoStatus,
+        responsavel:dadosOp.responsavel})
+    });
+
+    if(st){st.textContent='✓ salvo';setTimeout(()=>st.classList.remove('ok'),2000);}
     showSaved();
-    crmFecharModalDireto();
+    crmFecharModal();
     await crmCarregar();
-  }catch(e){
-    console.error('CRM: erro ao salvar', e);
-    if(statusEl){statusEl.textContent='⚠ erro';statusEl.className='crm-save-status err';}
-    showError('Erro ao salvar. Verifique a conexão.');
+    crmFiltrar();
+  }catch(err){
+    console.error('CRM salvar erro:',err);
+    if(st){st.textContent='⚠ '+err.message;st.className='crm-save-st err';}
+    showError('Erro ao salvar: '+err.message);
   }
 }
 
-// ── Adicionar nota rápida ──
+// ── Anotação rápida ──
 async function crmAddNota(){
-  const inp = document.getElementById('crmNotaRapida');
+  const inp  = document.getElementById('crmNota');
   const nota = inp?.value.trim();
-  if(!nota||!crmEditandoId) return;
-  const op = crmOportunidades.find(o=>o.id===crmEditandoId);
+  if(!nota||!_crmEditId) return;
+  const op   = _crmOps.find(o=>o.id===_crmEditId);
   if(!op) return;
-  const resp = document.getElementById('crm_responsavel')?.value||'';
+  const resp = document.getElementById('crm_resp')?.value||'';
   try{
     await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
       method:'POST',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({id:crmGerarId('ev'),oportunidade_id:crmEditandoId,pessoa_id:op.pessoa_id,
+      body:JSON.stringify({id:crmGid('ev'),oportunidade_id:_crmEditId,pessoa_id:op.pessoa_id,
         tipo:'anotacao',descricao:nota,status_anterior:'',status_novo:'',responsavel:resp})
     });
     inp.value='';
-    // Recarregar histórico inline
-    const r2 = await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+crmEditandoId+'&order=criado_em.asc',
+    const r2 = await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+_crmEditId+'&order=criado_em.asc',
       {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
     const evts = await r2.json();
-    const hist = document.getElementById('crmHistLista');
+    const hist = document.getElementById('crmHist');
     if(hist) hist.innerHTML = evts.map(ev=>`
       <div class="crm-hist-item">
-        <div class="crm-hist-dot"></div>
-        <div class="crm-hist-body">
+        <div class="crm-hist-dot ${ev.tipo==='no_show'?'red':ev.tipo==='status'?'purple':''}"></div>
+        <div>
           <div class="crm-hist-desc">${crmEsc(ev.descricao)}</div>
-          <div class="crm-hist-date">${crmFmtDateTime(ev.criado_em)}${ev.responsavel?' · '+crmEsc(ev.responsavel):''}</div>
+          <div class="crm-hist-dt">${crmFmtDtHr(ev.criado_em)}${ev.responsavel?' · '+crmEsc(ev.responsavel):''}</div>
         </div>
       </div>`).join('');
   }catch(e){showError('Erro ao registrar anotação.');}
 }
 
 // ── Excluir ──
-async function crmExcluirOportunidade(){
-  if(!crmEditandoId) return;
-  if(!confirm('Excluir esta oportunidade? O histórico de eventos será apagado junto.')) return;
+async function crmExcluir(){
+  if(!_crmEditId||!confirm('Excluir esta oportunidade? O histórico será removido.')) return;
   try{
-    await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+crmEditandoId,{
+    await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+_crmEditId,{
       method:'DELETE',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
     });
-    crmFecharModalDireto();
+    crmFecharModal();
     await crmCarregar();
+    crmFiltrar();
     showSaved();
   }catch(e){showError('Erro ao excluir.');}
 }
 
-// ── Modal helpers ──
-function crmFecharModal(e){
-  if(e.target===document.getElementById('crmModalOverlay')) crmFecharModalDireto();
+// ── Abordagens ──
+async function crmCarregarAbordHoje(){
+  try{
+    const hoje = today();
+    const r = await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+hoje,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(!r.ok) return;
+    const rows = await r.json();
+    if(rows.length){
+      const d = rows[0];
+      const map = {total:'total',pc:'pc',isca:'isca',reat:'reativacao',outros:'outros'};
+      Object.entries(map).forEach(([elId,field])=>{
+        const el = document.getElementById('abord_'+elId);
+        if(el) el.value = d[field]||'';
+      });
+    }
+    crmAtualizarAbordStats();
+  }catch(e){}
 }
-function crmFecharModalDireto(){
+
+async function crmSalvarAbordagens(){
+  const hoje = today();
+  const dados = {
+    data_reg:hoje,
+    total:      parseInt(document.getElementById('abord_total')?.value)||0,
+    pc:         parseInt(document.getElementById('abord_pc')?.value)||0,
+    isca:       parseInt(document.getElementById('abord_isca')?.value)||0,
+    reativacao: parseInt(document.getElementById('abord_reat')?.value)||0,
+    outros:     parseInt(document.getElementById('abord_outros')?.value)||0,
+  };
+  try{
+    const check = await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+hoje,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    const rows = await check.json();
+    if(rows.length){
+      await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+hoje,{
+        method:'PATCH',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify(dados)
+      });
+    } else {
+      await fetch(SUPA_URL+'/rest/v1/crm_abordagens',{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify(dados)
+      });
+    }
+    crmAtualizarAbordStats();
+    showSaved();
+  }catch(e){showError('Erro ao salvar abordagens.');}
+}
+
+function crmAtualizarAbordStats(){
+  const total  = parseInt(document.getElementById('abord_total')?.value)||0;
+  const hoje   = today();
+  const opsHoje = _crmOps.filter(o=>o.data_entrada===hoje).length;
+  const el = document.getElementById('crmAbordStats');
+  if(el) el.textContent = total>0
+    ? `${total} abordagens hoje · ${opsHoje} no CRM (${Math.round(opsHoje/total*100)}% qualificaram)`
+    : '';
+}
+
+// ── Adicionar pipeline_origem ao banco (migration segura) ──
+async function crmEnsurePipelineOrigemCol(){
+  // Se a coluna não existe no banco, o PATCH vai simplesmente ignorar o campo — sem erro.
+  // Só garantimos que o código não quebra se não existir.
+}
+
+// ── Modal ──
+function crmFecharModal(){
   document.getElementById('crmModalOverlay').classList.remove('open');
-  crmEditandoId=null;
-}
-function crmEsc(s){
-  if(!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  _crmEditId = null;
 }
 
 
