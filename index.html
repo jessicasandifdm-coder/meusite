@@ -3431,25 +3431,30 @@ async function crmSalvarAbordagens(){
     outros:     parseInt(document.getElementById('abord_outros')?.value)||0,
   };
   try{
-    const check = await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+dia,
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    const rows = await check.json();
-    if(rows.length){
-      await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+dia,{
-        method:'PATCH',
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify(dados)
-      });
-    } else {
-      await fetch(SUPA_URL+'/rest/v1/crm_abordagens',{
+    // Upsert: cria ou atualiza automaticamente pelo conflict na chave data_reg
+    const r = await fetch(
+      SUPA_URL+'/rest/v1/crm_abordagens?on_conflict=data_reg',
+      {
         method:'POST',
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        headers:{
+          'apikey':SUPA_KEY,
+          'Authorization':'Bearer '+SUPA_KEY,
+          'Content-Type':'application/json',
+          'Prefer':'resolution=merge-duplicates,return=minimal'
+        },
         body:JSON.stringify(dados)
-      });
+      }
+    );
+    if(!r.ok){
+      const txt = await r.text();
+      throw new Error('HTTP '+r.status+': '+txt);
     }
     crmAtualizarAbordStats(dia);
     showSaved();
-  }catch(e){ showError('Erro ao salvar abordagens.'); }
+  }catch(e){
+    console.error('Erro ao salvar abordagens:', e);
+    showError('Erro ao salvar: '+e.message);
+  }
 }
 
 function crmAtualizarAbordStats(dia){
