@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análise Estratégica — Segundo Semestre 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0d0b;
+  --surface:#111510;
+  --surface2:#181d16;
+  --border:#253022;
+  --border2:#2f3d2b;
+  --g2:#2d6a4f;
+  --g3:#40916c;
+  --g4:#74c69d;
+  --g5:#d8f3dc;
+  --amber:#e9a84c;
+  --coral:#e07070;
+  --text:#e4ede6;
+  --text2:#7a9b7e;
+  --text3:#435744;
+  --font:'DM Sans',sans-serif;
+  --display:'Syne',sans-serif;
+  --radius:12px;
+  --radius-sm:8px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.6;min-height:100vh}
+
+/* ── HEADER ── */
+.header{padding:48px 0 40px;text-align:center;border-bottom:1px solid var(--border)}
+.header-inner{max-width:640px;margin:0 auto;padding:0 24px}
+.eyebrow{font-family:var(--font);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--g4);margin-bottom:20px;display:flex;align-items:center;justify-content:center;gap:10px}
+.eyebrow::before,.eyebrow::after{content:'';flex:1;max-width:40px;height:1px;background:var(--border2)}
+.header h1{font-family:var(--display);font-size:clamp(28px,5vw,42px);font-weight:800;color:var(--text);line-height:1.15;letter-spacing:-.02em;margin-bottom:16px}
+.header h1 em{font-style:normal;color:var(--g4)}
+.header p{font-size:15px;color:var(--text2);line-height:1.7;max-width:480px;margin:0 auto}
+
+/* ── FORM CONTAINER ── */
+.form-wrap{max-width:640px;margin:0 auto;padding:48px 24px 80px}
+
+/* ── STEPS ── */
+.step{display:none;animation:fadeUp .35s ease}
+.step.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PROGRESS ── */
+.progress-wrap{margin-bottom:40px}
+.progress-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:8px}
+.progress-bar{height:3px;background:var(--border2);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--g3),var(--g4));border-radius:2px;transition:width .4s ease}
+
+/* ── QUESTION ── */
+.q-num{font-size:10px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--g4);margin-bottom:8px}
+.q-label{font-family:var(--display);font-size:22px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:6px;letter-spacing:-.01em}
+.q-hint{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.5}
+
+/* ── INPUTS ── */
+.inp{width:100%;background:var(--surface2);border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:15px;padding:14px 16px;transition:border-color .2s,box-shadow .2s;outline:none}
+.inp:focus{border-color:var(--g3);box-shadow:0 0 0 3px rgba(64,145,108,.15)}
+.inp::placeholder{color:var(--text3)}
+textarea.inp{resize:vertical;min-height:100px;line-height:1.6}
+
+/* ── OPTIONS ── */
+.options{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:center;gap:14px;background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:14px 18px;cursor:pointer;transition:all .2s;user-select:none}
+.opt:hover{border-color:var(--g3);background:rgba(64,145,108,.06)}
+.opt.selected{border-color:var(--g3);background:rgba(45,106,79,.15)}
+.opt.selected .opt-dot{background:var(--g4);box-shadow:0 0 0 3px rgba(116,198,157,.25)}
+.opt-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;transition:all .2s}
+.opt-text{font-size:14px;color:var(--text2);line-height:1.4}
+.opt.selected .opt-text{color:var(--text)}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:12px;margin-top:36px}
+.btn-next{flex:1;background:var(--g2);border:none;border-radius:var(--radius-sm);color:#fff;font-family:var(--display);font-size:15px;font-weight:700;padding:15px 28px;cursor:pointer;transition:background .2s;letter-spacing:.01em}
+.btn-next:hover{background:var(--g3)}
+.btn-next:disabled{background:var(--border2);color:var(--text3);cursor:not-allowed}
+.btn-back{background:none;border:1.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text2);font-family:var(--font);font-size:14px;padding:15px 20px;cursor:pointer;transition:all .2s}
+.btn-back:hover{border-color:var(--border2);color:var(--text)}
+
+/* ── ERROR ── */
+.field-error{font-size:12px;color:var(--coral);margin-top:8px;display:none}
+.field-error.show{display:block}
+
+/* ── SUBMIT STATE ── */
+.submitting{text-align:center;padding:60px 0}
+.submitting-icon{font-size:40px;margin-bottom:16px;animation:spin 1s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SUCCESS ── */
+.success-screen{text-align:center;padding:60px 24px;display:none}
+.success-screen.show{display:block}
+.success-icon{font-size:52px;margin-bottom:20px}
+.success-title{font-family:var(--display);font-size:28px;font-weight:700;color:var(--g4);margin-bottom:12px}
+.success-text{font-size:15px;color:var(--text2);line-height:1.7;max-width:440px;margin:0 auto}
+
+/* ── FOOTER ── */
+.form-footer{text-align:center;padding-bottom:40px;font-size:12px;color:var(--text3)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="eyebrow">JS Mentoria</div>
+    <h1>Análise Estratégica<br><em>Segundo Semestre 2026</em></h1>
+    <p>Formulário para entender o momento da sua loja e traçar um direcionamento para os próximos seis meses.</p>
+  </div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- PROGRESS -->
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-label">
+      <span id="progressLabel">Pergunta 1 de 13</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <!-- STEP 1: Nome -->
+  <div class="step active" id="step-1">
+    <div class="q-num">01 — Identificação</div>
+    <div class="q-label">Qual é o seu nome?</div>
+    <div class="q-hint">Seu nome completo ou como prefere ser chamada.</div>
+    <input class="inp" type="text" id="f_nome" placeholder="Seu nome..." autocomplete="name">
+    <div class="field-error" id="err-1">Por favor, informe seu nome.</div>
+    <div class="btn-row">
+      <button class="btn-next" onclick="nextStep(1)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Instagram -->
+  <div class="step" id="step-2">
+    <div class="q-num">02 — Redes sociais</div>
+    <div class="q-label">Qual é o seu perfil do Instagram?</div>
+    <div class="q-hint">Coloque exatamente o seu @.</div>
+    <input class="inp" type="text" id="f_instagram" placeholder="@nomedaloja" autocomplete="off">
+    <div class="field-error" id="err-2">Por favor, informe seu Instagram.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(2)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(2)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: WhatsApp -->
+  <div class="step" id="step-3">
+    <div class="q-num">03 — Contato</div>
+    <div class="q-label">Qual é o seu número de WhatsApp?</div>
+    <div class="q-hint">Com DDD. Ex: (51) 99999-9999</div>
+    <input class="inp" type="tel" id="f_whatsapp" placeholder="(51) 99999-9999" autocomplete="tel">
+    <div class="field-error" id="err-3">Por favor, informe seu WhatsApp.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(3)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(3)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Segmento -->
+  <div class="step" id="step-4">
+    <div class="q-num">04 — Sua loja</div>
+    <div class="q-label">Qual é o segmento da sua loja?</div>
+    <div class="q-hint">Selecione a opção que melhor descreve o seu negócio.</div>
+    <div class="options" id="opts-segmento">
+      <div class="opt" onclick="selectOpt('segmento',this,'Moda feminina')"><div class="opt-dot"></div><div class="opt-text">Moda feminina</div></div>
+      <div class="opt" onclick="selectOpt('segmento',this,'Moda infantil')"><div class="opt-dot"></div><div class="opt-text">Moda infantil</div></div>
+      <div class="opt" onclick="selectOpt('segmento',this,'Moda masculina')"><div class="opt-dot"></div><div class="opt-text">Moda masculina</div></div>
+      <div class="opt" onclick="selectOpt('segmento',this,'Calçados')"><div class="opt-dot"></div><div class="opt-text">Calçados</div></div>
+      <div class="opt" onclick="selectOpt('segmento',this,'Acessórios')"><div class="opt-dot"></div><div class="opt-text">Acessórios</div></div>
+      <div class="opt" onclick="selectOpt('segmento',this,'Beleza')"><div class="opt-dot"></div><div class="opt-text">Beleza</div></div>
+      <div class="opt" onclick="selectOpt('segmento',this,'Decoração')"><div class="opt-dot"></div><div class="opt-text">Decoração</div></div>
+      <div class="opt" onclick="selectOpt('segmento',this,'Outro')"><div class="opt-dot"></div><div class="opt-text">Outro</div></div>
+    </div>
+    <div class="field-error" id="err-4">Selecione uma opção para continuar.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(4)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(4)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 5: Tempo de operação -->
+  <div class="step" id="step-5">
+    <div class="q-num">05 — Maturidade</div>
+    <div class="q-label">Há quanto tempo sua empresa está em operação?</div>
+    <div class="options" id="opts-tempo">
+      <div class="opt" onclick="selectOpt('tempo',this,'Até 1 ano')"><div class="opt-dot"></div><div class="opt-text">Até 1 ano</div></div>
+      <div class="opt" onclick="selectOpt('tempo',this,'De 1 a 3 anos')"><div class="opt-dot"></div><div class="opt-text">De 1 a 3 anos</div></div>
+      <div class="opt" onclick="selectOpt('tempo',this,'De 3 a 5 anos')"><div class="opt-dot"></div><div class="opt-text">De 3 a 5 anos</div></div>
+      <div class="opt" onclick="selectOpt('tempo',this,'Mais de 5 anos')"><div class="opt-dot"></div><div class="opt-text">Mais de 5 anos</div></div>
+    </div>
+    <div class="field-error" id="err-5">Selecione uma opção para continuar.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(5)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(5)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: Faturamento -->
+  <div class="step" id="step-6">
+    <div class="q-num">06 — Faturamento atual</div>
+    <div class="q-label">Qual é o faturamento médio mensal da sua loja atualmente?</div>
+    <div class="options" id="opts-faturamento">
+      <div class="opt" onclick="selectOpt('faturamento',this,'Até R$ 5 mil')"><div class="opt-dot"></div><div class="opt-text">Até R$ 5 mil</div></div>
+      <div class="opt" onclick="selectOpt('faturamento',this,'De R$ 5 mil a R$ 15 mil')"><div class="opt-dot"></div><div class="opt-text">De R$ 5 mil a R$ 15 mil</div></div>
+      <div class="opt" onclick="selectOpt('faturamento',this,'De R$ 15 mil a R$ 30 mil')"><div class="opt-dot"></div><div class="opt-text">De R$ 15 mil a R$ 30 mil</div></div>
+      <div class="opt" onclick="selectOpt('faturamento',this,'De R$ 30 mil a R$ 50 mil')"><div class="opt-dot"></div><div class="opt-text">De R$ 30 mil a R$ 50 mil</div></div>
+      <div class="opt" onclick="selectOpt('faturamento',this,'De R$ 50 mil a R$ 100 mil')"><div class="opt-dot"></div><div class="opt-text">De R$ 50 mil a R$ 100 mil</div></div>
+      <div class="opt" onclick="selectOpt('faturamento',this,'Acima de R$ 100 mil')"><div class="opt-dot"></div><div class="opt-text">Acima de R$ 100 mil</div></div>
+    </div>
+    <div class="field-error" id="err-6">Selecione uma opção para continuar.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(6)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(6)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 7: Meta -->
+  <div class="step" id="step-7">
+    <div class="q-num">07 — Sua meta</div>
+    <div class="q-label">Qual faturamento você gostaria de alcançar até dezembro de 2026?</div>
+    <div class="q-hint">Pode ser um valor aproximado em reais.</div>
+    <input class="inp" type="text" id="f_meta" placeholder="Ex: R$ 50.000 por mês">
+    <div class="field-error" id="err-7">Por favor, informe sua meta.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(7)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(7)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 8: Maior desafio -->
+  <div class="step" id="step-8">
+    <div class="q-num">08 — Desafios</div>
+    <div class="q-label">Hoje, qual é o seu maior desafio na loja?</div>
+    <div class="options" id="opts-desafio">
+      <div class="opt" onclick="selectOpt('desafio',this,'Atrair novos clientes')"><div class="opt-dot"></div><div class="opt-text">Atrair novos clientes</div></div>
+      <div class="opt" onclick="selectOpt('desafio',this,'Gerar vendas com mais frequência')"><div class="opt-dot"></div><div class="opt-text">Gerar vendas com mais frequência</div></div>
+      <div class="opt" onclick="selectOpt('desafio',this,'Converter seguidores em compradores')"><div class="opt-dot"></div><div class="opt-text">Converter seguidores em compradores</div></div>
+      <div class="opt" onclick="selectOpt('desafio',this,'Criar conteúdo que gere resultado')"><div class="opt-dot"></div><div class="opt-text">Criar conteúdo que gere resultado</div></div>
+      <div class="opt" onclick="selectOpt('desafio',this,'Organizar campanhas e ações comerciais')"><div class="opt-dot"></div><div class="opt-text">Organizar campanhas e ações comerciais</div></div>
+      <div class="opt" onclick="selectOpt('desafio',this,'Ter clareza sobre o que fazer para crescer')"><div class="opt-dot"></div><div class="opt-text">Ter clareza sobre o que fazer para crescer</div></div>
+      <div class="opt" onclick="selectOpt('desafio',this,'Estruturar o processo de gestão comercial')"><div class="opt-dot"></div><div class="opt-text">Estruturar o processo de gestão comercial</div></div>
+    </div>
+    <div class="field-error" id="err-8">Selecione uma opção para continuar.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(8)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(8)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 9: Impedimento -->
+  <div class="step" id="step-9">
+    <div class="q-num">09 — Obstáculos</div>
+    <div class="q-label">O que você sente que mais impede sua loja de crescer hoje?</div>
+    <div class="q-hint">Escreva com suas próprias palavras. Não há resposta errada.</div>
+    <textarea class="inp" id="f_impedimento" placeholder="Conte o que você está vivendo na prática..."></textarea>
+    <div class="field-error" id="err-9">Por favor, responda esta pergunta.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(9)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(9)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 10: Situação atual -->
+  <div class="step" id="step-10">
+    <div class="q-num">10 — Realidade atual</div>
+    <div class="q-label">Qual dessas situações mais representa a sua realidade hoje?</div>
+    <div class="options" id="opts-situacao">
+      <div class="opt" onclick="selectOpt('situacao',this,'Faço muito conteúdo, mas vendo menos do que gostaria')"><div class="opt-dot"></div><div class="opt-text">Faço muito conteúdo, mas vendo menos do que gostaria</div></div>
+      <div class="opt" onclick="selectOpt('situacao',this,'As vendas dependem muito de promoções')"><div class="opt-dot"></div><div class="opt-text">As vendas dependem muito de promoções</div></div>
+      <div class="opt" onclick="selectOpt('situacao',this,'Tenho dificuldade em manter constância')"><div class="opt-dot"></div><div class="opt-text">Tenho dificuldade em manter constância</div></div>
+      <div class="opt" onclick="selectOpt('situacao',this,'Não tenho um planejamento claro para os próximos meses')"><div class="opt-dot"></div><div class="opt-text">Não tenho um planejamento claro para os próximos meses</div></div>
+      <div class="opt" onclick="selectOpt('situacao',this,'Sinto que estou apagando incêndio diariamente')"><div class="opt-dot"></div><div class="opt-text">Sinto que estou apagando incêndio diariamente</div></div>
+      <div class="opt" onclick="selectOpt('situacao',this,'Tenho vendas, mas quero crescer de forma mais estruturada')"><div class="opt-dot"></div><div class="opt-text">Tenho vendas, mas quero crescer de forma mais estruturada</div></div>
+    </div>
+    <div class="field-error" id="err-10">Selecione uma opção para continuar.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(10)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(10)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 11: Visão 6 meses -->
+  <div class="step" id="step-11">
+    <div class="q-num">11 — Futuro</div>
+    <div class="q-label">O que você gostaria que estivesse diferente na sua loja daqui a seis meses?</div>
+    <div class="q-hint">Seja específica. Quanto mais detalhes, melhor para a sua análise.</div>
+    <textarea class="inp" id="f_visao" placeholder="Descreva o que você imagina para a sua loja em dezembro de 2026..."></textarea>
+    <div class="field-error" id="err-11">Por favor, responda esta pergunta.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(11)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(11)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 12: Interesse em reunião -->
+  <div class="step" id="step-12">
+    <div class="q-num">12 — Próximo passo</div>
+    <div class="q-label">Caso sua análise seja selecionada e identificarmos uma oportunidade de crescimento para a sua loja, você teria interesse em receber uma devolutiva estratégica em uma chamada online?</div>
+    <div class="options" id="opts-reuniao">
+      <div class="opt" onclick="selectOpt('reuniao',this,'Sim')"><div class="opt-dot"></div><div class="opt-text">Sim, teria interesse</div></div>
+      <div class="opt" onclick="selectOpt('reuniao',this,'Talvez')"><div class="opt-dot"></div><div class="opt-text">Talvez — gostaria de entender melhor antes</div></div>
+      <div class="opt" onclick="selectOpt('reuniao',this,'Não')"><div class="opt-dot"></div><div class="opt-text">No momento, não</div></div>
+    </div>
+    <div class="field-error" id="err-12">Selecione uma opção para continuar.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(12)">← Voltar</button>
+      <button class="btn-next" onclick="nextStep(12)">Continuar →</button>
+    </div>
+  </div>
+
+  <!-- STEP 13: Interesse em investimento -->
+  <div class="step" id="step-13">
+    <div class="q-num">13 — Investimento</div>
+    <div class="q-label">Se, após a análise, identificarmos que um acompanhamento estratégico poderia fazer sentido para o momento da sua loja, como você se sente em relação a investir nesse tipo de acompanhamento hoje?</div>
+    <div class="options" id="opts-investimento">
+      <div class="opt" onclick="selectOpt('investimento',this,'Sim')"><div class="opt-dot"></div><div class="opt-text">Sim, faria sentido investir se eu enxergar que existe uma oportunidade real de crescimento</div></div>
+      <div class="opt" onclick="selectOpt('investimento',this,'Talvez')"><div class="opt-dot"></div><div class="opt-text">Talvez — gostaria de entender melhor antes de decidir</div></div>
+      <div class="opt" onclick="selectOpt('investimento',this,'Não')"><div class="opt-dot"></div><div class="opt-text">Neste momento, não tenho intenção de investir em acompanhamento</div></div>
+    </div>
+    <div class="field-error" id="err-13">Selecione uma opção para continuar.</div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="prevStep(13)">← Voltar</button>
+      <button class="btn-next" id="btnSubmit" onclick="submitForm()">Enviar análise ✓</button>
+    </div>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✦</div>
+    <div class="success-title">Análise recebida!</div>
+    <div class="success-text">Obrigada por compartilhar o momento da sua loja. Vamos analisar as respostas com cuidado e, se identificarmos uma oportunidade real para o seu negócio, entraremos em contato pelo WhatsApp.</div>
+  </div>
+
+</div>
+
+<div class="form-footer" id="formFooter">
+  JS Mentoria · Sistema de análise estratégica
+</div>
+
+<script>
+const SUPA_URL = 'https://lnfghtlrzoioaotamzvy.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZmdodGxyem9pb2FvdGFtenZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg5MTMsImV4cCI6MjA5MjI4NDkxM30.lNHckve8P--rp9axdwZ6v6zTl4LLnk-1xY_kJS3wfFo';
+
+const TOTAL_STEPS = 13;
+let currentStep = 1;
+const answers = {};
+
+// ── Seleção de opções ──
+function selectOpt(field, el, value){
+  const container = el.closest('.options');
+  container.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers[field] = value;
+  // Auto-avança em 300ms para opções de múltipla escolha
+  setTimeout(()=>{
+    const step = el.closest('.step');
+    const stepNum = parseInt(step.id.replace('step-',''));
+    if(stepNum < TOTAL_STEPS) nextStep(stepNum);
+    else submitForm();
+  }, 350);
+}
+
+// ── Navegação ──
+function nextStep(from){
+  // Validar
+  if(!validateStep(from)) return;
+  // Coletar campo de texto se houver
+  collectTextFields(from);
+  // Avançar
+  goToStep(from + 1);
+}
+
+function prevStep(from){
+  goToStep(from - 1);
+}
+
+function goToStep(n){
+  if(n < 1 || n > TOTAL_STEPS) return;
+  document.getElementById('step-'+currentStep).classList.remove('active');
+  currentStep = n;
+  document.getElementById('step-'+n).classList.add('active');
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateProgress(){
+  const pct = Math.round(((currentStep-1)/TOTAL_STEPS)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = `Pergunta ${currentStep} de ${TOTAL_STEPS}`;
+  document.getElementById('progressPct').textContent = pct+'%';
+}
+
+// ── Validação ──
+function validateStep(n){
+  const errEl = document.getElementById('err-'+n);
+  let valid = true;
+
+  if(n===1){ valid = (document.getElementById('f_nome')?.value.trim().length > 1); }
+  else if(n===2){ valid = (document.getElementById('f_instagram')?.value.trim().length > 1); }
+  else if(n===3){ valid = (document.getElementById('f_whatsapp')?.value.trim().length > 7); }
+  else if(n===4){ valid = !!answers.segmento; }
+  else if(n===5){ valid = !!answers.tempo; }
+  else if(n===6){ valid = !!answers.faturamento; }
+  else if(n===7){ valid = (document.getElementById('f_meta')?.value.trim().length > 0); }
+  else if(n===8){ valid = !!answers.desafio; }
+  else if(n===9){ valid = (document.getElementById('f_impedimento')?.value.trim().length > 10); }
+  else if(n===10){ valid = !!answers.situacao; }
+  else if(n===11){ valid = (document.getElementById('f_visao')?.value.trim().length > 10); }
+  else if(n===12){ valid = !!answers.reuniao; }
+  else if(n===13){ valid = !!answers.investimento; }
+
+  if(errEl){ errEl.classList.toggle('show', !valid); }
+  return valid;
+}
+
+function collectTextFields(n){
+  if(n===1) answers.nome = document.getElementById('f_nome')?.value.trim()||'';
+  if(n===2) answers.instagram = document.getElementById('f_instagram')?.value.trim()||'';
+  if(n===3) answers.whatsapp = document.getElementById('f_whatsapp')?.value.trim()||'';
+  if(n===7) answers.meta = document.getElementById('f_meta')?.value.trim()||'';
+  if(n===9) answers.impedimento = document.getElementById('f_impedimento')?.value.trim()||'';
+  if(n===11) answers.visao = document.getElementById('f_visao')?.value.trim()||'';
+}
+
+// ── Qualificação ──
+function calcQualificacao(){
+  const fat = answers.faturamento || '';
+  const DESQUALIF = ['Até R$ 5 mil'];
+  if(DESQUALIF.includes(fat)) return 'desqualificado';
+  return 'qualificado';
+}
+
+function calcStatusInicial(qualif){
+  if(qualif === 'desqualificado') return 'bv_desqualif';
+  const reuniao = answers.reuniao || '';
+  if(reuniao === 'Sim')    return 'bv_qualif';
+  if(reuniao === 'Talvez') return 'bv_aguardando';
+  if(reuniao === 'Não')    return 'bv_sem_interesse';
+  return 'bv_qualif';
+}
+
+function normIg(ig){
+  return 'https://instagram.com/' + ig.replace('@','').trim().toLowerCase();
+}
+
+function gerarId(p='x'){ return p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
+
+// ── Submit ──
+async function submitForm(){
+  if(!validateStep(13)) return;
+  collectTextFields(13);
+
+  const btnSubmit = document.getElementById('btnSubmit');
+  if(btnSubmit){ btnSubmit.disabled=true; btnSubmit.textContent='Enviando...'; }
+
+  const qualificacao = calcQualificacao();
+  const statusInicial = calcStatusInicial(qualificacao);
+  const igLink = normIg(answers.instagram||'');
+  const hoje = new Date().toISOString().split('T')[0];
+
+  try{
+    // 1. Verificar se pessoa já existe (por WA ou IG)
+    const waClean = (answers.whatsapp||'').replace(/\D/g,'');
+    const igClean = (answers.instagram||'').toLowerCase().replace('@','');
+    let pessoaId = null;
+
+    const rPes = await fetch(
+      SUPA_URL+'/rest/v1/crm_pessoas?or=(whatsapp.eq.'+encodeURIComponent(answers.whatsapp||'')+',instagram.eq.'+encodeURIComponent(answers.instagram||'')+')',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const pessoasExist = rPes.ok ? await rPes.json() : [];
+    // Filtrar por WA limpo ou IG limpo
+    const pessoaDup = pessoasExist.find(p=>{
+      const pwa=(p.whatsapp||'').replace(/\D/g,'');
+      const pig=(p.instagram||'').toLowerCase().replace('@','');
+      return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
+    });
+
+    if(pessoaDup){
+      pessoaId = pessoaDup.id;
+      // Atualizar dados da pessoa
+      await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
+        method:'PATCH',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({nome:answers.nome,whatsapp:answers.whatsapp,instagram:igLink})
+      });
+    } else {
+      pessoaId = gerarId('p');
+      await fetch(SUPA_URL+'/rest/v1/crm_pessoas',{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({id:pessoaId,nome:answers.nome,whatsapp:answers.whatsapp,instagram:igLink,email:''})
+      });
+    }
+
+    // 2. Criar oportunidade no pipeline BV
+    const opId = gerarId('op');
+    const dadosOp = {
+      id: opId,
+      pessoa_id: pessoaId,
+      pipeline: 'bv',
+      funil: 'bv',
+      origem: 'instagram',
+      status: statusInicial,
+      responsavel: 'Amanda',
+      data_entrada: hoje,
+      bv_segmento: answers.segmento||'',
+      bv_tempo_op: answers.tempo||'',
+      bv_faturamento: answers.faturamento||'',
+      bv_meta_fat: answers.meta||'',
+      bv_desafio: answers.desafio||'',
+      bv_impedimento: answers.impedimento||'',
+      bv_situacao: answers.situacao||'',
+      bv_visao_6m: answers.visao||'',
+      bv_interesse_reuniao: answers.reuniao||'',
+      bv_interesse_invest: answers.investimento||'',
+      bv_qualificacao: qualificacao,
+    };
+
+    await fetch(SUPA_URL+'/rest/v1/crm_oportunidades',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(dadosOp)
+    });
+
+    // 3. Salvar respostas brutas na tabela formulários
+    const formId = gerarId('form');
+    await fetch(SUPA_URL+'/rest/v1/crm_formularios',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        id:formId, tipo:'bv', pessoa_id:pessoaId, oportunidade_id:opId,
+        respostas:answers, qualificacao, score:0
+      })
+    });
+
+    // 4. Registrar evento no histórico
+    await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        id:gerarId('ev'), oportunidade_id:opId, pessoa_id:pessoaId,
+        tipo:'criacao',
+        descricao:`Formulário BV respondido · ${qualificacao === 'qualificado' ? '✓ Qualificado' : '✗ Desqualificado'} · Fat: ${answers.faturamento}`,
+        status_anterior:'', status_novo:statusInicial, responsavel:''
+      })
+    });
+
+    // Mostrar tela de sucesso
+    document.getElementById('step-'+currentStep).classList.remove('active');
+    document.getElementById('progressWrap').style.display='none';
+    document.getElementById('formFooter').style.display='none';
+    document.getElementById('successScreen').classList.add('show');
+
+  }catch(e){
+    console.error('Erro ao enviar formulário:', e);
+    if(btnSubmit){ btnSubmit.disabled=false; btnSubmit.textContent='Enviar análise ✓'; }
+    alert('Ocorreu um erro ao enviar. Por favor, tente novamente.');
+  }
+}
+</script>
+</body>
+</html>
