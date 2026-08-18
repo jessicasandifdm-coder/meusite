@@ -688,11 +688,11 @@ button{font-family:var(--font)}
       <button class="btn-nav" style="padding:5px 8px;font-size:12px" onclick="crmAbordChangeDay(1)">→</button>
       <button class="btn-nav" style="padding:5px 8px;font-size:12px" onclick="crmAbordHoje()">Hoje</button>
     </div>
-    <div class="crm-abord-field"><div class="crm-abord-field-label">Total</div><input class="crm-abord-input" type="number" id="abord_total" min="0" placeholder="0"></div>
-    <div class="crm-abord-field"><div class="crm-abord-field-label">PC</div><input class="crm-abord-input" type="number" id="abord_pc" min="0" placeholder="0"></div>
-    <div class="crm-abord-field"><div class="crm-abord-field-label">Isca</div><input class="crm-abord-input" type="number" id="abord_isca" min="0" placeholder="0"></div>
-    <div class="crm-abord-field"><div class="crm-abord-field-label">Reat.</div><input class="crm-abord-input" type="number" id="abord_reat" min="0" placeholder="0"></div>
-    <div class="crm-abord-field"><div class="crm-abord-field-label">Follow-up</div><input class="crm-abord-input" type="number" id="abord_outros" min="0" placeholder="0"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Total</div><input class="crm-abord-input" type="number" id="abord_total" min="0" placeholder="0" readonly style="background:var(--surface3);color:var(--g4);cursor:default;font-weight:600"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">PC</div><input class="crm-abord-input" type="number" id="abord_pc" min="0" placeholder="0" oninput="crmCalcTotalAbord()"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Isca</div><input class="crm-abord-input" type="number" id="abord_isca" min="0" placeholder="0" oninput="crmCalcTotalAbord()"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Reat.</div><input class="crm-abord-input" type="number" id="abord_reat" min="0" placeholder="0" oninput="crmCalcTotalAbord()"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Follow-up</div><input class="crm-abord-input" type="number" id="abord_outros" min="0" placeholder="0" oninput="crmCalcTotalAbord()"></div>
     <button class="crm-abord-save-btn" onclick="crmSalvarAbordagens()">Salvar</button>
     <span class="crm-abord-stats" id="crmAbordStats"></span>
   </div>
@@ -3400,6 +3400,7 @@ async function crmCarregarAbordDia(){
         if(el) el.value = d[field] || '';
       });
     }
+    crmCalcTotalAbord();
     crmAtualizarAbordStats(dia);
   }catch(e){ console.error('Erro ao carregar abordagens:', e); }
 }
@@ -3419,30 +3420,48 @@ function crmAbordHoje(){
   crmCarregarAbordDia();
 }
 
+function crmCalcTotalAbord(){
+  const pc   = parseInt(document.getElementById('abord_pc')?.value)||0;
+  const isca = parseInt(document.getElementById('abord_isca')?.value)||0;
+  const reat = parseInt(document.getElementById('abord_reat')?.value)||0;
+  const fu   = parseInt(document.getElementById('abord_outros')?.value)||0;
+  const tot  = pc + isca + reat + fu;
+  const elTot = document.getElementById('abord_total');
+  if(elTot) elTot.value = tot || '';
+}
+
 async function crmSalvarAbordagens(){
-  const dateEl = document.getElementById('abordDate');
-  const dia = dateEl?.value || today();
+  // Garantir total calculado antes de salvar
+  crmCalcTotalAbord();
+
+  const dia = document.getElementById('abordDate')?.value || today();
+  const pc   = parseInt(document.getElementById('abord_pc')?.value)||0;
+  const isca = parseInt(document.getElementById('abord_isca')?.value)||0;
+  const reat = parseInt(document.getElementById('abord_reat')?.value)||0;
+  const fu   = parseInt(document.getElementById('abord_outros')?.value)||0;
+  const total = pc + isca + reat + fu;
+
   const dados = {
     data_reg:   dia,
-    total:      parseInt(document.getElementById('abord_total')?.value)||0,
-    pc:         parseInt(document.getElementById('abord_pc')?.value)||0,
-    isca:       parseInt(document.getElementById('abord_isca')?.value)||0,
-    reativacao: parseInt(document.getElementById('abord_reat')?.value)||0,
-    outros:     parseInt(document.getElementById('abord_outros')?.value)||0,
+    total,
+    pc,
+    isca,
+    reativacao: reat,
+    outros:     fu,
   };
+
   try{
-    // Upsert: cria ou atualiza automaticamente pelo conflict na chave data_reg
     const r = await fetch(
       SUPA_URL+'/rest/v1/crm_abordagens?on_conflict=data_reg',
       {
         method:'POST',
         headers:{
-          'apikey':SUPA_KEY,
-          'Authorization':'Bearer '+SUPA_KEY,
-          'Content-Type':'application/json',
-          'Prefer':'resolution=merge-duplicates,return=minimal'
+          'apikey':        SUPA_KEY,
+          'Authorization': 'Bearer '+SUPA_KEY,
+          'Content-Type':  'application/json',
+          'Prefer':        'resolution=merge-duplicates,return=minimal'
         },
-        body:JSON.stringify(dados)
+        body: JSON.stringify(dados)
       }
     );
     if(!r.ok){
@@ -3452,8 +3471,8 @@ async function crmSalvarAbordagens(){
     crmAtualizarAbordStats(dia);
     showSaved();
   }catch(e){
-    console.error('Erro ao salvar abordagens:', e);
-    showError('Erro ao salvar: '+e.message);
+    console.error('Erro ao salvar abordagens:', e.message);
+    showError('Erro ao salvar abordagens: '+e.message);
   }
 }
 
