@@ -682,12 +682,17 @@ button{font-family:var(--font)}
 
   <!-- Barra de abordagens (só na aba Reuniões) -->
   <div class="crm-abord-bar" id="crmAbordBar">
-    <span class="crm-abord-label">Abordagens de hoje</span>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <button class="btn-nav" style="padding:5px 8px;font-size:12px" onclick="crmAbordChangeDay(-1)">←</button>
+      <input type="date" id="abordDate" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 8px;cursor:pointer" onchange="crmCarregarAbordDia()">
+      <button class="btn-nav" style="padding:5px 8px;font-size:12px" onclick="crmAbordChangeDay(1)">→</button>
+      <button class="btn-nav" style="padding:5px 8px;font-size:12px" onclick="crmAbordHoje()">Hoje</button>
+    </div>
     <div class="crm-abord-field"><div class="crm-abord-field-label">Total</div><input class="crm-abord-input" type="number" id="abord_total" min="0" placeholder="0"></div>
     <div class="crm-abord-field"><div class="crm-abord-field-label">PC</div><input class="crm-abord-input" type="number" id="abord_pc" min="0" placeholder="0"></div>
     <div class="crm-abord-field"><div class="crm-abord-field-label">Isca</div><input class="crm-abord-input" type="number" id="abord_isca" min="0" placeholder="0"></div>
     <div class="crm-abord-field"><div class="crm-abord-field-label">Reat.</div><input class="crm-abord-input" type="number" id="abord_reat" min="0" placeholder="0"></div>
-    <div class="crm-abord-field"><div class="crm-abord-field-label">Outros</div><input class="crm-abord-input" type="number" id="abord_outros" min="0" placeholder="0"></div>
+    <div class="crm-abord-field"><div class="crm-abord-field-label">Follow-up</div><input class="crm-abord-input" type="number" id="abord_outros" min="0" placeholder="0"></div>
     <button class="crm-abord-save-btn" onclick="crmSalvarAbordagens()">Salvar</button>
     <span class="crm-abord-stats" id="crmAbordStats"></span>
   </div>
@@ -986,6 +991,25 @@ button{font-family:var(--font)}
     </div>
   </div>
 
+  <!-- Dados reais do CRM -->
+  <div class="sh"><span class="sh-label">Dados reais — CRM</span><div class="sh-line"></div></div>
+  <div id="crmMensalBox" style="margin-bottom:20px">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+      <div class="kpi-card"><div class="kpi-val" id="crm-m-abord">—</div><div class="kpi-lbl">Abordagens (CRM)</div></div>
+      <div class="kpi-card"><div class="kpi-val" id="crm-m-ops">—</div><div class="kpi-lbl">Oportunidades abertas</div></div>
+      <div class="kpi-card" style="border-color:var(--purple-dim)"><div class="kpi-val" style="color:var(--purple)" id="crm-m-agend">—</div><div class="kpi-lbl">Reuniões agendadas</div></div>
+      <div class="kpi-card" style="border-color:var(--coral-dim)"><div class="kpi-val" style="color:var(--coral)" id="crm-m-noshow">—</div><div class="kpi-lbl">No-show</div></div>
+      <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="crm-m-ganho">—</div><div class="kpi-lbl">Ganhos (CRM)</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px">
+      <div class="kpi-card"><div class="kpi-val" id="crm-m-pc">—</div><div class="kpi-lbl">Abordagens PC</div></div>
+      <div class="kpi-card"><div class="kpi-val" id="crm-m-isca">—</div><div class="kpi-lbl">Abordagens Isca</div></div>
+      <div class="kpi-card"><div class="kpi-val" id="crm-m-reat">—</div><div class="kpi-lbl">Abordagens Reat.</div></div>
+      <div class="kpi-card"><div class="kpi-val" id="crm-m-followup">—</div><div class="kpi-lbl">Abordagens Follow-up</div></div>
+    </div>
+    <div id="crmConvRateBox" style="margin-top:10px"></div>
+  </div>
+
   <!-- Alertas automáticos -->
   <div class="sh"><span class="sh-label">Alertas automáticos</span><div class="sh-line"></div></div>
   <div id="alertasBox" style="margin-bottom:14px"></div>
@@ -1076,8 +1100,15 @@ button{font-family:var(--font)}
     <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.1)"><div class="kpi-val" style="color:var(--g4)" id="anual-fat">—</div><div class="kpi-lbl">Faturamento total (R$)</div></div>
   </div>
 
+  <div class="card" style="margin-bottom:14px">
+    <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução mensal — CRM</div>
+    <div style="overflow-x:auto"><table class="canal-table" id="anualCrmTable">
+      <thead><tr><th>Mês</th><th>Abordagens</th><th>Oportunidades</th><th>Agendadas</th><th>No-show</th><th>Ganhos</th><th>% Conversão</th></tr></thead>
+      <tbody id="anualCrmTableBody"></tbody>
+    </table></div>
+  </div>
   <div class="card">
-    <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução mensal</div>
+    <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução mensal — Registro diário</div>
     <div style="overflow-x:auto"><table class="canal-table" id="anualTable">
       <thead><tr><th>Mês</th><th>Abordagens</th><th>Reuniões</th><th>Vendas</th><th>Faturamento (R$)</th><th>Taxa resp.</th><th>Fech.</th></tr></thead>
       <tbody id="anualTableBody"></tbody>
@@ -1992,6 +2023,76 @@ function fmtN(n){return n||'—';}
 let currentMonth=new Date().getMonth();
 let currentYear=new Date().getFullYear();
 
+// ══════════════════════════════════════════
+// CRM → DASHBOARDS: buscar dados reais do CRM
+// ══════════════════════════════════════════
+async function crmBuscarDadosMes(ano, mes){
+  // Primeiro e último dia do mês
+  const inicio = `${ano}-${String(mes+1).padStart(2,'0')}-01`;
+  const fimDate = new Date(ano, mes+1, 0);
+  const fim = fimDate.toISOString().split('T')[0];
+
+  try{
+    // Abordagens do mês
+    const rAbord = await fetch(
+      SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const abordRows = rAbord.ok ? await rAbord.json() : [];
+
+    // Oportunidades criadas no mês
+    const rOps = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const opsRows = rOps.ok ? await rOps.json() : [];
+
+    // Reuniões agendadas no mês (pelo data_agendamento)
+    const rAgend = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+inicio+'T00:00:00Z&data_agendamento=lte.'+fim+'T23:59:59Z',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const agendRows = rAgend.ok ? await rAgend.json() : [];
+
+    // No-shows (pelo data_no_show)
+    const rNoShow = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_no_show=gte.'+inicio+'T00:00:00Z&data_no_show=lte.'+fim+'T23:59:59Z',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const noshowRows = rNoShow.ok ? await rNoShow.json() : [];
+
+    // Ganhos no mês (pelo data_ganho)
+    const rGanho = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+inicio+'T00:00:00Z&data_ganho=lte.'+fim+'T23:59:59Z',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const ganhoRows = rGanho.ok ? await rGanho.json() : [];
+
+    // Agregar abordagens
+    const totAbord    = abordRows.reduce((s,r)=>s+(r.total||0),0);
+    const totAbordPc  = abordRows.reduce((s,r)=>s+(r.pc||0),0);
+    const totAbordIs  = abordRows.reduce((s,r)=>s+(r.isca||0),0);
+    const totAbordRe  = abordRows.reduce((s,r)=>s+(r.reativacao||0),0);
+    const totAbordFu  = abordRows.reduce((s,r)=>s+(r.outros||0),0);
+
+    return {
+      abord:      totAbord,
+      abord_pc:   totAbordPc,
+      abord_isca: totAbordIs,
+      abord_reat: totAbordRe,
+      abord_fu:   totAbordFu,
+      ops:        opsRows.length,
+      agend:      agendRows.length,
+      noshow:     noshowRows.length,
+      ganho:      ganhoRows.length,
+      fat_ganho:  ganhoRows.reduce((s,r)=>s+(parseFloat(r.valor_venda)||0),0),
+    };
+  }catch(e){
+    console.error('Erro buscar dados CRM mês:', e);
+    return {abord:0,abord_pc:0,abord_isca:0,abord_reat:0,abord_fu:0,ops:0,agend:0,noshow:0,ganho:0,fat_ganho:0};
+  }
+}
+
 async function renderMensal(){
   // Tabs de meses
   const tabs=document.getElementById('monthTabs');
@@ -2160,6 +2261,34 @@ async function renderMensal(){
   }
   insights.innerHTML=ins.map(i=>`<div class="alert-box alert-warn" style="margin-bottom:6px">${i}</div>`).join('');
 
+  // ── DADOS DO CRM NO MENSAL ──
+  try{
+    const crmDados = await crmBuscarDadosMes(currentYear, currentMonth);
+    const setEl = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
+    setEl('crm-m-abord',   crmDados.abord||0);
+    setEl('crm-m-ops',     crmDados.ops||0);
+    setEl('crm-m-agend',   crmDados.agend||0);
+    setEl('crm-m-noshow',  crmDados.noshow||0);
+    setEl('crm-m-ganho',   crmDados.ganho||0);
+    setEl('crm-m-pc',      crmDados.abord_pc||0);
+    setEl('crm-m-isca',    crmDados.abord_isca||0);
+    setEl('crm-m-reat',    crmDados.abord_reat||0);
+    setEl('crm-m-followup',crmDados.abord_fu||0);
+    // Taxa de conversão abordagem → reunião
+    const taxaConvCrm = crmDados.abord > 0
+      ? Math.round(crmDados.agend / crmDados.abord * 100) + '%'
+      : '—';
+    const rateBox = document.getElementById('crmConvRateBox');
+    if(rateBox) rateBox.innerHTML = crmDados.abord > 0 ? `
+      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text3)">
+        <span>Abordagens → Oportunidade: <b style="color:var(--text)">${crmDados.abord>0?Math.round(crmDados.ops/crmDados.abord*100):0}%</b></span>
+        <span>Abordagens → Reunião: <b style="color:var(--purple)">${taxaConvCrm}</b></span>
+        <span>Reuniões → Ganho: <b style="color:var(--g4)">${crmDados.agend>0?Math.round(crmDados.ganho/crmDados.agend*100):0}%</b></span>
+        <span>No-show: <b style="color:var(--coral)">${crmDados.agend>0?Math.round(crmDados.noshow/crmDados.agend*100):0}%</b></span>
+        ${crmDados.fat_ganho>0?`<span>Faturamento CRM: <b style="color:var(--g4)">R$ ${crmDados.fat_ganho.toLocaleString('pt-BR')}</b></span>`:''}
+      </div>` : '<div style="font-size:12px;color:var(--text3)">Sem abordagens registradas no CRM para este mês.</div>';
+  }catch(e){ console.error('CRM mensal:', e); }
+
   // ── METAS VS REAL ──
   const m=currentMonth;
   let metasData={};
@@ -2313,6 +2442,29 @@ async function renderAnual(){
   grid.innerHTML='';
   let totAbord=0,totReun=0,totVend=0,totFat=0;
   const rows=[];
+
+  // Buscar dados CRM para cada mês do ano
+  const crmAnualData = [];
+  for(let i=0;i<12;i++){
+    try{
+      const d = await crmBuscarDadosMes(currentYear, i);
+      crmAnualData.push(d);
+    }catch(e){ crmAnualData.push({abord:0,ops:0,agend:0,noshow:0,ganho:0,fat_ganho:0}); }
+  }
+
+  // Preencher tabela CRM anual
+  const anualCrmBody = document.getElementById('anualCrmTableBody');
+  if(anualCrmBody){
+    anualCrmBody.innerHTML = crmAnualData.map((d,i)=>`<tr>
+      <td>${MONTHS_PT[i]}/26</td>
+      <td>${d.abord||0}</td>
+      <td>${d.ops||0}</td>
+      <td>${d.agend||0}</td>
+      <td>${d.noshow||0}</td>
+      <td style="color:var(--g4);font-weight:500">${d.ganho||0}</td>
+      <td style="color:var(--purple)">${d.agend>0?Math.round(d.ganho/d.agend*100)+'%':'—'}</td>
+    </tr>`).join('');
+  }
 
   MONTHS_PT.forEach((m,i)=>{
     const mDays=allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===i;});
@@ -2899,7 +3051,10 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       <div class="crm-field"><div class="crm-lbl">WhatsApp</div>
         <input class="crm-inp" id="crm_wa" value="${crmEsc(pessoa.whatsapp||'')}" placeholder="(51) 9..." oninput="crmBuscaDup()"></div>
       <div class="crm-field"><div class="crm-lbl">Instagram</div>
-        <input class="crm-inp" id="crm_ig" value="${crmEsc(pessoa.instagram||'')}" placeholder="@usuario" oninput="crmBuscaDup()"></div>
+        <div style="position:relative;display:flex;gap:6px;align-items:center">
+          <input class="crm-inp" id="crm_ig" value="${crmEsc(pessoa.instagram||'')}" placeholder="@usuario" oninput="crmBuscaDup()" style="flex:1">
+          ${pessoa.instagram ? `<a href="https://instagram.com/${(pessoa.instagram||'').replace('@','')}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;background:rgba(155,114,207,.12);border:1px solid rgba(155,114,207,.25);border-radius:var(--radius-sm);padding:6px 10px;color:var(--purple);font-size:11px;text-decoration:none;white-space:nowrap;flex-shrink:0" title="Abrir perfil no Instagram">↗ Ver perfil</a>` : ''}
+        </div></div>
       <div class="crm-field"><div class="crm-lbl">E-mail</div>
         <input class="crm-inp" id="crm_email" value="${crmEsc(pessoa.email||'')}" placeholder="email@..."></div>
     </div>
@@ -3212,28 +3367,63 @@ async function crmExcluir(){
 
 // ── Abordagens ──
 async function crmCarregarAbordHoje(){
+  // Inicializa data como hoje
+  const dateEl = document.getElementById('abordDate');
+  if(dateEl && !dateEl.value) dateEl.value = today();
+  await crmCarregarAbordDia();
+}
+
+async function crmCarregarAbordDia(){
+  const dateEl = document.getElementById('abordDate');
+  const dia = dateEl?.value || today();
+  // Banner de dia passado
+  const isHoje = dia === today();
+  const bar = document.getElementById('crmAbordBar');
+  if(bar){
+    bar.style.borderColor = isHoje ? '' : 'rgba(233,168,76,.3)';
+  }
   try{
-    const hoje = today();
-    const r = await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+hoje,
+    const r = await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+dia,
       {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
     if(!r.ok) return;
     const rows = await r.json();
+    const map = {total:'total', pc:'pc', isca:'isca', reat:'reativacao', outros:'outros'};
+    // Zerar campos antes de preencher
+    Object.keys(map).forEach(elId => {
+      const el = document.getElementById('abord_'+elId);
+      if(el) el.value = '';
+    });
     if(rows.length){
       const d = rows[0];
-      const map = {total:'total',pc:'pc',isca:'isca',reat:'reativacao',outros:'outros'};
-      Object.entries(map).forEach(([elId,field])=>{
+      Object.entries(map).forEach(([elId, field]) => {
         const el = document.getElementById('abord_'+elId);
-        if(el) el.value = d[field]||'';
+        if(el) el.value = d[field] || '';
       });
     }
-    crmAtualizarAbordStats();
-  }catch(e){}
+    crmAtualizarAbordStats(dia);
+  }catch(e){ console.error('Erro ao carregar abordagens:', e); }
+}
+
+function crmAbordChangeDay(delta){
+  const el = document.getElementById('abordDate');
+  if(!el) return;
+  const d = new Date((el.value || today())+'T12:00:00');
+  d.setDate(d.getDate() + delta);
+  el.value = d.toISOString().split('T')[0];
+  crmCarregarAbordDia();
+}
+
+function crmAbordHoje(){
+  const el = document.getElementById('abordDate');
+  if(el) el.value = today();
+  crmCarregarAbordDia();
 }
 
 async function crmSalvarAbordagens(){
-  const hoje = today();
+  const dateEl = document.getElementById('abordDate');
+  const dia = dateEl?.value || today();
   const dados = {
-    data_reg:hoje,
+    data_reg:   dia,
     total:      parseInt(document.getElementById('abord_total')?.value)||0,
     pc:         parseInt(document.getElementById('abord_pc')?.value)||0,
     isca:       parseInt(document.getElementById('abord_isca')?.value)||0,
@@ -3241,11 +3431,11 @@ async function crmSalvarAbordagens(){
     outros:     parseInt(document.getElementById('abord_outros')?.value)||0,
   };
   try{
-    const check = await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+hoje,
+    const check = await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+dia,
       {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
     const rows = await check.json();
     if(rows.length){
-      await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+hoje,{
+      await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=eq.'+dia,{
         method:'PATCH',
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
         body:JSON.stringify(dados)
@@ -3257,25 +3447,19 @@ async function crmSalvarAbordagens(){
         body:JSON.stringify(dados)
       });
     }
-    crmAtualizarAbordStats();
+    crmAtualizarAbordStats(dia);
     showSaved();
-  }catch(e){showError('Erro ao salvar abordagens.');}
+  }catch(e){ showError('Erro ao salvar abordagens.'); }
 }
 
-function crmAtualizarAbordStats(){
-  const total  = parseInt(document.getElementById('abord_total')?.value)||0;
-  const hoje   = today();
-  const opsHoje = _crmOps.filter(o=>o.data_entrada===hoje).length;
+function crmAtualizarAbordStats(dia){
+  const total   = parseInt(document.getElementById('abord_total')?.value)||0;
+  const diaRef  = dia || today();
+  const opsNoDia = _crmOps.filter(o=>o.data_entrada===diaRef).length;
   const el = document.getElementById('crmAbordStats');
-  if(el) el.textContent = total>0
-    ? `${total} abordagens hoje · ${opsHoje} no CRM (${Math.round(opsHoje/total*100)}% qualificaram)`
-    : '';
-}
-
-// ── Adicionar pipeline_origem ao banco (migration segura) ──
-async function crmEnsurePipelineOrigemCol(){
-  // Se a coluna não existe no banco, o PATCH vai simplesmente ignorar o campo — sem erro.
-  // Só garantimos que o código não quebra se não existir.
+  if(el) el.textContent = total > 0
+    ? `${total} abordagens · ${opsNoDia} no CRM (${Math.round(opsNoDia/total*100)}% qualificaram)`
+    : diaRef !== today() ? `Dia ${diaRef.split('-').reverse().join('/')}` : '';
 }
 
 // ── Modal ──
