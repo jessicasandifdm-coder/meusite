@@ -666,12 +666,16 @@ button{font-family:var(--font)}
       <p class="page-title">CRM Comercial</p>
       <p class="page-sub" id="crmSubtitle">Reuniões — acompanhe cada oportunidade até o fechamento</p>
     </div>
-    <button class="crm-add-btn" onclick="crmNovaOportunidade()">+ Nova oportunidade</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <a href="/form-bv.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,.12);border:1px solid rgba(64,145,108,.25);border-radius:var(--radius-sm);color:var(--g4);font-size:12px;font-weight:500;padding:8px 14px;text-decoration:none" onmouseover="this.style.background='rgba(45,106,79,.22)'" onmouseout="this.style.background='rgba(45,106,79,.12)'">↗ Formulário BV</a>
+      <button class="crm-add-btn" onclick="crmNovaOportunidade()">+ Nova oportunidade</button>
+    </div>
   </div>
 
   <!-- Pipeline tabs -->
   <div class="crm-pipeline-tabs">
     <button class="crm-pipe-tab active" onclick="crmSetPipeline('reunioes',this)">Reuniões</button>
+    <button class="crm-pipe-tab" onclick="crmSetPipeline('bv',this)">BV</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('iscas',this)">Iscas</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('reativacao',this)">Reativação</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('nutricao',this)">Nutrição</button>
@@ -2075,17 +2079,27 @@ async function crmBuscarDadosMes(ano, mes){
     const totAbordRe  = abordRows.reduce((s,r)=>s+(r.reativacao||0),0);
     const totAbordFu  = abordRows.reduce((s,r)=>s+(r.outros||0),0);
 
+    // Leads BV do mês
+    const rBv = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const bvRows = rBv.ok ? await rBv.json() : [];
+
     return {
-      abord:      totAbord,
-      abord_pc:   totAbordPc,
-      abord_isca: totAbordIs,
-      abord_reat: totAbordRe,
-      abord_fu:   totAbordFu,
-      ops:        opsRows.length,
-      agend:      agendRows.length,
-      noshow:     noshowRows.length,
-      ganho:      ganhoRows.length,
-      fat_ganho:  ganhoRows.reduce((s,r)=>s+(parseFloat(r.valor_venda)||0),0),
+      abord:        totAbord,
+      abord_pc:     totAbordPc,
+      abord_isca:   totAbordIs,
+      abord_reat:   totAbordRe,
+      abord_fu:     totAbordFu,
+      ops:          opsRows.length,
+      agend:        agendRows.length,
+      noshow:       noshowRows.length,
+      ganho:        ganhoRows.length,
+      fat_ganho:    ganhoRows.reduce((s,r)=>s+(parseFloat(r.valor_venda)||0),0),
+      bv_total:     bvRows.length,
+      bv_qualif:    bvRows.filter(r=>r.bv_qualificacao==='qualificado').length,
+      bv_desqualif: bvRows.filter(r=>r.bv_qualificacao==='desqualificado').length,
     };
   }catch(e){
     console.error('Erro buscar dados CRM mês:', e);
@@ -2278,6 +2292,19 @@ async function renderMensal(){
     const taxaConvCrm = crmDados.abord > 0
       ? Math.round(crmDados.agend / crmDados.abord * 100) + '%'
       : '—';
+    // KPIs BV no mensal
+    if(crmDados.bv_total > 0){
+      const bvKpi = document.createElement('div');
+      bvKpi.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px';
+      bvKpi.innerHTML = `
+        <div class="kpi-card"><div class="kpi-val">${crmDados.bv_total}</div><div class="kpi-lbl">Leads BV</div></div>
+        <div class="kpi-card" style="border-color:var(--g2)"><div class="kpi-val" style="color:var(--g4)">${crmDados.bv_qualif}</div><div class="kpi-lbl">Qualificados BV (${crmDados.bv_total>0?Math.round(crmDados.bv_qualif/crmDados.bv_total*100):0}%)</div></div>
+        <div class="kpi-card" style="border-color:var(--coral-dim)"><div class="kpi-val" style="color:var(--coral)">${crmDados.bv_desqualif}</div><div class="kpi-lbl">Desqualificados BV</div></div>
+      `;
+      const crmBox = document.getElementById('crmMensalBox');
+      if(crmBox) crmBox.appendChild(bvKpi);
+    }
+
     const rateBox = document.getElementById('crmConvRateBox');
     if(rateBox) rateBox.innerHTML = crmDados.abord > 0 ? `
       <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text3)">
@@ -2752,6 +2779,26 @@ const CRM_PIPELINES = {
     showAbord: true,
   },
 
+  bv: {
+    label: 'BV',
+    sub: 'Novos seguidores — do formulário à reunião',
+    cols: [
+      { status:'bv_qualif',        label:'Qualificado',           color:'var(--g4)'     },
+      { status:'bv_aguardando',    label:'Aguardando decisão',    color:'var(--amber)'  },
+      { status:'bv_sem_interesse', label:'Sem interesse',         color:'var(--text3)'  },
+      { status:'bv_desqualif',     label:'Desqualificado',        color:'var(--coral)'  },
+      { status:'bv_convite',       label:'Convite p/ reunião',    color:'var(--purple)' },
+      { status:'ganho',            label:'Ganho direto',          color:'var(--g4)'     },
+    ],
+    kpis: (ops) => [
+      { label:'Total leads',       val: ops.length,                                              color:'' },
+      { label:'Qualificados',      val: ops.filter(o=>o.bv_qualificacao==='qualificado').length, color:'var(--g4)'    },
+      { label:'Desqualificados',   val: ops.filter(o=>o.bv_qualificacao==='desqualificado').length, color:'var(--coral)' },
+      { label:'→ Reunião',         val: ops.filter(o=>o.status==='bv_convite'||o.status==='agendado').length, color:'var(--purple)' },
+    ],
+    showAbord: false,
+  },
+
   iscas: {
     label: 'Iscas',
     sub: 'Do interesse recebido à reunião ou venda direta',
@@ -2817,7 +2864,7 @@ const CRM_STATUS_PIPELINE_RULES = {
 
 const CRM_FUNIL_LABELS = {
   pc:'PC / Outbound', isca:'Isca', reativacao:'Reativação',
-  novo_seguidor:'Novo Seguidor', campanha:'Campanha', outro:'Outro',
+  bv:'BV (Novo Seguidor)', novo_seguidor:'Novo Seguidor', campanha:'Campanha', outro:'Outro',
 };
 const CRM_ORIGEM_LABELS = {
   instagram:'Instagram', indicacao:'Indicação', trafego_pago:'Tráfego Pago',
@@ -3084,6 +3131,23 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       <div class="crm-field"><div class="crm-lbl">Isca enviada</div>
         <input class="crm-inp" id="crm_isca" value="${crmEsc(op.isca_nome||'')}" placeholder="Nome da isca..."></div>
     </div>
+    ${(pipeAtual==='bv' && op.bv_faturamento) ? `
+    <div style="margin-top:14px;background:rgba(45,106,79,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:10px">Respostas do Formulário BV</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+        <div><span style="color:var(--text3)">Qualificação:</span> <b style="color:${op.bv_qualificacao==='qualificado'?'var(--g4)':'var(--coral)'}">${op.bv_qualificacao==='qualificado'?'✓ Qualificado':'✗ Desqualificado'}</b></div>
+        <div><span style="color:var(--text3)">Faturamento:</span> <b>${op.bv_faturamento||'—'}</b></div>
+        <div><span style="color:var(--text3)">Segmento:</span> ${op.bv_segmento||'—'}</div>
+        <div><span style="color:var(--text3)">Tempo operação:</span> ${op.bv_tempo_op||'—'}</div>
+        <div><span style="color:var(--text3)">Meta:</span> ${crmEsc(op.bv_meta_fat||'—')}</div>
+        <div><span style="color:var(--text3)">Desafio:</span> ${op.bv_desafio||'—'}</div>
+        <div><span style="color:var(--text3)">Interesse reunião:</span> <b style="color:${op.bv_interesse_reuniao==='Sim'?'var(--g4)':op.bv_interesse_reuniao==='Talvez'?'var(--amber)':'var(--coral)'}">${op.bv_interesse_reuniao||'—'}</b></div>
+        <div><span style="color:var(--text3)">Interesse invest.:</span> <b style="color:${op.bv_interesse_invest==='Sim'?'var(--g4)':op.bv_interesse_invest==='Talvez'?'var(--amber)':'var(--coral)'}">${op.bv_interesse_invest||'—'}</b></div>
+      </div>
+      ${op.bv_situacao ? '<div style="margin-top:8px;font-size:12px"><span style="color:var(--text3)">Situação atual:</span> '+crmEsc(op.bv_situacao)+'</div>' : ''}
+      ${op.bv_impedimento ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Impedimento:</span> '+crmEsc(op.bv_impedimento)+'</div>' : ''}
+      ${op.bv_visao_6m ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Visão 6 meses:</span> '+crmEsc(op.bv_visao_6m)+'</div>' : ''}
+    </div>` : ''}
     <div class="crm-grid2" style="margin-top:10px">
       <div class="crm-field"><div class="crm-lbl">Próxima ação</div>
         <input class="crm-inp" id="crm_prox" value="${crmEsc(op.proxima_acao||'')}" placeholder="ex: ligar, enviar proposta..."></div>
