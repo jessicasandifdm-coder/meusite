@@ -492,7 +492,6 @@ button{font-family:var(--font)}
   <div class="logo">JS<span>/</span>Sistema</div>
   <nav class="nav">
     <button class="nav-btn active" onclick="showTab('visao')">Visão Geral</button>
-    <button class="nav-btn" onclick="showTab('registro')">Registro Diário</button>
     <button class="nav-btn" onclick="showTab('crm')">CRM</button>
     <button class="nav-btn" onclick="showTab('mensal')">Dashboard Mensal</button>
     <button class="nav-btn" onclick="showTab('anual')">Dashboard Anual</button>
@@ -908,19 +907,24 @@ button{font-family:var(--font)}
     <div class="period-tabs" id="monthTabs"></div>
   </div>
 
-  <!-- KPIs topo -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
-    <div class="kpi-card"><div class="kpi-val" id="kpi-abord">—</div><div class="kpi-lbl">Abordagens</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="kpi-resp">—</div><div class="kpi-lbl">Respostas</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="kpi-conv">—</div><div class="kpi-lbl">Convites p/ reunião</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="kpi-agend">—</div><div class="kpi-lbl">Reuniões agendadas</div></div>
+  <!-- KPIs topo — unificado (Registro Diário + CRM) -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px">
+    <div class="kpi-card"><div class="kpi-val" id="kpi-abord">—</div><div class="kpi-lbl">Abordagens</div><div style="font-size:10px;color:var(--text3);margin-top:3px">reg. diário + CRM</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-agend">—</div><div class="kpi-lbl">Reuniões agendadas</div><div style="font-size:10px;color:var(--text3);margin-top:3px">via CRM</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-reun">—</div><div class="kpi-lbl">Reuniões realizadas</div><div style="font-size:10px;color:var(--text3);margin-top:3px">reg. diário + CRM</div></div>
+    <div class="kpi-card" style="border-color:var(--coral-dim);background:rgba(224,112,112,.06)"><div class="kpi-val" style="color:var(--coral)" id="kpi-noshow">—</div><div class="kpi-lbl">No-show<span id="kpi-noshow-pct" style="font-size:10px;font-weight:400;color:var(--text3);display:block"></span></div></div>
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="kpi-vendas">—</div><div class="kpi-lbl">Ganhos / Vendas</div><div style="font-size:10px;color:var(--text3);margin-top:3px">reg. diário + CRM</div></div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
-    <div class="kpi-card"><div class="kpi-val" id="kpi-reun">—</div><div class="kpi-lbl">Reuniões realizadas</div></div>
-    <div class="kpi-card" style="border-color:var(--coral-dim);background:rgba(224,112,112,.06)"><div class="kpi-val" style="color:var(--coral)" id="kpi-noshow">—</div><div class="kpi-lbl">No-show<span id="kpi-noshow-pct" style="font-size:11px;font-weight:400;color:var(--text3);display:block"></span></div></div>
-    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="kpi-vendas">—</div><div class="kpi-lbl">Vendas ment.</div></div>
-    <div class="kpi-card" style="border-color:var(--amber-dim);background:rgba(233,168,76,.06)"><div class="kpi-val" style="color:var(--amber)" id="kpi-vcurso">—</div><div class="kpi-lbl">Vendas curso</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-abord-pc">—</div><div class="kpi-lbl">Abordagens PC</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-abord-isca">—</div><div class="kpi-lbl">Abordagens Isca</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-abord-reat">—</div><div class="kpi-lbl">Abordagens Reat.</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="kpi-abord-fu">—</div><div class="kpi-lbl">Abordagens Follow-up</div></div>
   </div>
+  <!-- IDs legados mantidos por compatibilidade -->
+  <span id="kpi-resp" style="display:none"></span>
+  <span id="kpi-conv" style="display:none"></span>
+  <span id="kpi-vcurso" style="display:none"></span>
 
   <!-- Seguidores do mês -->
   <div class="sh"><span class="sh-label">Crescimento de seguidores no mês</span><div class="sh-line"></div></div>
@@ -963,18 +967,12 @@ button{font-family:var(--font)}
         <thead><tr>
           <th>Semana</th>
           <th>Abordagens</th>
-          <th>Respostas</th>
-          <th>Convites</th>
+          <th>Oportunidades</th>
           <th>Agendadas</th>
-          <th>Realizadas</th>
           <th>No-show</th>
-          <th>V.Mentoria</th>
-          <th>Fat.Ment (R$)</th>
-          <th>V.Curso</th>
-          <th>Fat.Curso (R$)</th>
-          <th>% Resposta</th>
-          <th>% Conv→Conv</th>
-          <th>% Conv→Reun</th>
+          <th>Ganhos</th>
+          <th>Fat. (R$)</th>
+          <th>% Abord→Reun</th>
           <th>% Fechamento</th>
         </tr></thead>
         <tbody id="semanaTableBody"></tbody>
@@ -995,24 +993,8 @@ button{font-family:var(--font)}
     </div>
   </div>
 
-  <!-- Dados reais do CRM -->
-  <div class="sh"><span class="sh-label">Dados reais — CRM</span><div class="sh-line"></div></div>
-  <div id="crmMensalBox" style="margin-bottom:20px">
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
-      <div class="kpi-card"><div class="kpi-val" id="crm-m-abord">—</div><div class="kpi-lbl">Abordagens (CRM)</div></div>
-      <div class="kpi-card"><div class="kpi-val" id="crm-m-ops">—</div><div class="kpi-lbl">Oportunidades abertas</div></div>
-      <div class="kpi-card" style="border-color:var(--purple-dim)"><div class="kpi-val" style="color:var(--purple)" id="crm-m-agend">—</div><div class="kpi-lbl">Reuniões agendadas</div></div>
-      <div class="kpi-card" style="border-color:var(--coral-dim)"><div class="kpi-val" style="color:var(--coral)" id="crm-m-noshow">—</div><div class="kpi-lbl">No-show</div></div>
-      <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="crm-m-ganho">—</div><div class="kpi-lbl">Ganhos (CRM)</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px">
-      <div class="kpi-card"><div class="kpi-val" id="crm-m-pc">—</div><div class="kpi-lbl">Abordagens PC</div></div>
-      <div class="kpi-card"><div class="kpi-val" id="crm-m-isca">—</div><div class="kpi-lbl">Abordagens Isca</div></div>
-      <div class="kpi-card"><div class="kpi-val" id="crm-m-reat">—</div><div class="kpi-lbl">Abordagens Reat.</div></div>
-      <div class="kpi-card"><div class="kpi-val" id="crm-m-followup">—</div><div class="kpi-lbl">Abordagens Follow-up</div></div>
-    </div>
-    <div id="crmConvRateBox" style="margin-top:10px"></div>
-  </div>
+  <!-- Taxas de conversão -->
+  <div id="crmConvRateBox" style="margin-bottom:16px"></div>
 
   <!-- Alertas automáticos -->
   <div class="sh"><span class="sh-label">Alertas automáticos</span><div class="sh-line"></div></div>
@@ -1104,20 +1086,24 @@ button{font-family:var(--font)}
     <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.1)"><div class="kpi-val" style="color:var(--g4)" id="anual-fat">—</div><div class="kpi-lbl">Faturamento total (R$)</div></div>
   </div>
 
-  <div class="card" style="margin-bottom:14px">
-    <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução mensal — CRM</div>
-    <div style="overflow-x:auto"><table class="canal-table" id="anualCrmTable">
-      <thead><tr><th>Mês</th><th>Abordagens</th><th>Oportunidades</th><th>Agendadas</th><th>No-show</th><th>Ganhos</th><th>% Conversão</th></tr></thead>
-      <tbody id="anualCrmTableBody"></tbody>
-    </table></div>
-  </div>
   <div class="card">
-    <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução mensal — Registro diário</div>
+    <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Evolução mensal</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px">Meses anteriores: registro diário + CRM somados. A partir de setembro/2026: somente CRM.</div>
     <div style="overflow-x:auto"><table class="canal-table" id="anualTable">
-      <thead><tr><th>Mês</th><th>Abordagens</th><th>Reuniões</th><th>Vendas</th><th>Faturamento (R$)</th><th>Taxa resp.</th><th>Fech.</th></tr></thead>
+      <thead><tr>
+        <th>Mês</th>
+        <th>Abordagens</th>
+        <th>Reuniões ag.</th>
+        <th>No-show</th>
+        <th>Ganhos</th>
+        <th>Fat. (R$)</th>
+        <th>% Abord→Reun</th>
+        <th>% Fechamento</th>
+      </tr></thead>
       <tbody id="anualTableBody"></tbody>
     </table></div>
   </div>
+  <span id="anualCrmTableBody" style="display:none"></span>
 
 </div>
 
@@ -2119,233 +2105,229 @@ async function renderMensal(){
     tabs.appendChild(btn);
   });
 
-  const allDays=await getAllDaysAsync(currentYear);
-  const monthDays=allDays.filter(d=>{
+  // ── DADOS: Registro Diário (legado) + CRM (novo) ──
+  const allDays = await getAllDaysAsync(currentYear);
+  const monthDays = allDays.filter(d=>{
     const [y,m]=d._date.split('-').map(Number);
-    return y===currentYear&&m-1===currentMonth;
+    return y===currentYear && m-1===currentMonth;
   });
-  const agg=aggregateDays(monthDays);
+  const aggLeg = aggregateDays(monthDays); // dados do registro diário antigo
 
-  // KPIs topo
-  document.getElementById('kpi-abord').textContent=agg.abord||0;
-  document.getElementById('kpi-resp').textContent=agg.resp||0;
-  document.getElementById('kpi-conv').textContent=agg.convites||0;
-  document.getElementById('kpi-agend').textContent=agg.agendadas||0;
-  document.getElementById('kpi-reun').textContent=agg.reunioes||0;
-  const noshow=Math.max(0,(agg.agendadas||0)-(agg.reunioes||0));
-  const noshowPct=agg.agendadas>0?Math.round(noshow/agg.agendadas*100):0;
-  document.getElementById('kpi-noshow').textContent=noshow||0;
-  const nsPctEl=document.getElementById('kpi-noshow-pct');
-  if(nsPctEl)nsPctEl.textContent=agg.agendadas>0?noshowPct+'% das agendadas':'';
-  document.getElementById('kpi-vendas').textContent=agg.vendas||0;
-  document.getElementById('kpi-vcurso').textContent=agg.vcurso||0;
+  let crmDados = {abord:0,abord_pc:0,abord_isca:0,abord_reat:0,abord_fu:0,
+    ops:0,agend:0,noshow:0,ganho:0,fat_ganho:0,bv_total:0,bv_qualif:0,bv_desqualif:0};
+  try{ crmDados = await crmBuscarDadosMes(currentYear, currentMonth); }
+  catch(e){ console.error('CRM mensal:', e); }
 
-  // Seguidores do mês
-  const segNovosMes=agg.seg_novos||0;
-  const segPerdidosMes=agg.seg_perdidos||0;
-  const segPcMes=agg.pc_seguidores||0;
-  const segOutrosMes=Math.max(0,segNovosMes-segPcMes);
-  document.getElementById('kpi-seg-novos').textContent=segNovosMes||'0';
-  const segPerdSub=document.getElementById('kpi-seg-perdidos-sub');
-  if(segPerdSub)segPerdSub.textContent=segPerdidosMes?('−'+segPerdidosMes+' perdidos no mês'):'sem perdas registradas';
-  document.getElementById('kpi-seg-pc').textContent=segPcMes||'0';
-  const segPcPct=document.getElementById('kpi-seg-pc-pct');
-  if(segPcPct)segPcPct.textContent=segNovosMes>0?pct(segPcMes,segNovosMes)+' do total ganho':'—';
-  document.getElementById('kpi-seg-outros').textContent=segOutrosMes||'0';
+  // ── SOMA: unificar as duas fontes ──
+  const abord    = (aggLeg.abord||0)     + (crmDados.abord||0);
+  const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);
+  const reunioes = (aggLeg.reunioes||0)  + (crmDados.agend||0); // CRM usa agend como realizadas
+  const noshow   = Math.max(0,(aggLeg.agendadas||0)-(aggLeg.reunioes||0)) + (crmDados.noshow||0);
+  const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);
+  const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0);
+  const abordPc  = (aggLeg.pc?.abord||0) + (crmDados.abord_pc||0);
+  const abordIs  = (aggLeg.is?.leads||0) + (crmDados.abord_isca||0);
+  const abordRe  = (aggLeg.re?.abord||0) + (crmDados.abord_reat||0);
+  const abordFu  = (crmDados.abord_fu||0);
 
-  // Taxas
-  document.getElementById('taxa-resp').textContent=pct(agg.resp,agg.abord);
-  document.getElementById('taxa-convite').textContent=pct(agg.convites,agg.resp);
-  document.getElementById('taxa-agend').textContent=pct(agg.agendadas||0,agg.convites);
-  const noshowTaxa=Math.max(0,(agg.agendadas||0)-(agg.reunioes||0));
-  document.getElementById('taxa-noshow').textContent=pct(noshowTaxa,agg.agendadas||0);
-  document.getElementById('taxa-reun').textContent=pct(agg.reunioes,agg.agendadas||agg.convites);
-  document.getElementById('taxa-fech').textContent=pct(agg.vendas,agg.reunioes);
+  // ── KPIs TOPO ──
+  const setEl = (id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
+  setEl('kpi-abord',   abord||0);
+  setEl('kpi-agend',   agend||0);
+  setEl('kpi-reun',    reunioes||0);
+  setEl('kpi-noshow',  noshow||0);
+  setEl('kpi-vendas',  vendas||0);
+  setEl('kpi-abord-pc',  abordPc||0);
+  setEl('kpi-abord-isca',abordIs||0);
+  setEl('kpi-abord-reat',abordRe||0);
+  setEl('kpi-abord-fu',  abordFu||0);
+  const nsPctEl = document.getElementById('kpi-noshow-pct');
+  if(nsPctEl) nsPctEl.textContent = agend>0 ? Math.round(noshow/agend*100)+'% das agendadas' : '';
 
-  // ── COMPARATIVO SEMANA A SEMANA ──
-  // Agrupar dias por semana do mês
-  const semanas={};
-  monthDays.forEach(d=>{
-    const dayNum=parseInt(d._date.split('-')[2]);
-    const wk=Math.ceil(dayNum/7);
-    const key='Semana '+wk;
-    if(!semanas[key])semanas[key]=[];
-    semanas[key].push(d);
-  });
-  // Garantir 5 semanas mesmo vazias
-  for(let i=1;i<=5;i++){if(!semanas['Semana '+i])semanas['Semana '+i]=[];}
+  // ── TAXAS DO FUNIL ──
+  document.getElementById('taxa-resp').textContent    = pct(aggLeg.resp, aggLeg.abord);
+  document.getElementById('taxa-convite').textContent = pct(aggLeg.convites, aggLeg.resp);
+  document.getElementById('taxa-agend').textContent   = pct(agend, abord);
+  document.getElementById('taxa-noshow').textContent  = pct(noshow, agend);
+  document.getElementById('taxa-reun').textContent    = pct(reunioes, agend);
+  document.getElementById('taxa-fech').textContent    = pct(vendas, reunioes);
 
-  const semBody=document.getElementById('semanaTableBody');
-  let melhorSem='';let melhorAbord=0;
-  semBody.innerHTML=Object.keys(semanas).sort().map(sem=>{
-    const sd=semanas[sem];
-    const sa=aggregateDays(sd);
-    if(sa.abord>melhorAbord){melhorAbord=sa.abord;melhorSem=sem;}
-    const isMelhor=false;
-    return`<tr>
-      <td style="font-weight:500">${sem}</td>
-      <td>${sa.abord||0}</td>
-      <td>${sa.resp||0}</td>
-      <td>${sa.convites||0}</td>
-      <td>${sa.agendadas||0}</td>
-      <td>${sa.reunioes||0}</td>
-      <td>${Math.max(0,(sa.agendadas||0)-(sa.reunioes||0))}</td>
-      <td>${sa.vendas||0}</td>
-      <td>${sa.valor?'R$ '+sa.valor.toLocaleString('pt-BR'):'R$ 0,00'}</td>
-      <td>${sa.vcurso||0}</td>
-      <td>${sa.vcurso_val?'R$ '+sa.vcurso_val.toLocaleString('pt-BR'):'R$ 0,00'}</td>
-      <td>${pct(sa.resp,sa.abord)}</td>
-      <td>${pct(sa.convites,sa.resp)}</td>
-      <td>${pct(sa.reunioes,sa.convites)}</td>
-      <td>${pct(sa.vendas,sa.reunioes)}</td>
-    </tr>`;
-  }).join('')+`<tr class="total-row">
-    <td>TOTAL</td>
-    <td>${agg.abord}</td><td>${agg.resp}</td><td>${agg.convites}</td><td>${agg.reunioes}</td>
-    <td>${agg.vendas}</td>
-    <td>${agg.valor?'R$ '+agg.valor.toLocaleString('pt-BR'):'R$ 0,00'}</td>
-    <td>${agg.vcurso||0}</td>
-    <td>${agg.vcurso_val?'R$ '+agg.vcurso_val.toLocaleString('pt-BR'):'R$ 0,00'}</td>
-    <td>${pct(agg.resp,agg.abord)}</td>
-    <td>${pct(agg.convites,agg.resp)}</td>
-    <td>${pct(agg.reunioes,agg.convites)}</td>
-    <td>${pct(agg.vendas,agg.reunioes)}</td>
-  </tr>`;
+  // ── SEGUIDORES DO MÊS ──
+  const segNovosMes    = aggLeg.seg_novos||0;
+  const segPerdidosMes = aggLeg.seg_perdidos||0;
+  const segPcMes       = aggLeg.pc_seguidores||0;
+  const segOutrosMes   = Math.max(0, segNovosMes - segPcMes);
+  setEl('kpi-seg-novos',   segNovosMes||0);
+  setEl('kpi-seg-pc',      segPcMes||0);
+  setEl('kpi-seg-outros',  segOutrosMes||0);
+  const segPerdSub = document.getElementById('kpi-seg-perdidos-sub');
+  if(segPerdSub) segPerdSub.textContent = segPerdidosMes ? '−'+segPerdidosMes+' perdidos no mês' : 'sem perdas registradas';
+  const segPcPct = document.getElementById('kpi-seg-pc-pct');
+  if(segPcPct) segPcPct.textContent = segNovosMes>0 ? pct(segPcMes,segNovosMes)+' do total ganho' : '—';
 
-  // ── TABELA POR CANAL ──
-  const tbody=document.getElementById('canalTableBody');
-  const canais=[
-    ['BV Automático',agg.bv.auto,agg.bv.sdr,agg.bv.convites,agg.bv.reun,agg.bv.vend,agg.bv.valor,0],
-    ['PC — Outbound',agg.pc.abord,agg.pc.resp,agg.pc.convites,agg.pc.reun,agg.pc.vend,agg.pc.valor,agg.pc.vcurso],
-    ['Stories',agg.st.inter,agg.st.sdr,agg.st.convites,agg.st.reun,agg.st.vend,0,0],
-    ['Follow-up',agg.fu.ret,agg.fu.resp,agg.fu.convites,agg.fu.reun,agg.fu.vend,agg.fu.valor,agg.fu.vcurso],
-    ['Reativação',agg.re.abord,agg.re.resp,agg.re.convites,agg.re.reun,agg.re.vend,0,0],
-    ['Isca',agg.is.leads,agg.is.sdr,agg.is.convites,agg.is.reun,agg.is.vend,0,0],
-  ];
-  tbody.innerHTML=canais.map(c=>`<tr>
-    <td>${c[0]}</td><td>${c[1]||0}</td><td>${c[2]||0}</td><td>${c[3]||0}</td><td>${c[4]||0}</td>
-    <td>${c[5]||0}</td><td>${c[6]?'R$ '+c[6].toLocaleString('pt-BR'):'—'}</td><td>${c[7]||0}</td>
-    <td>${pct(c[2]||0,c[1]||0)}</td><td>${pct(c[5]||0,c[4]||0)}</td>
-  </tr>`).join('')+
-  `<tr class="total-row"><td>TOTAL</td><td>${agg.abord}</td><td>${agg.resp}</td><td>${agg.convites}</td><td>${agg.reunioes}</td>
-  <td>${agg.vendas}</td><td>${agg.valor?'R$ '+agg.valor.toLocaleString('pt-BR'):'—'}</td><td>${agg.vcurso||0}</td>
-  <td>${pct(agg.resp,agg.abord)}</td><td>${pct(agg.vendas,agg.reunioes)}</td></tr>`;
+  // ── TAXA CONVERSÃO CRM ──
+  const rateBox = document.getElementById('crmConvRateBox');
+  if(rateBox && (abord>0||crmDados.ops>0)){
+    rateBox.innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text3);margin-bottom:16px">
+      ${abord>0?`<span>Abord → Reun: <b style="color:var(--purple)">${pct(agend,abord)}</b></span>`:''}
+      ${agend>0?`<span>Agend → Realizada: <b style="color:var(--g4)">${pct(reunioes,agend)}</b></span>`:''}
+      ${agend>0?`<span>No-show: <b style="color:var(--coral)">${pct(noshow,agend)}</b></span>`:''}
+      ${reunioes>0?`<span>Fechamento: <b style="color:var(--g4)">${pct(vendas,reunioes)}</b></span>`:''}
+      ${fat>0?`<span>Faturamento: <b style="color:var(--g4)">R$ ${fat.toLocaleString('pt-BR')}</b></span>`:''}
+      ${crmDados.ops>0?`<span>Oportunidades abertas (CRM): <b>${crmDados.ops}</b></span>`:''}
+    </div>`;
+  } else if(rateBox){ rateBox.innerHTML=''; }
 
-  // ── ALERTAS AUTOMÁTICOS ──
-  const alertas=document.getElementById('alertasBox');
-  const taxaResp=agg.abord?agg.resp/agg.abord:0;
-  const taxaConv=agg.resp?agg.convites/agg.resp:0;
-  const taxaReun=agg.convites?agg.reunioes/agg.convites:0;
-  const taxaFech=agg.reunioes?agg.vendas/agg.reunioes:0;
-  let als=[];
-  if(agg.abord>0){
-    if(taxaResp>=0.2)als.push({type:'ok',msg:'✓ Taxa de resposta OK ('+pct(agg.resp,agg.abord)+')'});
-    else als.push({type:'bad',msg:'⚠ Taxa de resposta baixa ('+pct(agg.resp,agg.abord)+') → revisar script e filtro de qualificação'});
-    if(taxaConv<0.1&&agg.resp>5)als.push({type:'warn',msg:'⚠ Poucos convites ('+pct(agg.convites,agg.resp)+') → problema na conversa ou qualificação'});
-    if(taxaReun>=0.3)als.push({type:'ok',msg:'✓ Comparecimento em reunião OK ('+pct(agg.reunioes,agg.convites)+')'});
-    else if(agg.convites>2)als.push({type:'warn',msg:'⚠ Baixo comparecimento ('+pct(agg.reunioes,agg.convites)+') → reforçar pré-aquecimento'});
-    if(agg.reunioes>0&&taxaFech<0.2)als.push({type:'bad',msg:'⚠ Reuniões sem fechamento ('+pct(agg.vendas,agg.reunioes)+') → revisar oferta e pitch'});
-    else if(agg.vendas>0)als.push({type:'ok',msg:'✓ BV mantém boa performance relativa'});
-  } else {
-    als.push({type:'warn',msg:'Nenhum dado registrado neste mês ainda.'});
-  }
-  alertas.innerHTML=als.map(a=>`<div class="alert-box alert-${a.type}">${a.msg}</div>`).join('');
+  // ── TABELA SEMANA A SEMANA ──
+  // Buscar eventos CRM da semana para cruzar com registro diário
+  const inicio = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-01`;
+  const fimDate = new Date(currentYear, currentMonth+1, 0);
+  const fim = fimDate.toISOString().split('T')[0];
 
-  // ── INSIGHTS AUTOMÁTICOS ──
-  const insights=document.getElementById('insightsBox');
-  let ins=[];
-  if(agg.abord>0){
-    // Gargalo principal
-    if(taxaResp<0.15)ins.push('🔴 Gargalo na abordagem — menos de 15% respondem. Prioridade: revisar script PC e critério de seleção de perfis.');
-    else if(taxaConv<0.08)ins.push('🟠 Gargalo na conversa — poucas abordagens chegam ao convite. Prioridade: treinar SDR na condução e no momento de convidar.');
-    else if(taxaReun<0.25)ins.push('🟠 Gargalo no comparecimento — convidados não aparecem. Prioridade: reforçar pré-aquecimento 1 dia antes e no dia.');
-    else if(taxaFech<0.2&&agg.reunioes>0)ins.push('🟡 Gargalo no fechamento — reuniões acontecem mas não convertem. Prioridade: revisar oferta, fit do lead e apresentação da mentoria.');
-    else if(agg.vendas>0)ins.push('✅ Volume e resposta equilibrados. Foco: aumentar volume de abordagens para escalar o resultado.');
-    // Canal mais qualificado
-    const melhorCanal=canais.reduce((best,c)=>{
-      const t=c[4]>0?c[5]/c[4]:0;
-      const bestT=best[4]>0?best[5]/best[4]:0;
-      return t>bestT?c:best;
-    },canais[0]);
-    if(melhorCanal[5]>0)ins.push('💡 Canal com melhor taxa de fechamento: '+melhorCanal[0]+' ('+pct(melhorCanal[5],melhorCanal[4])+' de fechamento). Considere aumentar volume neste funil.');
-    // Semana de melhor performance
-    if(melhorAbord>0)ins.push('📅 Semana de maior volume: '+melhorSem+' ('+melhorAbord+' abordagens).');
-  } else {
-    ins.push('Sem dados suficientes para gerar insights. Comece a preencher o Registro Diário.');
-  }
-  insights.innerHTML=ins.map(i=>`<div class="alert-box alert-warn" style="margin-bottom:6px">${i}</div>`).join('');
-
-  // ── DADOS DO CRM NO MENSAL ──
+  // Eventos CRM do mês (oportunidades com datas no mês)
+  let crmOpsDoMes = [];
   try{
-    const crmDados = await crmBuscarDadosMes(currentYear, currentMonth);
-    const setEl = (id, val) => { const e=document.getElementById(id); if(e) e.textContent=val; };
-    setEl('crm-m-abord',   crmDados.abord||0);
-    setEl('crm-m-ops',     crmDados.ops||0);
-    setEl('crm-m-agend',   crmDados.agend||0);
-    setEl('crm-m-noshow',  crmDados.noshow||0);
-    setEl('crm-m-ganho',   crmDados.ganho||0);
-    setEl('crm-m-pc',      crmDados.abord_pc||0);
-    setEl('crm-m-isca',    crmDados.abord_isca||0);
-    setEl('crm-m-reat',    crmDados.abord_reat||0);
-    setEl('crm-m-followup',crmDados.abord_fu||0);
-    // Taxa de conversão abordagem → reunião
-    const taxaConvCrm = crmDados.abord > 0
-      ? Math.round(crmDados.agend / crmDados.abord * 100) + '%'
-      : '—';
-    // KPIs BV no mensal
-    if(crmDados.bv_total > 0){
-      const bvKpi = document.createElement('div');
-      bvKpi.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px';
-      bvKpi.innerHTML = `
-        <div class="kpi-card"><div class="kpi-val">${crmDados.bv_total}</div><div class="kpi-lbl">Leads BV</div></div>
-        <div class="kpi-card" style="border-color:var(--g2)"><div class="kpi-val" style="color:var(--g4)">${crmDados.bv_qualif}</div><div class="kpi-lbl">Qualificados BV (${crmDados.bv_total>0?Math.round(crmDados.bv_qualif/crmDados.bv_total*100):0}%)</div></div>
-        <div class="kpi-card" style="border-color:var(--coral-dim)"><div class="kpi-val" style="color:var(--coral)">${crmDados.bv_desqualif}</div><div class="kpi-lbl">Desqualificados BV</div></div>
-      `;
-      const crmBox = document.getElementById('crmMensalBox');
-      if(crmBox) crmBox.appendChild(bvKpi);
+    const rOps = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    if(rOps.ok) crmOpsDoMes = await rOps.json();
+  }catch(e){}
+
+  // Abordagens CRM do mês por data
+  let abordCrmMes = {};
+  try{
+    const rAb = await fetch(
+      SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    if(rAb.ok){
+      const rows = await rAb.json();
+      rows.forEach(r=>{ abordCrmMes[r.data_reg] = r; });
+    }
+  }catch(e){}
+
+  // Agrupar por semana (dia 1-7=S1, 8-14=S2, 15-21=S3, 22-28=S4, 29+=S5)
+  const semanas = {1:[],2:[],3:[],4:[],5:[]};
+  monthDays.forEach(d=>{
+    const dayNum = parseInt(d._date.split('-')[2]);
+    const wk = Math.min(Math.ceil(dayNum/7), 5);
+    semanas[wk].push(d);
+  });
+
+  const semBody = document.getElementById('semanaTableBody');
+  let semRows = '';
+  let totS={abord:0,agend:0,noshow:0,ganho:0,fat:0};
+
+  for(let i=1;i<=5;i++){
+    const sd = semanas[i];
+    const sa = aggregateDays(sd);
+
+    // Datas desta semana
+    const dayStart = (i-1)*7+1;
+    const dayEnd   = Math.min(i*7, fimDate.getDate());
+    const dateStart = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(dayStart).padStart(2,'0')}`;
+    const dateEnd   = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(dayEnd).padStart(2,'0')}`;
+
+    // CRM: oportunidades e ganhos desta semana
+    const crmOps = crmOpsDoMes.filter(o=>o.data_entrada>=dateStart&&o.data_entrada<=dateEnd);
+    const crmAgend = crmOpsDoMes.filter(o=>o.data_agendamento&&o.data_agendamento.slice(0,10)>=dateStart&&o.data_agendamento.slice(0,10)<=dateEnd);
+    const crmNoshow = crmOpsDoMes.filter(o=>o.data_no_show&&o.data_no_show.slice(0,10)>=dateStart&&o.data_no_show.slice(0,10)<=dateEnd);
+    const crmGanho = crmOpsDoMes.filter(o=>o.data_ganho&&o.data_ganho.slice(0,10)>=dateStart&&o.data_ganho.slice(0,10)<=dateEnd);
+    const crmFat = crmGanho.reduce((s,o)=>s+(parseFloat(o.valor_venda)||0),0);
+
+    // Abordagens CRM desta semana
+    let crmAbordSem = 0;
+    for(let d=dayStart;d<=dayEnd;d++){
+      const key = `${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      if(abordCrmMes[key]) crmAbordSem += (abordCrmMes[key].total||0);
     }
 
-    const rateBox = document.getElementById('crmConvRateBox');
-    if(rateBox) rateBox.innerHTML = crmDados.abord > 0 ? `
-      <div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text3)">
-        <span>Abordagens → Oportunidade: <b style="color:var(--text)">${crmDados.abord>0?Math.round(crmDados.ops/crmDados.abord*100):0}%</b></span>
-        <span>Abordagens → Reunião: <b style="color:var(--purple)">${taxaConvCrm}</b></span>
-        <span>Reuniões → Ganho: <b style="color:var(--g4)">${crmDados.agend>0?Math.round(crmDados.ganho/crmDados.agend*100):0}%</b></span>
-        <span>No-show: <b style="color:var(--coral)">${crmDados.agend>0?Math.round(crmDados.noshow/crmDados.agend*100):0}%</b></span>
-        ${crmDados.fat_ganho>0?`<span>Faturamento CRM: <b style="color:var(--g4)">R$ ${crmDados.fat_ganho.toLocaleString('pt-BR')}</b></span>`:''}
-      </div>` : '<div style="font-size:12px;color:var(--text3)">Sem abordagens registradas no CRM para este mês.</div>';
-  }catch(e){ console.error('CRM mensal:', e); }
+    // Somar legado + CRM
+    const sAbord  = (sa.abord||0) + crmAbordSem;
+    const sAgend  = (sa.agendadas||0) + crmAgend.length;
+    const sNoshow = Math.max(0,(sa.agendadas||0)-(sa.reunioes||0)) + crmNoshow.length;
+    const sGanho  = (sa.vendas||0) + crmGanho.length;
+    const sFat    = (sa.valor||0) + crmFat;
 
-  // ── METAS VS REAL ──
-  const m=currentMonth;
-  let metasData={};
+    if(sAbord===0 && sAgend===0 && sGanho===0) continue; // pular semanas vazias
+
+    totS.abord  += sAbord;
+    totS.agend  += sAgend;
+    totS.noshow += sNoshow;
+    totS.ganho  += sGanho;
+    totS.fat    += sFat;
+
+    semRows += `<tr>
+      <td style="font-weight:500">Semana ${i}</td>
+      <td>${sAbord||0}</td>
+      <td>${crmOps.length||0}</td>
+      <td>${sAgend||0}</td>
+      <td>${sNoshow||0}</td>
+      <td style="color:var(--g4);font-weight:500">${sGanho||0}</td>
+      <td>${sFat?'R$ '+sFat.toLocaleString('pt-BR'):'—'}</td>
+      <td>${sAbord>0?pct(sAgend,sAbord):'—'}</td>
+      <td>${sAgend>0?pct(sGanho,sAgend):'—'}</td>
+    </tr>`;
+  }
+  semRows += `<tr class="total-row">
+    <td>TOTAL</td>
+    <td>${totS.abord}</td>
+    <td>${crmOpsDoMes.length}</td>
+    <td>${totS.agend}</td>
+    <td>${totS.noshow}</td>
+    <td style="color:var(--g4);font-weight:600">${totS.ganho}</td>
+    <td>${totS.fat?'R$ '+totS.fat.toLocaleString('pt-BR'):'—'}</td>
+    <td>${totS.abord>0?pct(totS.agend,totS.abord):'—'}</td>
+    <td>${totS.agend>0?pct(totS.ganho,totS.agend):'—'}</td>
+  </tr>`;
+  if(semBody) semBody.innerHTML = semRows || '<tr><td colspan="9" style="text-align:center;color:var(--text3)">Sem dados neste mês.</td></tr>';
+
+  // ── ALERTAS E INSIGHTS ──
+  const alertas = document.getElementById('alertasBox');
+  const taxaFech = agend>0 ? vendas/agend : 0;
+  const taxaAgend = abord>0 ? agend/abord : 0;
+  let als = [];
+  if(abord>0||agend>0){
+    if(taxaAgend>=0.1) als.push({type:'ok',msg:'✓ Taxa abordagem→reunião OK ('+pct(agend,abord)+')'});
+    else if(abord>5) als.push({type:'bad',msg:'⚠ Poucas reuniões geradas ('+pct(agend,abord)+') — revisar abordagem e qualificação'});
+    if(noshow>0&&agend>0) als.push({type:'warn',msg:'⚠ '+noshow+' no-show ('+pct(noshow,agend)+') — reforçar pré-aquecimento'});
+    if(vendas>0) als.push({type:'ok',msg:'✓ '+vendas+' ganho(s) no mês ('+pct(vendas,agend)+' de fechamento)'});
+    else if(agend>0) als.push({type:'warn',msg:'⚠ Reuniões sem fechamento — revisar oferta e abordagem pós-reunião'});
+  } else {
+    als.push({type:'warn',msg:'Sem dados suficientes neste mês.'});
+  }
+  if(alertas) alertas.innerHTML = als.map(a=>`<div class="alert-box alert-${a.type}">${a.msg}</div>`).join('');
+
+  const insights = document.getElementById('insightsBox');
+  let ins = [];
+  if(abord>0){
+    if(taxaAgend<0.05) ins.push('🔴 Volume alto mas poucas reuniões — gargalo na qualificação ou abordagem.');
+    else if(taxaFech<0.2&&agend>0) ins.push('🟡 Reuniões acontecem mas conversão baixa — revisar oferta e diagnóstico.');
+    else if(vendas>0) ins.push('✅ Funil equilibrado. Foco: aumentar volume de abordagens qualificadas.');
+    if(crmDados.bv_total>0) ins.push(`💡 ${crmDados.bv_total} lead(s) BV no mês — ${crmDados.bv_qualif} qualificado(s) (${crmDados.bv_total>0?Math.round(crmDados.bv_qualif/crmDados.bv_total*100):0}% taxa).`);
+  }
+  if(insights) insights.innerHTML = ins.length ? ins.map(i=>`<div class="alert-box alert-warn" style="margin-bottom:6px">${i}</div>`).join('') : '<div style="font-size:12px;color:var(--text3)">Preencha o CRM para gerar insights automáticos.</div>';
+
+  // ── METAS ──
+  const m = currentMonth;
+  let metasData = {};
   try{
-    const mr=await apiGet({action:'get_metas',ano:currentYear,mes:m});
-    metasData=mr.dados||{};
-  }catch(e){console.error('Erro ao carregar metas:',e);}
-  // Preenche os campos com os valores salvos
+    const mr = await apiGet({action:'get_metas',ano:currentYear,mes:m});
+    metasData = mr.dados||{};
+  }catch(e){ console.error('Erro ao carregar metas:',e); }
   ['abord','resp','convites','agend','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
-    const el=document.getElementById('meta_'+k);
-    if(el)el.value=metasData[k]||'';
+    const el = document.getElementById('meta_'+k);
+    if(el) el.value = metasData[k]||'';
   });
-  // Bloqueia campos se já tem metas salvas
-  const metaAbord=parseFloat(metasData.abord)||0;
-  const metaReun=parseFloat(metasData.reun)||0;
-  const metaVend=parseFloat(metasData.vendas)||0;
-  const metaFat=parseFloat(metasData.fat)||0;
-  const metaVC=parseFloat(metasData.vcurso)||0;
-  const metaFC=parseFloat(metasData.fcurso)||0;
-  const hasSavedMetas=metaAbord||metaReun||metaVend||metaFat||(parseFloat(metasData.resp)||0)||(parseFloat(metasData.convites)||0);
-  if(hasSavedMetas)lockMetasFields(true);
-  else lockMetasFields(false);
-  const realFat=agg.valor||0;
-  const realFC=agg.vcurso_val||0;
+  const hasSavedMetas = ['abord','reun','vendas','fat'].some(k=>parseFloat(metasData[k])||0);
+  lockMetasFields(hasSavedMetas);
 
   function metaRow(label,meta,real,isMoney){
-    if(!meta)return`<tr><td>${label}</td><td style="color:var(--text3)">—</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>`;
-    const pct_val=meta?Math.round(real/meta*100):0;
-    const falta=meta-real;
-    const color=pct_val>=100?'var(--g4)':pct_val>=50?'var(--amber)':'var(--coral)';
+    if(!meta) return`<tr><td>${label}</td><td style="color:var(--text3)">—</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>`;
+    const pct_val = meta ? Math.round(real/meta*100) : 0;
+    const falta = meta-real;
+    const color = pct_val>=100?'var(--g4)':pct_val>=50?'var(--amber)':'var(--coral)';
     return`<tr>
       <td>${label}</td>
       <td>${isMoney?'R$ '+meta.toLocaleString('pt-BR'):meta}</td>
@@ -2354,14 +2336,18 @@ async function renderMensal(){
       <td style="color:${falta<=0?'var(--g4)':'var(--text2)'}">${falta<=0?'✓ atingido':(isMoney?'R$ '+falta.toLocaleString('pt-BR'):falta)}</td>
     </tr>`;
   }
-  document.getElementById('metasTableBody').innerHTML=
-    metaRow('Abordagens',metaAbord,agg.abord,false)+
-    metaRow('Reuniões',metaReun,agg.reunioes,false)+
-    metaRow('Vendas mentoria (qtd)',metaVend,agg.vendas,false)+
-    metaRow('Faturamento mentoria (R$)',metaFat,realFat,true)+
-    metaRow('Vendas curso (qtd)',metaVC,agg.vcurso||0,false)+
-    metaRow('Faturamento curso (R$)',metaFC,realFC,true);
+  const metaAbord = parseFloat(metasData.abord)||0;
+  const metaReun  = parseFloat(metasData.reun)||0;
+  const metaVend  = parseFloat(metasData.vendas)||0;
+  const metaFat   = parseFloat(metasData.fat)||0;
+  const tbody = document.getElementById('metasTableBody');
+  if(tbody) tbody.innerHTML =
+    metaRow('Abordagens',metaAbord,abord,false)+
+    metaRow('Reuniões agendadas',metaReun,agend,false)+
+    metaRow('Ganhos / Vendas',metaVend,vendas,false)+
+    metaRow('Faturamento (R$)',metaFat,fat,true);
 }
+
 
 async function saveMetas(){
   const m=currentMonth;
@@ -2464,57 +2450,65 @@ async function renderMetasTable(){
 // DASHBOARD ANUAL
 // ══════════════════════════════════════════
 async function renderAnual(){
-  const allDays=await getAllDaysAsync(currentYear);
-  const grid=document.getElementById('yearGrid');
-  grid.innerHTML='';
-  let totAbord=0,totReun=0,totVend=0,totFat=0;
-  const rows=[];
+  const allDays = await getAllDaysAsync(currentYear);
+  const grid = document.getElementById('yearGrid');
+  grid.innerHTML = '';
+  let totAbord=0, totReun=0, totVend=0, totFat=0;
+  const rows = [];
 
-  // Buscar dados CRM para cada mês do ano
-  const crmAnualData = [];
   for(let i=0;i<12;i++){
-    try{
-      const d = await crmBuscarDadosMes(currentYear, i);
-      crmAnualData.push(d);
-    }catch(e){ crmAnualData.push({abord:0,ops:0,agend:0,noshow:0,ganho:0,fat_ganho:0}); }
-  }
+    // Dados registro diário
+    const mDays = allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===i;});
+    const agg = aggregateDays(mDays);
 
-  // Preencher tabela CRM anual
-  const anualCrmBody = document.getElementById('anualCrmTableBody');
-  if(anualCrmBody){
-    anualCrmBody.innerHTML = crmAnualData.map((d,i)=>`<tr>
-      <td>${MONTHS_PT[i]}/26</td>
-      <td>${d.abord||0}</td>
-      <td>${d.ops||0}</td>
-      <td>${d.agend||0}</td>
-      <td>${d.noshow||0}</td>
-      <td style="color:var(--g4);font-weight:500">${d.ganho||0}</td>
-      <td style="color:var(--purple)">${d.agend>0?Math.round(d.ganho/d.agend*100)+'%':'—'}</td>
-    </tr>`).join('');
-  }
+    // Dados CRM
+    let crmD = {abord:0,agend:0,noshow:0,ganho:0,fat_ganho:0};
+    try{ crmD = await crmBuscarDadosMes(currentYear, i); }catch(e){}
 
-  MONTHS_PT.forEach((m,i)=>{
-    const mDays=allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===i;});
-    const agg=aggregateDays(mDays);
-    totAbord+=agg.abord;totReun+=agg.reunioes;totVend+=agg.vendas;totFat+=agg.valor;
+    // Somar
+    const sAbord  = (agg.abord||0)     + (crmD.abord||0);
+    const sAgend  = (agg.agendadas||0) + (crmD.agend||0);
+    const sNoshow = Math.max(0,(agg.agendadas||0)-(agg.reunioes||0)) + (crmD.noshow||0);
+    const sGanho  = (agg.vendas||0)    + (crmD.ganho||0);
+    const sFat    = (agg.valor||0)     + (crmD.fat_ganho||0);
 
-    const card=document.createElement('div');
-    card.className='month-card'+(i===currentMonth?' active':'');
-    card.innerHTML=`<div class="month-name">${m}/26</div><div class="month-val ${agg.vendas>0?'has-data':''}">${agg.vendas>0?agg.vendas:'—'}<span style="font-size:12px;font-weight:400;color:var(--text3)"> vend.</span></div>`;
-    card.onclick=()=>{currentMonth=i;showTab('mensal');document.querySelectorAll('.nav-btn').forEach((b,bi)=>{if(bi===2)b.classList.add('active');else b.classList.remove('active');});};
+    totAbord += sAbord;
+    totReun  += sAgend;
+    totVend  += sGanho;
+    totFat   += sFat;
+
+    // Card do grid
+    const card = document.createElement('div');
+    card.className = 'month-card'+(i===currentMonth?' active':'');
+    card.innerHTML = `<div class="month-name">${MONTHS_PT[i]}/26</div>
+      <div class="month-val ${sGanho>0?'has-data':''}">${sGanho>0?sGanho:'—'}<span style="font-size:12px;font-weight:400;color:var(--text3)"> ganhos</span></div>`;
+    card.onclick = ()=>{
+      currentMonth=i;
+      showTabByName('mensal');
+      document.querySelectorAll('.nav-btn').forEach((b,bi)=>{if(bi===2)b.classList.add('active');else b.classList.remove('active');});
+    };
     grid.appendChild(card);
+    rows.push({m:MONTHS_PT[i],sAbord,sAgend,sNoshow,sGanho,sFat});
+  }
 
-    rows.push({m,agg});
-  });
+  document.getElementById('anual-abord').textContent  = totAbord||'0';
+  document.getElementById('anual-reun').textContent   = totReun||'0';
+  document.getElementById('anual-vendas').textContent = totVend||'0';
+  document.getElementById('anual-fat').textContent    = totFat?'R$ '+totFat.toLocaleString('pt-BR'):'—';
 
-  document.getElementById('anual-abord').textContent=totAbord||'0';
-  document.getElementById('anual-reun').textContent=totReun||'0';
-  document.getElementById('anual-vendas').textContent=totVend||'0';
-  document.getElementById('anual-fat').textContent=totFat?'R$ '+totFat.toLocaleString('pt-BR'):'—';
-
-  const tbody=document.getElementById('anualTableBody');
-  tbody.innerHTML=rows.map(({m,agg})=>`<tr><td>${m}/26</td><td>${agg.abord||0}</td><td>${agg.reunioes||0}</td><td>${agg.vendas||0}</td><td>${agg.valor?'R$ '+agg.valor.toLocaleString('pt-BR'):'—'}</td><td>${pct(agg.resp,agg.abord)}</td><td>${pct(agg.vendas,agg.reunioes)}</td></tr>`).join('');
+  const tbody = document.getElementById('anualTableBody');
+  if(tbody) tbody.innerHTML = rows.map(r=>`<tr>
+    <td>${r.m}/26</td>
+    <td>${r.sAbord||0}</td>
+    <td>${r.sAgend||0}</td>
+    <td>${r.sNoshow||0}</td>
+    <td style="color:var(--g4);font-weight:500">${r.sGanho||0}</td>
+    <td>${r.sFat?'R$ '+r.sFat.toLocaleString('pt-BR'):'—'}</td>
+    <td>${r.sAbord>0?pct(r.sAgend,r.sAbord):'—'}</td>
+    <td>${r.sAgend>0?pct(r.sGanho,r.sAgend):'—'}</td>
+  </tr>`).join('');
 }
+
 
 // ══════════════════════════════════════════
 // TRÁFEGO PAGO — CAMPANHAS
