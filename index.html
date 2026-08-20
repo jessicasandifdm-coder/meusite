@@ -3255,7 +3255,15 @@ async function crmSalvar(){
     let pessoaId;
 
     if(_crmEditId){
+      // Busca pessoaId em memória ou no banco (fallback seguro)
       pessoaId = _crmOps.find(o=>o.id===_crmEditId)?.pessoa_id;
+      if(!pessoaId){
+        const rOp = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+_crmEditId+'&select=pessoa_id',
+          {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+        const opRows = rOp.ok ? await rOp.json() : [];
+        pessoaId = opRows[0]?.pessoa_id;
+      }
+      if(!pessoaId) throw new Error('Oportunidade não encontrada. Feche e abra a ficha novamente.');
       const r = await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
         method:'PATCH',
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
@@ -3329,7 +3337,8 @@ async function crmSalvar(){
       reuniao_obs:document.getElementById('crm_reun_obs')?.value||'',
       transcricao:document.getElementById('crm_transcricao')?.value||'',
       valor_venda:parseFloat(document.getElementById('crm_vl_venda')?.value)||null,
-      data_entrada:today(),
+      // Ao editar, preservar a data_entrada original (não sobrescrever com today())
+      ...(_crmEditId ? {} : {data_entrada:today()}),
       ...datesUpdate,
       ...pipelineOrigemUpdate
     };
