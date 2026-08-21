@@ -667,6 +667,7 @@ button{font-family:var(--font)}
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <a href="/form-bv.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,.12);border:1px solid rgba(64,145,108,.25);border-radius:var(--radius-sm);color:var(--g4);font-size:12px;font-weight:500;padding:8px 14px;text-decoration:none" onmouseover="this.style.background='rgba(45,106,79,.22)'" onmouseout="this.style.background='rgba(45,106,79,.12)'">↗ Formulário BV</a>
+      <a href="/form-reativacao.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(155,114,207,.1);border:1px solid rgba(155,114,207,.25);border-radius:var(--radius-sm);color:var(--purple);font-size:12px;font-weight:500;padding:8px 14px;text-decoration:none" onmouseover="this.style.background='rgba(155,114,207,.2)'" onmouseout="this.style.background='rgba(155,114,207,.1)'">↗ Diagnóstico</a>
       <button class="crm-add-btn" onclick="crmNovaOportunidade()">+ Nova oportunidade</button>
     </div>
   </div>
@@ -2815,21 +2816,21 @@ const CRM_PIPELINES = {
 
   reativacao: {
     label: 'Reativação',
-    sub: 'Quem já passou pelo funil e está sendo reativado',
+    sub: 'Diagnóstico Estratégico — do formulário à sessão',
     cols: [
-      { status:'reat_novo',      label:'Novo',                  color:'var(--text2)'  },
-      { status:'reat_form',      label:'Formulário enviado',    color:'var(--amber)'  },
-      { status:'reat_qualif',    label:'Qualificado',           color:'var(--g4)'     },
-      { status:'reat_desqualif', label:'Desqualificado',        color:'var(--coral)'  },
-      { status:'isca_convite',   label:'Convite p/ reunião',   color:'var(--purple)' },
-      { status:'ganho',          label:'Ganho direto',          color:'var(--g4)'     },
-      { status:'perdido',        label:'Perdido',               color:'var(--coral)'  },
+      { status:'reat_form',       label:'Formulário recebido',    color:'var(--amber)'  },
+      { status:'reat_analise',    label:'Em análise',             color:'var(--teal)'   },
+      { status:'reat_qualif',     label:'Qualificado',            color:'var(--g4)'     },
+      { status:'reat_desqualif',  label:'Desqualificado',         color:'var(--coral)'  },
+      { status:'reat_convite',    label:'Convite enviado',        color:'var(--purple)' },
+      { status:'reat_interessada',label:'Interessada',            color:'var(--purple)' },
+      { status:'agendado',        label:'Agendamento realizado',  color:'var(--g4)'     },
     ],
     kpis: (ops) => [
-      { label:'Novos',           val: ops.filter(o=>o.status==='reat_novo').length,      color:'' },
-      { label:'Form. enviado',   val: ops.filter(o=>o.status==='reat_form').length,      color:'var(--amber)'  },
-      { label:'Qualificados',    val: ops.filter(o=>o.status==='reat_qualif').length,    color:'var(--g4)'     },
-      { label:'Desqualificados', val: ops.filter(o=>o.status==='reat_desqualif').length, color:'var(--coral)'  },
+      { label:'Form. recebidos',  val: ops.filter(o=>o.status==='reat_form').length,        color:'' },
+      { label:'Qualificadas',     val: ops.filter(o=>o.status==='reat_qualif'||o.status==='reat_convite'||o.status==='reat_interessada').length, color:'var(--g4)' },
+      { label:'Desqualificadas',  val: ops.filter(o=>o.status==='reat_desqualif').length,   color:'var(--coral)'  },
+      { label:'→ Agendamento',    val: ops.filter(o=>o.status==='agendado').length,          color:'var(--purple)' },
     ],
     showAbord: false,
   },
@@ -3125,6 +3126,26 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       <div class="crm-field"><div class="crm-lbl">Isca enviada</div>
         <input class="crm-inp" id="crm_isca" value="${crmEsc(op.isca_nome||'')}" placeholder="Nome da isca..."></div>
     </div>
+    ${(pipeAtual==='reativacao' && op.reat_faturamento) ? `
+    <div style="margin-top:14px;background:rgba(155,114,207,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:10px">Diagnóstico Estratégico — Respostas do Formulário</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+        <div><span style="color:var(--text3)">Qualificação:</span> <b style="color:${op.reat_qualificacao==='qualificado'?'var(--g4)':'var(--coral)'}">${op.reat_qualificacao==='qualificado'?'✓ Qualificada':'✗ Desqualificada'}</b></div>
+        <div><span style="color:var(--text3)">Score:</span> <b>${op.reat_score||0}/100</b></div>
+        <div><span style="color:var(--text3)">Loja:</span> ${crmEsc(op.reat_nome_loja||'—')}</div>
+        <div><span style="color:var(--text3)">Faturamento:</span> <b>${op.reat_faturamento||'—'}</b></div>
+        <div><span style="color:var(--text3)">Tempo de loja:</span> ${op.reat_tempo_loja||'—'}</div>
+        <div><span style="color:var(--text3)">Equipe:</span> ${op.reat_equipe||'—'}</div>
+        <div><span style="color:var(--text3)">Canal de vendas:</span> ${op.reat_canal_venda||'—'}</div>
+        <div><span style="color:var(--text3)">Invest. anterior:</span> ${op.reat_invest_anterior||'—'}</div>
+        <div><span style="color:var(--text3)">Intenção invest.:</span> <b style="color:${op.reat_intencao_invest&&op.reat_intencao_invest.startsWith('Sim')?'var(--g4)':op.reat_intencao_invest&&op.reat_intencao_invest.startsWith('Talvez')?'var(--amber)':'var(--coral)'}">${crmEsc(op.reat_intencao_invest||'—')}</b></div>
+        <div><span style="color:var(--text3)">Clareza:</span> ${crmEsc(op.reat_clareza||'—')}</div>
+      </div>
+      ${op.reat_situacoes ? '<div style="margin-top:8px;font-size:12px"><span style="color:var(--text3)">Situações:</span> '+crmEsc(op.reat_situacoes)+'</div>' : ''}
+      ${op.reat_desafio ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Desafio principal:</span> '+crmEsc(op.reat_desafio)+'</div>' : ''}
+      ${op.reat_objetivos ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Objetivos:</span> '+crmEsc(op.reat_objetivos)+'</div>' : ''}
+      ${op.reat_mudanca ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Mudança desejada:</span> '+crmEsc(op.reat_mudanca)+'</div>' : ''}
+    </div>` : ''}
     ${(pipeAtual==='bv' && op.bv_faturamento) ? `
     <div style="margin-top:14px;background:rgba(45,106,79,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:10px">Respostas do Formulário BV</div>
