@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Diagnóstico Estratégico — JS Mentoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0a0d0b;--surface:#111510;--surface2:#181d16;--border:#253022;--border2:#2f3d2b;
+  --g2:#2d6a4f;--g3:#40916c;--g4:#74c69d;
+  --amber:#e9a84c;--coral:#e07070;--purple:#9b72cf;
+  --text:#e4ede6;--text2:#7a9b7e;--text3:#435744;
+  --font:'DM Sans',sans-serif;--display:'Syne',sans-serif;
+  --r:12px;--rs:8px;
+}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{color:var(--text);font-family:var(--font);font-size:16px;line-height:1.5;min-height:100vh;
+  background:var(--bg);padding-bottom:env(safe-area-inset-bottom)}
+
+/* ── HEADER ── */
+.hdr{padding:40px 20px 32px;text-align:center;border-bottom:1px solid var(--border)}
+.hdr-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--g4);margin-bottom:18px}
+.hdr-tag::before,.hdr-tag::after{content:'';width:24px;height:1px;background:var(--border2)}
+.hdr h1{font-family:var(--display);font-size:clamp(24px,6vw,36px);font-weight:800;
+  color:var(--text);line-height:1.15;letter-spacing:-.02em;margin-bottom:10px}
+.hdr h1 span{color:var(--g4)}
+.hdr-sub{font-size:14px;color:var(--text2);line-height:1.6;max-width:360px;margin:0 auto 20px}
+.hdr-intro{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px 20px;text-align:left;max-width:500px;margin:0 auto}
+.hdr-intro p{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:10px}
+.hdr-intro p:last-child{margin-bottom:0}
+
+/* ── PROGRESSO ── */
+.prog-wrap{padding:20px 20px 0;max-width:500px;margin:0 auto}
+.prog-top{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:8px}
+.prog-bar{height:3px;background:var(--border2);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--g3),var(--g4));
+  border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+/* ── STEP ── */
+.step{display:none;padding:28px 20px 100px;max-width:500px;margin:0 auto;
+  animation:up .3s ease}
+.step.active{display:block}
+@keyframes up{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── PERGUNTA ── */
+.q-num{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--g4);margin-bottom:6px}
+.q-label{font-family:var(--display);font-size:20px;font-weight:700;color:var(--text);
+  line-height:1.3;margin-bottom:6px;letter-spacing:-.01em}
+.q-hint{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.5}
+.q-multi{font-size:11px;color:var(--text3);margin-bottom:16px;
+  background:rgba(45,106,79,.1);border:1px solid rgba(64,145,108,.2);
+  border-radius:6px;padding:6px 10px;display:inline-block}
+
+/* ── OPÇÕES ── */
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:14px;background:var(--surface);
+  border:2px solid var(--border2);border-radius:var(--rs);padding:16px 18px;
+  cursor:pointer;transition:all .18s;user-select:none;min-height:54px}
+.opt:active{transform:scale(.98)}
+.opt:hover{border-color:var(--g3);background:rgba(64,145,108,.05)}
+.opt.sel{border-color:var(--g3);background:rgba(45,106,79,.14)}
+.opt.sel .dot{background:var(--g4);box-shadow:0 0 0 3px rgba(116,198,157,.2)}
+.dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--border2);
+  flex-shrink:0;transition:all .18s;margin-top:2px}
+.dot.sq{border-radius:5px}
+.opt-txt{font-size:15px;color:var(--text2);line-height:1.45}
+.opt.sel .opt-txt{color:var(--text)}
+
+/* ── INPUT TEXT ── */
+.inp{width:100%;background:var(--surface2);border:2px solid var(--border2);
+  border-radius:var(--rs);color:var(--text);font-family:var(--font);font-size:16px;
+  padding:16px;transition:border-color .2s;outline:none;-webkit-appearance:none}
+.inp:focus{border-color:var(--g3)}
+.inp::placeholder{color:var(--text3)}
+textarea.inp{resize:none;min-height:110px;line-height:1.6}
+
+/* ── ERRO ── */
+.err{font-size:13px;color:var(--coral);margin-top:10px;display:none}
+.err.show{display:block}
+
+/* ── BOTÕES FIXOS ── */
+.btn-fixed{position:fixed;bottom:0;left:0;right:0;
+  background:linear-gradient(to top,var(--bg) 80%,transparent);
+  padding:16px 20px calc(16px + env(safe-area-inset-bottom));z-index:50}
+.btn-row{display:flex;gap:10px;max-width:500px;margin:0 auto}
+.btn-next{flex:1;background:var(--g2);border:none;border-radius:var(--rs);color:#fff;
+  font-family:var(--display);font-size:16px;font-weight:700;padding:17px;
+  cursor:pointer;transition:background .2s;letter-spacing:.01em}
+.btn-next:hover{background:var(--g3)}
+.btn-next:disabled{background:var(--border2);color:var(--text3);cursor:not-allowed}
+.btn-back{background:none;border:2px solid var(--border2);border-radius:var(--rs);
+  color:var(--text2);font-family:var(--font);font-size:15px;padding:17px 20px;
+  cursor:pointer;transition:all .2s;min-width:64px}
+.btn-back:hover{border-color:var(--border2);color:var(--text)}
+
+/* ── SCORE BADGE ── */
+.score-badge{display:inline-flex;align-items:center;gap:6px;border-radius:20px;
+  padding:4px 12px;font-size:12px;font-weight:500;margin-top:8px}
+.score-qualif{background:rgba(45,106,79,.2);color:var(--g4)}
+.score-desq{background:rgba(224,112,112,.15);color:var(--coral)}
+
+/* ── SUCESSO ── */
+.success{display:none;padding:60px 24px calc(60px + env(safe-area-inset-bottom));
+  text-align:center;max-width:460px;margin:0 auto}
+.success.show{display:block}
+.success-icon{font-size:48px;margin-bottom:20px;animation:pulse 2s ease infinite}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.success-title{font-family:var(--display);font-size:26px;font-weight:800;
+  color:var(--g4);margin-bottom:14px;letter-spacing:-.01em}
+.success-body{font-size:15px;color:var(--text2);line-height:1.75}
+.success-body b{color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- HEADER (só aparece no step 0/intro) -->
+<div id="hdrWrap">
+  <div class="hdr">
+    <div class="hdr-tag">JS Mentoria</div>
+    <h1>Diagnóstico Estratégico<br><span>do Seu Negócio</span></h1>
+    <p class="hdr-sub">Uma análise de 30 minutos para enxergar onde sua loja pode estar perdendo oportunidades de crescimento.</p>
+    <div class="hdr-intro">
+      <p>Estamos selecionando algumas lojistas para uma sessão individual de diagnóstico.</p>
+      <p>Nessa conversa, vou analisar o momento atual da sua loja, entender os principais gargalos comerciais e identificar quais pontos precisam de mais atenção para você conseguir crescer com mais estratégia e menos improviso.</p>
+      <p>Não é uma reunião genérica e nem uma apresentação de produto. É uma conversa individual, baseada no momento atual do seu negócio.</p>
+      <p>Por isso, antes de liberar a sessão, preciso conhecer um pouco melhor a sua loja. Leva poucos minutos para responder.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PROGRESSO -->
+<div class="prog-wrap" id="progWrap" style="display:none">
+  <div class="prog-top">
+    <span id="progLabel">Etapa 1 de 9</span>
+    <span id="progPct">0%</span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+</div>
+
+<!-- ════ STEPS ════ -->
+
+<!-- STEP 0: intro / start -->
+<div class="step active" id="step-0" style="padding:28px 20px 100px;max-width:500px;margin:0 auto">
+  <div class="btn-row" style="margin-top:8px">
+    <button class="btn-next" onclick="startForm()">Quero participar →</button>
+  </div>
+</div>
+
+<!-- STEP 1: Nome + Nome da loja -->
+<div class="step" id="step-1">
+  <div class="q-num">01 — Identificação</div>
+  <div class="q-label">Qual é o seu nome e o nome da sua loja?</div>
+  <div class="q-hint">Vamos usar essas informações para personalizar a análise.</div>
+  <input class="inp" type="text" id="f_nome" placeholder="Seu nome completo" autocomplete="name" style="margin-bottom:12px">
+  <input class="inp" type="text" id="f_loja" placeholder="Nome da loja" autocomplete="organization">
+  <div class="err" id="err-1">Por favor, preencha seu nome e o nome da loja.</div>
+</div>
+
+<!-- STEP 2: Instagram + WhatsApp -->
+<div class="step" id="step-2">
+  <div class="q-num">02 — Contato</div>
+  <div class="q-label">Como podemos te encontrar?</div>
+  <div class="q-hint">Se sua análise for selecionada, o contato será pelo WhatsApp informado.</div>
+  <input class="inp" type="text" id="f_ig" placeholder="@instagram da loja" autocomplete="off" style="margin-bottom:12px">
+  <input class="inp" type="tel" id="f_wa" placeholder="WhatsApp com DDD" autocomplete="tel">
+  <div class="err" id="err-2">Preencha seu Instagram e WhatsApp.</div>
+</div>
+
+<!-- STEP 3: Tempo de loja -->
+<div class="step" id="step-3">
+  <div class="q-num">03 — Maturidade</div>
+  <div class="q-label">Há quanto tempo sua loja existe?</div>
+  <div class="opts" id="opts-tempo">
+    <div class="opt" onclick="sel('tempo',this,'Menos de 1 ano',3)"><div class="dot"></div><div class="opt-txt">Menos de 1 ano</div></div>
+    <div class="opt" onclick="sel('tempo',this,'De 1 a 2 anos',3)"><div class="dot"></div><div class="opt-txt">De 1 a 2 anos</div></div>
+    <div class="opt" onclick="sel('tempo',this,'De 2 a 5 anos',3)"><div class="dot"></div><div class="opt-txt">De 2 a 5 anos</div></div>
+    <div class="opt" onclick="sel('tempo',this,'Mais de 5 anos',3)"><div class="dot"></div><div class="opt-txt">Mais de 5 anos</div></div>
+  </div>
+  <div class="err" id="err-3">Selecione uma opção.</div>
+</div>
+
+<!-- STEP 4: Canal de vendas + Equipe + Faturamento -->
+<div class="step" id="step-4">
+  <div class="q-num">04 — Estrutura atual</div>
+  <div class="q-label">Hoje, sua loja vende principalmente por onde?</div>
+  <div class="opts" id="opts-canal" style="margin-bottom:24px">
+    <div class="opt" onclick="sel('canal',this,'Loja física',4,false)"><div class="dot"></div><div class="opt-txt">Loja física</div></div>
+    <div class="opt" onclick="sel('canal',this,'Instagram / WhatsApp',4,false)"><div class="dot"></div><div class="opt-txt">Instagram / WhatsApp</div></div>
+    <div class="opt" onclick="sel('canal',this,'Loja física + Instagram / WhatsApp',4,false)"><div class="dot"></div><div class="opt-txt">Loja física + Instagram / WhatsApp</div></div>
+    <div class="opt" onclick="sel('canal',this,'E-commerce + redes sociais',4,false)"><div class="dot"></div><div class="opt-txt">E-commerce + redes sociais</div></div>
+    <div class="opt" onclick="sel('canal',this,'Outro',4,false)"><div class="dot"></div><div class="opt-txt">Outro</div></div>
+  </div>
+  <div class="q-label" style="font-size:17px;margin-bottom:6px">Você trabalha sozinha ou possui equipe?</div>
+  <div class="opts" id="opts-equipe" style="margin-bottom:24px">
+    <div class="opt" onclick="sel('equipe',this,'Trabalho sozinha',4,false)"><div class="dot"></div><div class="opt-txt">Trabalho sozinha</div></div>
+    <div class="opt" onclick="sel('equipe',this,'Tenho 1 pessoa na equipe',4,false)"><div class="dot"></div><div class="opt-txt">Tenho 1 pessoa na equipe</div></div>
+    <div class="opt" onclick="sel('equipe',this,'Tenho de 2 a 4 pessoas',4,false)"><div class="dot"></div><div class="opt-txt">Tenho de 2 a 4 pessoas</div></div>
+    <div class="opt" onclick="sel('equipe',this,'Tenho 5 ou mais pessoas',4,false)"><div class="dot"></div><div class="opt-txt">Tenho 5 ou mais pessoas</div></div>
+  </div>
+  <div class="q-label" style="font-size:17px;margin-bottom:6px">Qual é o faturamento médio mensal atual?</div>
+  <div class="opts" id="opts-fat">
+    <div class="opt" onclick="sel('fat',this,'Até R$10 mil',4,false)"><div class="dot"></div><div class="opt-txt">Até R$10 mil</div></div>
+    <div class="opt" onclick="sel('fat',this,'De R$10 mil a R$20 mil',4,false)"><div class="dot"></div><div class="opt-txt">De R$10 mil a R$20 mil</div></div>
+    <div class="opt" onclick="sel('fat',this,'De R$20 mil a R$50 mil',4,false)"><div class="dot"></div><div class="opt-txt">De R$20 mil a R$50 mil</div></div>
+    <div class="opt" onclick="sel('fat',this,'De R$50 mil a R$100 mil',4,false)"><div class="dot"></div><div class="opt-txt">De R$50 mil a R$100 mil</div></div>
+    <div class="opt" onclick="sel('fat',this,'Acima de R$100 mil',4,false)"><div class="dot"></div><div class="opt-txt">Acima de R$100 mil</div></div>
+  </div>
+  <div class="err" id="err-4">Responda todas as perguntas desta etapa.</div>
+</div>
+
+<!-- STEP 5: Situações + Desafio -->
+<div class="step" id="step-5">
+  <div class="q-num">05 — Diagnóstico atual</div>
+  <div class="q-label">Qual dessas situações representa o momento da sua loja?</div>
+  <div class="q-multi">Pode selecionar mais de uma</div>
+  <div class="opts" id="opts-sit" style="margin-bottom:24px">
+    <div class="opt" onclick="selM('sit',this,'Tenho clientes, mas quero aumentar o volume de vendas')"><div class="dot sq"></div><div class="opt-txt">Tenho clientes, mas quero aumentar o volume de vendas</div></div>
+    <div class="opt" onclick="selM('sit',this,'Tenho dificuldade para atrair novos clientes')"><div class="dot sq"></div><div class="opt-txt">Tenho dificuldade para atrair novos clientes</div></div>
+    <div class="opt" onclick="selM('sit',this,'Tenho seguidores, mas poucos viram clientes')"><div class="dot sq"></div><div class="opt-txt">Tenho seguidores, mas poucos viram clientes</div></div>
+    <div class="opt" onclick="selM('sit',this,'Meu Instagram não está trazendo vendas como eu gostaria')"><div class="dot sq"></div><div class="opt-txt">Meu Instagram não está trazendo vendas como eu gostaria</div></div>
+    <div class="opt" onclick="selM('sit',this,'Tenho movimento, mas sinto que poderia vender muito mais')"><div class="dot sq"></div><div class="opt-txt">Tenho movimento, mas sinto que poderia vender muito mais</div></div>
+    <div class="opt" onclick="selM('sit',this,'Minhas vendas dependem muito de promoção')"><div class="dot sq"></div><div class="opt-txt">Minhas vendas dependem muito de promoção</div></div>
+    <div class="opt" onclick="selM('sit',this,'Sinto que faço muitas coisas, mas sem uma estratégia clara')"><div class="dot sq"></div><div class="opt-txt">Sinto que faço muitas coisas, mas sem uma estratégia clara</div></div>
+    <div class="opt" onclick="selM('sit',this,'Minha loja cresceu e agora preciso organizar melhor a operação comercial')"><div class="dot sq"></div><div class="opt-txt">Minha loja cresceu e agora preciso organizar melhor a operação comercial</div></div>
+  </div>
+  <div class="q-label" style="font-size:17px;margin-bottom:6px">Qual é o principal desafio que você gostaria de resolver?</div>
+  <textarea class="inp" id="f_desafio" placeholder="Descreva com suas próprias palavras..."></textarea>
+  <div class="err" id="err-5">Selecione ao menos uma situação e descreva seu desafio.</div>
+</div>
+
+<!-- STEP 6: Objetivos + Mudança -->
+<div class="step" id="step-6">
+  <div class="q-num">06 — Seus objetivos</div>
+  <div class="q-label">Se sua loja estivesse funcionando melhor, o que você gostaria de conseguir?</div>
+  <div class="q-multi">Pode selecionar mais de uma</div>
+  <div class="opts" id="opts-obj" style="margin-bottom:24px">
+    <div class="opt" onclick="selM('obj',this,'Atrair mais clientes novos')"><div class="dot sq"></div><div class="opt-txt">Atrair mais clientes novos</div></div>
+    <div class="opt" onclick="selM('obj',this,'Vender mais para os clientes que já tenho')"><div class="dot sq"></div><div class="opt-txt">Vender mais para os clientes que já tenho</div></div>
+    <div class="opt" onclick="selM('obj',this,'Melhorar minha estratégia de conteúdo')"><div class="dot sq"></div><div class="opt-txt">Melhorar minha estratégia de conteúdo</div></div>
+    <div class="opt" onclick="selM('obj',this,'Transformar mais seguidores em clientes')"><div class="dot sq"></div><div class="opt-txt">Transformar mais seguidores em clientes</div></div>
+    <div class="opt" onclick="selM('obj',this,'Criar campanhas que realmente gerem vendas')"><div class="dot sq"></div><div class="opt-txt">Criar campanhas que realmente gerem vendas</div></div>
+    <div class="opt" onclick="selM('obj',this,'Aumentar meu faturamento')"><div class="dot sq"></div><div class="opt-txt">Aumentar meu faturamento</div></div>
+    <div class="opt" onclick="selM('obj',this,'Aumentar meu ticket médio')"><div class="dot sq"></div><div class="opt-txt">Aumentar meu ticket médio</div></div>
+    <div class="opt" onclick="selM('obj',this,'Melhorar minha conversão de vendas')"><div class="dot sq"></div><div class="opt-txt">Melhorar minha conversão de vendas</div></div>
+    <div class="opt" onclick="selM('obj',this,'Criar processos para minha equipe vender melhor')"><div class="dot sq"></div><div class="opt-txt">Criar processos para minha equipe vender melhor</div></div>
+    <div class="opt" onclick="selM('obj',this,'Ter uma rotina comercial mais organizada')"><div class="dot sq"></div><div class="opt-txt">Ter uma rotina comercial mais organizada</div></div>
+    <div class="opt" onclick="selM('obj',this,'Parar de depender apenas de promoções para vender')"><div class="dot sq"></div><div class="opt-txt">Parar de depender apenas de promoções para vender</div></div>
+    <div class="opt" onclick="selM('obj',this,'Construir uma estratégia mais previsível para a loja')"><div class="dot sq"></div><div class="opt-txt">Construir uma estratégia mais previsível para a loja</div></div>
+  </div>
+  <div class="q-label" style="font-size:17px;margin-bottom:6px">Qual seria a principal mudança que você gostaria de ver?</div>
+  <textarea class="inp" id="f_mudanca" placeholder="Escreva livremente..."></textarea>
+  <div class="err" id="err-6">Selecione ao menos um objetivo e responda a pergunta aberta.</div>
+</div>
+
+<!-- STEP 7: Clareza + Aproveitamento + Investimentos anteriores -->
+<div class="step" id="step-7">
+  <div class="q-num">07 — Maturidade estratégica</div>
+  <div class="q-label">Você tem clareza sobre o que precisa fazer para aumentar as vendas?</div>
+  <div class="opts" id="opts-clareza" style="margin-bottom:24px">
+    <div class="opt" onclick="sel('clareza',this,'Sim, sei exatamente o que preciso fazer',7,false)"><div class="dot"></div><div class="opt-txt">Sim, sei exatamente o que preciso fazer</div></div>
+    <div class="opt" onclick="sel('clareza',this,'Tenho algumas ideias, mas não sei por onde começar',7,false)"><div class="dot"></div><div class="opt-txt">Tenho algumas ideias, mas não sei por onde começar</div></div>
+    <div class="opt" onclick="sel('clareza',this,'Faço várias ações, mas não sei o que realmente funciona',7,false)"><div class="dot"></div><div class="opt-txt">Faço várias ações, mas não sei o que realmente funciona</div></div>
+    <div class="opt" onclick="sel('clareza',this,'Sinto que estou trabalhando muito no improviso',7,false)"><div class="dot"></div><div class="opt-txt">Sinto que estou trabalhando muito no improviso</div></div>
+  </div>
+  <div class="q-label" style="font-size:17px;margin-bottom:6px">Quanto você sente que está aproveitando o potencial da sua loja?</div>
+  <div class="opts" id="opts-aprov" style="margin-bottom:24px">
+    <div class="opt" onclick="sel('aprov',this,'Muito — estou em uma fase excelente',7,false)"><div class="dot"></div><div class="opt-txt">Muito — estou em uma fase excelente</div></div>
+    <div class="opt" onclick="sel('aprov',this,'Razoavelmente — sei que poderia estar melhor',7,false)"><div class="dot"></div><div class="opt-txt">Razoavelmente — sei que poderia estar melhor</div></div>
+    <div class="opt" onclick="sel('aprov',this,'Pouco — sinto que estou deixando oportunidades passar',7,false)"><div class="dot"></div><div class="opt-txt">Pouco — sinto que estou deixando oportunidades passar</div></div>
+    <div class="opt" onclick="sel('aprov',this,'Não sei dizer',7,false)"><div class="dot"></div><div class="opt-txt">Não sei dizer</div></div>
+  </div>
+  <div class="q-label" style="font-size:17px;margin-bottom:6px">Você já investiu em cursos, mentorias ou consultorias?</div>
+  <div class="opts" id="opts-investant">
+    <div class="opt" onclick="sel('investant',this,'Sim, várias vezes',7,false)"><div class="dot"></div><div class="opt-txt">Sim, várias vezes</div></div>
+    <div class="opt" onclick="sel('investant',this,'Sim, algumas vezes',7,false)"><div class="dot"></div><div class="opt-txt">Sim, algumas vezes</div></div>
+    <div class="opt" onclick="sel('investant',this,'Poucas vezes',7,false)"><div class="dot"></div><div class="opt-txt">Poucas vezes</div></div>
+    <div class="opt" onclick="sel('investant',this,'Ainda não',7,false)"><div class="dot"></div><div class="opt-txt">Ainda não</div></div>
+  </div>
+  <div class="err" id="err-7">Responda todas as perguntas desta etapa.</div>
+</div>
+
+<!-- STEP 8: Intenção de investimento -->
+<div class="step" id="step-8">
+  <div class="q-num">08 — Próximo passo</div>
+  <div class="q-label">Se você perceber que existem pontos importantes para ajustar na sua estratégia, você estaria disposta a investir em uma solução?</div>
+  <div class="q-hint">Não existe resposta certa ou errada. Queremos entender o seu momento.</div>
+  <div class="opts" id="opts-invest">
+    <div class="opt" onclick="sel('invest',this,'Sim, estou buscando uma solução neste momento',9)"><div class="dot"></div><div class="opt-txt">Sim, estou buscando uma solução neste momento</div></div>
+    <div class="opt" onclick="sel('invest',this,'Sim, dependendo da proposta',9)"><div class="dot"></div><div class="opt-txt">Sim, dependendo da proposta</div></div>
+    <div class="opt" onclick="sel('invest',this,'Talvez, primeiro quero entender o que preciso melhorar',9)"><div class="dot"></div><div class="opt-txt">Talvez, primeiro quero entender o que preciso melhorar</div></div>
+    <div class="opt" onclick="sel('invest',this,'Neste momento, não pretendo investir',9)"><div class="dot"></div><div class="opt-txt">Neste momento, não pretendo investir</div></div>
+  </div>
+  <div class="err" id="err-8">Selecione uma opção.</div>
+</div>
+
+<!-- STEP 9: Confirmar e enviar -->
+<div class="step" id="step-9">
+  <div class="q-num">09 — Finalizar</div>
+  <div class="q-label">Tudo certo. Vamos enviar sua análise.</div>
+  <div class="q-hint">Confirme os dados abaixo antes de enviar.</div>
+  <div id="resumoBox" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:16px;font-size:14px;line-height:1.8;color:var(--text2)"></div>
+  <div class="err" id="err-9">Ocorreu um erro ao enviar. Tente novamente.</div>
+</div>
+
+<!-- SUCESSO -->
+<div class="success" id="successScreen">
+  <div class="success-icon">✦</div>
+  <div class="success-title">Recebemos suas respostas.</div>
+  <div class="success-body">
+    <p>Obrigada por compartilhar um pouco do momento da sua loja.</p>
+    <br>
+    <p>Agora nossa equipe vai analisar suas respostas e entender se o seu perfil está dentro dos critérios para receber uma <b>Sessão de Diagnóstico Estratégico individual de 30 minutos</b>.</p>
+    <br>
+    <p>Como as sessões são individuais e possuem número limitado de vagas, nem todos os formulários são selecionados.</p>
+    <br>
+    <p>Se o seu perfil for aprovado, nossa equipe entrará em contato pelo <b>WhatsApp informado</b> para apresentar os próximos passos e verificar a disponibilidade para a sessão.</p>
+    <br>
+    <p><b>Fique de olho no seu WhatsApp.</b></p>
+  </div>
+</div>
+
+<!-- BOTÕES FIXOS -->
+<div class="btn-fixed" id="btnWrap">
+  <div class="btn-row">
+    <button class="btn-back" id="btnBack" style="display:none" onclick="prevStep()">←</button>
+    <button class="btn-next" id="btnNext" onclick="nextStep()">Continuar →</button>
+  </div>
+</div>
+
+<script>
+const SUPA_URL = 'https://lnfghtlrzoioaotamzvy.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZmdodGxyem9pb2FvdGFtenZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg5MTMsImV4cCI6MjA5MjI4NDkxM30.lNHckve8P--rp9axdwZ6v6zTl4LLnk-1xY_kJS3wfFo';
+
+const TOTAL = 9;
+let cur = 0;
+const A = {};   // respostas single
+const AM = {};  // respostas múltiplas
+
+// ── Selecionar opção única ──
+function sel(field, el, val, nextStep, autoAdv=true){
+  const container = el.closest('.opts');
+  container.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  A[field] = val;
+  if(autoAdv) setTimeout(()=>nextStepAuto(nextStep), 320);
+}
+
+// ── Selecionar múltiplas ──
+function selM(field, el, val){
+  el.classList.toggle('sel');
+  if(!AM[field]) AM[field] = [];
+  if(el.classList.contains('sel')){ if(!AM[field].includes(val)) AM[field].push(val); }
+  else { AM[field] = AM[field].filter(v=>v!==val); }
+}
+
+// ── Auto avança para step seguinte ──
+function nextStepAuto(n){ goTo(n); }
+
+// ── Iniciar formulário ──
+function startForm(){
+  document.getElementById('hdrWrap').style.display = 'none';
+  document.getElementById('progWrap').style.display = 'block';
+  goTo(1);
+}
+
+// ── Navegação ──
+function nextStep(){
+  if(cur === 9){ submitForm(); return; }
+  if(!validate(cur)) return;
+  collect(cur);
+  if(cur === 8){ buildResumo(); }
+  goTo(cur + 1);
+}
+
+function prevStep(){
+  if(cur <= 1) return;
+  goTo(cur - 1);
+}
+
+function goTo(n){
+  document.getElementById('step-'+cur).classList.remove('active');
+  cur = n;
+  document.getElementById('step-'+n).classList.add('active');
+  updateProg();
+  updateBtns();
+  window.scrollTo({top:0,behavior:'smooth'});
+  hideErr();
+}
+
+function updateProg(){
+  const pct = Math.round(((cur-1)/TOTAL)*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progLabel').textContent = `Etapa ${cur} de ${TOTAL}`;
+  document.getElementById('progPct').textContent = pct+'%';
+}
+
+function updateBtns(){
+  const back = document.getElementById('btnBack');
+  const next = document.getElementById('btnNext');
+  if(back) back.style.display = cur > 1 ? '' : 'none';
+  if(next){
+    if(cur === 9) next.textContent = 'Enviar minha análise ✓';
+    else next.textContent = 'Continuar →';
+  }
+}
+
+function hideErr(){
+  document.querySelectorAll('.err').forEach(e=>e.classList.remove('show'));
+}
+
+// ── Validação por step ──
+function validate(n){
+  const errEl = document.getElementById('err-'+n);
+  let ok = true;
+  if(n===1){
+    ok = (document.getElementById('f_nome')?.value.trim().length>1) &&
+         (document.getElementById('f_loja')?.value.trim().length>0);
+  } else if(n===2){
+    ok = (document.getElementById('f_ig')?.value.trim().length>1) &&
+         (document.getElementById('f_wa')?.value.trim().length>7);
+  } else if(n===3){ ok = !!A.tempo; }
+  else if(n===4){ ok = !!A.canal && !!A.equipe && !!A.fat; }
+  else if(n===5){
+    ok = (AM.sit?.length>0) && (document.getElementById('f_desafio')?.value.trim().length>10);
+  } else if(n===6){
+    ok = (AM.obj?.length>0) && (document.getElementById('f_mudanca')?.value.trim().length>5);
+  } else if(n===7){ ok = !!A.clareza && !!A.aprov && !!A.investant; }
+  else if(n===8){ ok = !!A.invest; }
+  else if(n===9){ ok = true; }
+  if(errEl) errEl.classList.toggle('show', !ok);
+  return ok;
+}
+
+// ── Coletar campos de texto ──
+function collect(n){
+  if(n===1){ A.nome = document.getElementById('f_nome')?.value.trim()||''; A.loja = document.getElementById('f_loja')?.value.trim()||''; }
+  if(n===2){ A.ig = document.getElementById('f_ig')?.value.trim()||''; A.wa = document.getElementById('f_wa')?.value.trim()||''; }
+  if(n===5){ A.desafio = document.getElementById('f_desafio')?.value.trim()||''; }
+  if(n===6){ A.mudanca = document.getElementById('f_mudanca')?.value.trim()||''; }
+}
+
+// ── Resumo antes de enviar ──
+function buildResumo(){
+  collect(5); collect(6);
+  const box = document.getElementById('resumoBox');
+  if(!box) return;
+  box.innerHTML = `
+    <div style="margin-bottom:6px"><b style="color:var(--text)">Nome:</b> ${esc(A.nome)}</div>
+    <div style="margin-bottom:6px"><b style="color:var(--text)">Loja:</b> ${esc(A.loja)}</div>
+    <div style="margin-bottom:6px"><b style="color:var(--text)">Instagram:</b> ${esc(A.ig)}</div>
+    <div style="margin-bottom:6px"><b style="color:var(--text)">WhatsApp:</b> ${esc(A.wa)}</div>
+    <div style="margin-bottom:6px"><b style="color:var(--text)">Tempo de loja:</b> ${A.tempo||'—'}</div>
+    <div style="margin-bottom:6px"><b style="color:var(--text)">Faturamento:</b> ${A.fat||'—'}</div>
+    <div style="margin-bottom:6px"><b style="color:var(--text)">Canal:</b> ${A.canal||'—'}</div>
+    <div><b style="color:var(--text)">Intenção de investimento:</b> ${A.invest||'—'}</div>
+  `;
+}
+
+// ── Score de qualificação ──
+function calcScore(){
+  let score = 0;
+
+  // Faturamento (0–25 pts)
+  const fatMap = {'Até R$10 mil':5,'De R$10 mil a R$20 mil':12,'De R$20 mil a R$50 mil':20,'De R$50 mil a R$100 mil':25,'Acima de R$100 mil':25};
+  score += fatMap[A.fat]||0;
+
+  // Tempo de loja (0–15 pts)
+  const tempoMap = {'Menos de 1 ano':3,'De 1 a 2 anos':8,'De 2 a 5 anos':12,'Mais de 5 anos':15};
+  score += tempoMap[A.tempo]||0;
+
+  // Equipe (0–10 pts — tem estrutura para crescer)
+  const equipeMap = {'Trabalho sozinha':5,'Tenho 1 pessoa na equipe':8,'Tenho de 2 a 4 pessoas':10,'Tenho 5 ou mais pessoas':10};
+  score += equipeMap[A.equipe]||0;
+
+  // Dor comercial (0–20 pts — situações marcadas)
+  const doresPts = {
+    'Tenho dificuldade para atrair novos clientes':3,
+    'Tenho seguidores, mas poucos viram clientes':3,
+    'Meu Instagram não está trazendo vendas como eu gostaria':3,
+    'Minhas vendas dependem muito de promoção':3,
+    'Sinto que faço muitas coisas, mas sem uma estratégia clara':4,
+    'Minha loja cresceu e agora preciso organizar melhor a operação comercial':4,
+  };
+  (AM.sit||[]).forEach(s=>{ score += doresPts[s]||2; });
+  score = Math.min(score, score); // sem cap aqui
+
+  // Objetivos alinhados (0–10 pts)
+  const objAlinhados = ['Aumentar meu faturamento','Melhorar minha conversão de vendas','Construir uma estratégia mais previsível para a loja','Criar processos para minha equipe vender melhor'];
+  (AM.obj||[]).forEach(o=>{ if(objAlinhados.includes(o)) score += 2; else score += 1; });
+
+  // Clareza estratégica (0–10 pts — quanto mais perdida, mais precisa)
+  const clarezaMap = {
+    'Sim, sei exatamente o que preciso fazer':3,
+    'Tenho algumas ideias, mas não sei por onde começar':8,
+    'Faço várias ações, mas não sei o que realmente funciona':10,
+    'Sinto que estou trabalhando muito no improviso':10,
+  };
+  score += clarezaMap[A.clareza]||0;
+
+  // Intenção de investimento (0–15 pts)
+  const investMap = {
+    'Sim, estou buscando uma solução neste momento':15,
+    'Sim, dependendo da proposta':12,
+    'Talvez, primeiro quero entender o que preciso melhorar':5,
+    'Neste momento, não pretendo investir':0,
+  };
+  score += investMap[A.invest]||0;
+
+  return Math.min(score, 100);
+}
+
+function calcQualif(score){
+  // Desqualifica automaticamente quem não quer investir + faturamento muito baixo
+  if(A.invest === 'Neste momento, não pretendo investir' && A.fat === 'Até R$10 mil') return 'desqualificado';
+  if(score >= 45) return 'qualificado';
+  return 'desqualificado';
+}
+
+function normIg(ig){ return 'https://instagram.com/'+ig.replace('@','').trim().toLowerCase(); }
+function gerarId(p='x'){ return p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7); }
+function esc(s){ if(!s)return''; const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+// ── Enviar formulário ──
+async function submitForm(){
+  const btn = document.getElementById('btnNext');
+  if(btn){ btn.disabled=true; btn.textContent='Enviando...'; }
+
+  // Coletar todos os campos de texto restantes
+  collect(1); collect(2); collect(5); collect(6);
+
+  const score = calcScore();
+  const qualif = calcQualif(score);
+  const statusInicial = 'reat_form'; // Formulário recebido
+  const igLink = normIg(A.ig||'');
+  const hoje = new Date().toISOString().split('T')[0];
+
+  try{
+    // 1. Verificar se pessoa já existe
+    const waClean = (A.wa||'').replace(/\D/g,'');
+    const igClean = (A.ig||'').toLowerCase().replace('@','');
+    const rPes = await fetch(
+      SUPA_URL+'/rest/v1/crm_pessoas?limit=10',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const todasPessoas = rPes.ok ? await rPes.json() : [];
+    const pessoaDup = todasPessoas.find(p=>{
+      const pwa=(p.whatsapp||'').replace(/\D/g,'');
+      const pig=(p.instagram||'').toLowerCase().replace('https://instagram.com/','').replace('@','');
+      return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
+    });
+
+    let pessoaId;
+    if(pessoaDup){
+      pessoaId = pessoaDup.id;
+      await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
+        method:'PATCH',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({nome:A.nome, whatsapp:A.wa, instagram:igLink})
+      });
+    } else {
+      pessoaId = gerarId('p');
+      await fetch(SUPA_URL+'/rest/v1/crm_pessoas',{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({id:pessoaId, nome:A.nome, whatsapp:A.wa, instagram:igLink, email:''})
+      });
+    }
+
+    // 2. Criar oportunidade no pipeline Reativação
+    const opId = gerarId('op');
+    const r = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        id:opId, pessoa_id:pessoaId,
+        pipeline:'reativacao', funil:'reativacao', origem:'instagram',
+        status:statusInicial, responsavel:'Amanda', data_entrada:hoje,
+        // Campos específicos do diagnóstico
+        reat_nome_loja:     A.loja||'',
+        reat_tempo_loja:    A.tempo||'',
+        reat_canal_venda:   A.canal||'',
+        reat_equipe:        A.equipe||'',
+        reat_faturamento:   A.fat||'',
+        reat_situacoes:     (AM.sit||[]).join(' | '),
+        reat_desafio:       A.desafio||'',
+        reat_objetivos:     (AM.obj||[]).join(' | '),
+        reat_mudanca:       A.mudanca||'',
+        reat_clareza:       A.clareza||'',
+        reat_aproveitamento:A.aprov||'',
+        reat_invest_anterior:A.investant||'',
+        reat_intencao_invest:A.invest||'',
+        reat_qualificacao:  qualif,
+        reat_score:         score,
+      })
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+
+    // 3. Salvar respostas brutas na tabela formulários (reutilizável)
+    await fetch(SUPA_URL+'/rest/v1/crm_formularios',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        id:gerarId('form'), tipo:'reativacao_diag',
+        pessoa_id:pessoaId, oportunidade_id:opId,
+        respostas:{...A, situacoes:AM.sit, objetivos:AM.obj},
+        qualificacao:qualif, score
+      })
+    });
+
+    // 4. Evento no histórico
+    await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({
+        id:gerarId('ev'), oportunidade_id:opId, pessoa_id:pessoaId,
+        tipo:'criacao',
+        descricao:`Diagnóstico Estratégico respondido · Score: ${score}/100 · ${qualif==='qualificado'?'✓ Qualificada':'✗ Desqualificada'} · Fat: ${A.fat}`,
+        status_anterior:'', status_novo:statusInicial, responsavel:''
+      })
+    });
+
+    // Mostrar sucesso
+    document.getElementById('step-'+cur).classList.remove('active');
+    document.getElementById('progWrap').style.display = 'none';
+    document.getElementById('btnWrap').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+
+  }catch(e){
+    console.error('Erro:', e);
+    const errEl = document.getElementById('err-9');
+    if(errEl) errEl.classList.add('show');
+    if(btn){ btn.disabled=false; btn.textContent='Tentar novamente'; }
+  }
+}
+</script>
+</body>
+</html>
