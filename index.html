@@ -197,6 +197,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 
 /* ── PAGE: TRÁFEGO PAGO ── */
 .tp-note{background:rgba(155,114,207,.08);border:1px solid rgba(155,114,207,.2);border-radius:var(--radius);padding:14px 18px;font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.tp-tabela{width:100%;border-collapse:collapse;font-size:12px}
+.tp-tabela th{background:var(--surface2);color:var(--text3);font-weight:500;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:9px 12px;text-align:right;border:1px solid var(--border);white-space:nowrap}
+.tp-tabela th:first-child{text-align:left}
+.tp-tabela td{padding:10px 12px;text-align:right;border:1px solid var(--border);color:var(--text2);white-space:nowrap}
+.tp-tabela td:first-child{text-align:left;color:var(--text);font-weight:500;white-space:normal;max-width:260px}
+.tp-tabela tr{cursor:pointer;transition:background .12s}
+.tp-tabela tr:hover td{background:var(--surface2)}
+.tp-status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px}
+.tp-status-active{background:var(--g4)}
+.tp-status-paused{background:var(--text3)}
+.tp-destaque-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.tp-destaque-lbl{font-size:10px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.tp-destaque-nome{font-size:13px;color:var(--text);font-weight:500;margin-bottom:4px;line-height:1.3}
+.tp-destaque-val{font-family:var(--display);font-size:20px;font-weight:700;color:var(--g4)}
+.tp-bar-row{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text3);margin-bottom:6px}
+.tp-bar-date{width:64px;flex-shrink:0;font-family:var(--mono)}
+.tp-bar-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.tp-bar-fill{height:100%;background:var(--g3);border-radius:4px}
+.tp-bar-val{width:70px;flex-shrink:0;text-align:right;font-family:var(--mono);color:var(--text2)}
+.tp-pill{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px}
+.tp-pill-nome{color:var(--text)}
+.tp-pill-val{font-family:var(--mono);color:var(--text2)}
 
 /* ── PAGE: SCRIPTS ── */
 .script-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
@@ -1113,99 +1135,120 @@ button{font-family:var(--font)}
 <!-- ═══════════════════════════════════════════════ -->
 <div class="tab-content" id="tab-trafego">
 
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
     <div>
       <p class="page-title">Tráfego Pago</p>
-      <p class="page-sub">Gerencie campanhas · atualize diariamente · resumo mensal automático</p>
+      <p class="page-sub">Performance comercial · dados direto da Meta Ads</p>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <div class="period-tabs" id="tpMonthTabs"></div>
-      <button class="btn-save" onclick="showNovaCampanha()">+ Nova campanha</button>
+    <button class="btn-save" onclick="tpSincronizar()" id="tpSyncBtn">Sincronizar agora</button>
+  </div>
+
+  <!-- Status da conexão -->
+  <div class="card-sm" style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="tpConnDot" style="width:8px;height:8px;border-radius:50%;background:var(--text3);flex-shrink:0"></span>
+      <div>
+        <div style="font-size:13px;color:var(--text)" id="tpConnLabel">Verificando conexão…</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="tpConnSub"></div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--text3)" id="tpSyncMsg"></div>
+  </div>
+
+  <!-- Período -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:20px">
+    <div class="period-tabs" id="tpPeriodTabs"></div>
+    <div id="tpCustomRange" style="display:none;gap:8px;align-items:center">
+      <input type="date" class="field-input" id="tpCustomStart" style="width:150px">
+      <span style="color:var(--text3);font-size:12px">até</span>
+      <input type="date" class="field-input" id="tpCustomEnd" style="width:150px">
+      <button class="btn-save" onclick="tpAplicarPersonalizado()" style="padding:8px 14px">Aplicar</button>
     </div>
   </div>
 
-  <!-- KPIs do mês -->
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px">
-    <div class="kpi-card"><div class="kpi-val" id="tp-total-verba" style="color:var(--coral)">R$ —</div><div class="kpi-lbl">Total investido</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="tp-total-leads">—</div><div class="kpi-lbl">Total leads</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="tp-total-reun">—</div><div class="kpi-lbl">Reuniões geradas</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="tp-total-vendas">—</div><div class="kpi-lbl">Vendas totais</div></div>
-    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="tp-total-roas">—</div><div class="kpi-lbl">ROAS geral</div></div>
+  <!-- KPIs -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
+    <div class="kpi-card"><div class="kpi-val" id="tp-investimento" style="color:var(--coral)">—</div><div class="kpi-lbl">Investimento</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-resultados">—</div><div class="kpi-lbl">Resultados</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-vendas">—</div><div class="kpi-lbl">Vendas</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-receita">—</div><div class="kpi-lbl">Receita</div></div>
+    <div class="kpi-card"><div class="kpi-val" id="tp-cac">—</div><div class="kpi-lbl">CAC</div></div>
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)" id="tp-roas">—</div><div class="kpi-lbl">ROAS</div></div>
   </div>
 
-  <!-- Modal nova campanha -->
-  <div id="modalCampanha" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center">
-    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:560px;max-height:90vh;overflow-y:auto">
+  <!-- Filtro por tipo -->
+  <div class="period-tabs" id="tpTipoTabs" style="margin-bottom:18px;flex-wrap:wrap"></div>
+
+  <!-- Tabela de campanhas -->
+  <div class="sh"><span class="sh-label">Campanhas</span><div class="sh-line"></div>
+    <button class="add-script-btn" onclick="tpAbrirManual()" style="margin-top:0">+ Campanha manual</button>
+  </div>
+  <div id="tpTabelaWrap" style="margin-bottom:28px"></div>
+
+  <!-- O que está funcionando -->
+  <div class="sh"><span class="sh-label">O que está funcionando</span><div class="sh-line"></div></div>
+  <div class="grid-4" id="tpDestaques" style="margin-bottom:28px"></div>
+
+  <!-- Alertas -->
+  <div class="sh"><span class="sh-label">Alertas</span><div class="sh-line"></div></div>
+  <div id="tpAlertas" style="margin-bottom:28px"></div>
+
+  <!-- Gerador de Caixa -->
+  <div id="tpGCWrap" style="display:none;margin-bottom:28px">
+    <div class="sh"><span class="sh-label">Gerador de Caixa</span><div class="sh-line"></div></div>
+    <div id="tpGCConteudo"></div>
+  </div>
+
+  <!-- Evolução -->
+  <div class="sh"><span class="sh-label">Evolução do investimento</span><div class="sh-line"></div></div>
+  <div class="card" id="tpEvolucao" style="margin-bottom:28px"></div>
+
+  <!-- Modal detalhe da campanha -->
+  <div id="tpModalDetalhe" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-family:var(--display);font-size:16px;font-weight:600;color:var(--text)" id="tpDetTitulo">Campanha</div>
+        <button onclick="tpFecharDetalhe()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
+      </div>
+      <div id="tpDetConteudo"></div>
+    </div>
+  </div>
+
+  <!-- Modal campanha manual -->
+  <div id="tpModalManual" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <div style="font-family:var(--display);font-size:16px;font-weight:600;color:var(--text)" id="modalTitle">Nova campanha</div>
-        <button onclick="fecharModal()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
+        <div style="font-family:var(--display);font-size:16px;font-weight:600;color:var(--text)">Campanha manual</div>
+        <button onclick="tpFecharManual()" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">✕</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px">
-        <input type="hidden" id="camp_id">
-        <div class="field-group"><div class="field-label">Nome da campanha</div><input class="field-input" type="text" id="camp_nome" placeholder="ex: WhatsApp — Vídeo 1"></div>
+        <div class="field-group"><div class="field-label">Nome</div><input class="field-input" type="text" id="man_nome" placeholder="ex: Panfletagem loja física"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field-group"><div class="field-label">Tipo de criativo</div>
-            <select class="field-input" id="camp_criativo" style="cursor:pointer">
-              <option value="video">Vídeo</option>
-              <option value="foto">Foto</option>
-              <option value="carrossel">Carrossel</option>
-              <option value="stories">Stories</option>
-              <option value="texto">Texto</option>
+          <div class="field-group"><div class="field-label">Tipo comercial</div>
+            <select class="field-input" id="man_tipo" style="cursor:pointer">
+              <option value="produto_entrada">Produto de entrada</option>
+              <option value="perfil">Perfil</option>
+              <option value="whatsapp">WhatsApp</option>
+              <option value="diagnostico">Diagnóstico</option>
+              <option value="live">Live/Evento</option>
+              <option value="mentoria">Mentoria</option>
               <option value="outro">Outro</option>
             </select>
           </div>
-          <div class="field-group"><div class="field-label">Objetivo</div>
-            <select class="field-input" id="camp_objetivo" style="cursor:pointer">
-              <option value="whatsapp">WhatsApp</option>
-              <option value="conversao">Conversão</option>
-              <option value="trafego">Tráfego</option>
-              <option value="leads">Leads</option>
-            </select>
-          </div>
+          <div class="field-group"><div class="field-label">Oferta relacionada</div><input class="field-input" type="text" id="man_oferta" placeholder="ex: Gerador de Caixa"></div>
+        </div>
+        <div class="field-group"><div class="field-label">Data</div><input class="field-input" type="date" id="man_data"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field-group"><div class="field-label">Investimento (R$)</div><input class="field-input" type="number" id="man_investimento" placeholder="ex: 100"></div>
+          <div class="field-group"><div class="field-label">Resultados (qtd)</div><input class="field-input" type="number" id="man_resultados" placeholder="ex: 10"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field-group"><div class="field-label">Data início</div><input class="field-input" type="date" id="camp_inicio"></div>
-          <div class="field-group"><div class="field-label">Data fim (deixe vazio se ativa)</div><input class="field-input" type="date" id="camp_fim"></div>
+          <div class="field-group"><div class="field-label">Vendas (qtd)</div><input class="field-input" type="number" id="man_vendas" placeholder="ex: 2"></div>
+          <div class="field-group"><div class="field-label">Receita total (R$)</div><input class="field-input" type="number" id="man_receita" placeholder="ex: 400"></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field-group"><div class="field-label">Orçamento diário (R$)</div><input class="field-input" type="number" id="camp_orcamento" placeholder="ex: 30"></div>
-          <div class="field-group"><div class="field-label">Total gasto até agora (R$)</div><input class="field-input" type="number" id="camp_gasto" placeholder="ex: 210"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="field-group"><div class="field-label">Leads / conversas</div><input class="field-input" type="number" id="camp_leads" placeholder="ex: 15"></div>
-          <div class="field-group"><div class="field-label">Reuniões geradas</div><input class="field-input" type="number" id="camp_reunioes" placeholder="ex: 3"></div>
-        </div>
-        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px;border:1px solid var(--border2)">
-          <div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Vendas</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-            <div class="field-group"><div class="field-label">Vendas diretas no WhatsApp (qtd)</div><input class="field-input" type="number" id="camp_venda_direta_qtd" placeholder="ex: 2"></div>
-            <div class="field-group"><div class="field-label">Valor vendas diretas (R$)</div><input class="field-input" type="number" id="camp_venda_direta_val" placeholder="ex: 497"></div>
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="field-group"><div class="field-label">Vendas via reunião (qtd)</div><input class="field-input" type="number" id="camp_venda_reun_qtd" placeholder="ex: 1"></div>
-            <div class="field-group"><div class="field-label">Valor vendas via reunião (R$)</div><input class="field-input" type="number" id="camp_venda_reun_val" placeholder="ex: 3500"></div>
-          </div>
-        </div>
-        <div class="field-group"><div class="field-label">Status</div>
-          <select class="field-input" id="camp_status" style="cursor:pointer">
-            <option value="ativa">Ativa</option>
-            <option value="pausada">Pausada</option>
-            <option value="encerrada">Encerrada</option>
-          </select>
-        </div>
-        <div class="field-group"><div class="field-label">Observações / atualizações</div><textarea class="obs-field" id="camp_obs" placeholder="ex: Dia 7 pausei o vídeo 2. Dia 10 encerrrei toda a campanha..." style="min-height:70px"></textarea></div>
       </div>
-      <div style="display:flex;gap:10px;margin-top:20px">
-        <button class="btn-save" onclick="salvarCampanha()" style="flex:1">Salvar campanha</button>
-        <button id="btnExcluirCamp" onclick="excluirCampanha()" style="display:none;background:rgba(224,112,112,.15);border:1px solid var(--coral);border-radius:var(--radius-sm);color:var(--coral);font-size:13px;padding:8px 16px;cursor:pointer">Excluir</button>
-      </div>
+      <button class="btn-save" onclick="tpSalvarManual()" style="width:100%;margin-top:20px">Salvar campanha manual</button>
     </div>
-  </div>
-
-  <!-- Lista de campanhas -->
-  <div class="sh"><span class="sh-label">Campanhas do mês</span><div class="sh-line"></div></div>
-  <div id="listaCampanhas" style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
-    <div class="empty-state">Nenhuma campanha criada ainda. Clique em "+ Nova campanha" para começar.</div>
   </div>
 
 </div>
@@ -2512,197 +2555,481 @@ async function renderAnual(){
 
 
 // ══════════════════════════════════════════
-// TRÁFEGO PAGO — CAMPANHAS
+// TRÁFEGO PAGO — PAINEL META ADS
 // ══════════════════════════════════════════
-let tpMonth=new Date().getMonth();
-let tpYear=new Date().getFullYear();
-let campanhas=[];
-let editingCampId=null;
+const META_FN_URL='https://lnfghtlrzoioaotamzvy.supabase.co/functions/v1/meta-sync';
+const TP_TIPO_LABEL={
+  produto_entrada:'Produto de entrada', perfil:'Perfil', whatsapp:'WhatsApp',
+  diagnostico:'Diagnóstico', live:'Live/Evento', mentoria:'Mentoria', outro:'Outro'
+};
+const TP_RESULTADO_LABEL={
+  'omni_purchase':'compras','offsite_conversion.fb_pixel_purchase':'compras','onsite_conversion.purchase':'compras','purchase':'compras',
+  'onsite_conversion.lead_grouped':'leads','lead':'leads',
+  'onsite_conversion.messaging_conversation_started_7d':'conversas','onsite_conversion.messaging_first_reply':'conversas',
+  'link_click':'cliques','landing_page_view':'visitas à página','post_engagement':'engajamentos','page_engagement':'engajamentos'
+};
 
-function gerarId(){return 'c_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);}
+let tpPeriodo='este_mes';
+let tpCustomStartV=null, tpCustomEndV=null;
+let tpTipoFiltro='todos';
+let tpCampanhasCache=[];  // linhas já com métricas e vendas agregadas do período
+let tpDailyTotais=[];     // [{data, investimento}] para o gráfico de evolução
+let tpDetalheAtual=null;  // meta_id da campanha aberta no modal
+
+function tpGetPeriodo(){
+  const hoje=new Date();
+  const fmt=d=>d.toISOString().slice(0,10);
+  let start,end=fmt(hoje);
+  if(tpPeriodo==='hoje'){ start=fmt(hoje); }
+  else if(tpPeriodo==='7d'){ const d=new Date(hoje); d.setDate(d.getDate()-6); start=fmt(d); }
+  else if(tpPeriodo==='30d'){ const d=new Date(hoje); d.setDate(d.getDate()-29); start=fmt(d); }
+  else if(tpPeriodo==='este_mes'){ start=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),1)); }
+  else if(tpPeriodo==='mes_anterior'){
+    const d=new Date(hoje.getFullYear(),hoje.getMonth()-1,1);
+    start=fmt(d); end=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),0));
+  } else if(tpPeriodo==='personalizado'){ start=tpCustomStartV||fmt(hoje); end=tpCustomEndV||fmt(hoje); }
+  else { start=fmt(new Date(hoje.getFullYear(),hoje.getMonth(),1)); }
+  return {start,end};
+}
+
+async function tpSincronizar(){
+  const btn=document.getElementById('tpSyncBtn');
+  const msg=document.getElementById('tpSyncMsg');
+  btn.disabled=true; btn.textContent='Sincronizando…';
+  msg.textContent='';
+  try{
+    const r=await fetch(META_FN_URL+'?dias=90',{headers:{'Authorization':'Bearer '+SUPA_KEY,'apikey':SUPA_KEY}});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'Falha na sincronização');
+    msg.textContent=j.registros+' registros atualizados agora';
+    msg.style.color='var(--g4)';
+  }catch(e){
+    msg.textContent='Erro: '+e.message;
+    msg.style.color='var(--coral)';
+  }
+  btn.disabled=false; btn.textContent='Sincronizar agora';
+  await renderTrafego();
+}
+
+async function tpCarregarConfig(){
+  try{
+    const rows=await supaGet('meta_config',{id:1});
+    const cfg=rows[0];
+    const dot=document.getElementById('tpConnDot');
+    const lbl=document.getElementById('tpConnLabel');
+    const sub=document.getElementById('tpConnSub');
+    if(!cfg||!cfg.conectado){
+      dot.style.background='var(--text3)';
+      lbl.textContent='Meta Ads não conectada';
+      sub.textContent='Configure os secrets da function meta-sync no Supabase';
+      return;
+    }
+    dot.style.background=cfg.ultimo_status==='erro'?'var(--coral)':'var(--g4)';
+    lbl.textContent='Meta Ads conectada — '+(cfg.account_name||cfg.ad_account_id||'');
+    const dt=cfg.ultima_sincronizacao?new Date(cfg.ultima_sincronizacao).toLocaleString('pt-BR'):'nunca';
+    sub.textContent='Última sincronização: '+dt+(cfg.ultimo_status==='erro'?' · '+cfg.ultima_mensagem:'');
+  }catch(e){console.error('Erro ao carregar meta_config:',e);}
+}
 
 async function renderTrafego(){
-  // Month tabs
-  const tabs=document.getElementById('tpMonthTabs');
-  if(tabs){
-    tabs.innerHTML='';
-    MONTHS_PT.forEach((m,i)=>{
-      const btn=document.createElement('button');
-      btn.className='period-tab'+(i===tpMonth?' active':'');
-      btn.textContent=m;
-      btn.onclick=()=>{tpMonth=i;renderTrafego();};
-      tabs.appendChild(btn);
+  // Período tabs
+  const periodos=[['hoje','Hoje'],['7d','7 dias'],['30d','30 dias'],['este_mes','Este mês'],['mes_anterior','Mês anterior'],['personalizado','Personalizado']];
+  const ptabs=document.getElementById('tpPeriodTabs');
+  ptabs.innerHTML='';
+  periodos.forEach(([id,label])=>{
+    const btn=document.createElement('button');
+    btn.className='period-tab'+(id===tpPeriodo?' active':'');
+    btn.textContent=label;
+    btn.onclick=()=>{
+      tpPeriodo=id;
+      document.getElementById('tpCustomRange').style.display=id==='personalizado'?'flex':'none';
+      if(id!=='personalizado') renderTrafego();
+    };
+    ptabs.appendChild(btn);
+  });
+  document.getElementById('tpCustomRange').style.display=tpPeriodo==='personalizado'?'flex':'none';
+
+  await tpCarregarConfig();
+
+  const {start,end}=tpGetPeriodo();
+  await tpCarregarDados(start,end);
+  tpRenderTiposTabs();
+  tpRenderKpis();
+  tpRenderTabela();
+  tpRenderDestaques();
+  tpRenderAlertas();
+  tpRenderGeradorCaixa();
+  tpRenderEvolucao();
+}
+
+function tpAplicarPersonalizado(){
+  tpCustomStartV=document.getElementById('tpCustomStart').value;
+  tpCustomEndV=document.getElementById('tpCustomEnd').value;
+  if(!tpCustomStartV||!tpCustomEndV){showError('Selecione as duas datas.');return;}
+  renderTrafego();
+}
+
+async function tpCarregarDados(start,end){
+  try{
+    // Campanhas
+    const campUrl=SUPA_URL+'/rest/v1/meta_campanhas?select=meta_id,nome,status,objetivo_meta,tipo_comercial,oferta_relacionada,orcamento_diario,data_inicio,data_fim&order=data_inicio.desc.nullslast';
+    const campanhas=await(await fetch(campUrl,{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}})).json();
+
+    // Métricas de campanha no período
+    const metUrl=SUPA_URL+'/rest/v1/meta_metricas_diarias?nivel=eq.campanha&data=gte.'+start+'&data=lte.'+end+'&select=entity_id,data,investimento,alcance,impressoes,cliques,resultados,tipo_resultado,custo_por_resultado';
+    const metricas=await(await fetch(metUrl,{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}})).json();
+
+    // Vendas no período
+    const vendUrl=SUPA_URL+'/rest/v1/vendas?data_venda=gte.'+start+'&data_venda=lte.'+end+'&select=valor,quantidade,campanha_meta_id,status';
+    const vendas=await(await fetch(vendUrl,{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY}})).json();
+
+    // Agrega métricas por campanha
+    const porCampanha={};
+    const porDia={};
+    metricas.forEach(m=>{
+      if(!porCampanha[m.entity_id]) porCampanha[m.entity_id]={investimento:0,alcance:0,impressoes:0,cliques:0,resultados:0,tipo_resultado:m.tipo_resultado};
+      const p=porCampanha[m.entity_id];
+      p.investimento+=Number(m.investimento)||0;
+      p.alcance+=Number(m.alcance)||0;
+      p.impressoes+=Number(m.impressoes)||0;
+      p.cliques+=Number(m.cliques)||0;
+      p.resultados+=Number(m.resultados)||0;
+      if(m.tipo_resultado) p.tipo_resultado=m.tipo_resultado;
+      porDia[m.data]=(porDia[m.data]||0)+(Number(m.investimento)||0);
     });
-  }
-  await carregarCampanhas();
-  renderListaCampanhas();
-  calcularKpisTrafego();
-}
 
-async function carregarCampanhas(){
-  try{
-    const res=await apiGet({action:'get_trafego',ano:tpYear,mes:tpMonth});
-    campanhas=(res.dados&&res.dados.campanhas)||[];
+    // Agrega vendas por campanha
+    const vendasPorCampanha={};
+    vendas.forEach(v=>{
+      if(v.status==='cancelada'||v.status==='reembolsada')return;
+      const id=v.campanha_meta_id||'_sem_campanha';
+      if(!vendasPorCampanha[id]) vendasPorCampanha[id]={qtd:0,receita:0};
+      vendasPorCampanha[id].qtd+=Number(v.quantidade)||1;
+      vendasPorCampanha[id].receita+=Number(v.valor)||0;
+    });
+
+    tpCampanhasCache=campanhas
+      .map(c=>{
+        const m=porCampanha[c.meta_id]||{investimento:0,alcance:0,impressoes:0,cliques:0,resultados:0,tipo_resultado:null};
+        const v=vendasPorCampanha[c.meta_id]||{qtd:0,receita:0};
+        return {
+          ...c,
+          investimento:m.investimento, alcance:m.alcance, impressoes:m.impressoes, cliques:m.cliques,
+          resultados:m.resultados, tipo_resultado:m.tipo_resultado,
+          custo_por_resultado:m.resultados>0?m.investimento/m.resultados:null,
+          vendas_qtd:v.qtd, receita:v.receita,
+          cac:v.qtd>0?m.investimento/v.qtd:null,
+          roas:v.receita>0&&m.investimento>0?v.receita/m.investimento:null
+        };
+      })
+      .filter(c=>c.investimento>0||c.status==='ACTIVE'); // esconde ruído de campanhas antigas sem gasto no período
+
+    tpDailyTotais=Object.keys(porDia).sort().map(d=>({data:d,investimento:porDia[d]}));
   }catch(e){
-    console.error('Erro ao carregar campanhas:',e);
-    campanhas=[];
+    console.error('Erro ao carregar dados de tráfego:',e);
+    tpCampanhasCache=[]; tpDailyTotais=[];
   }
 }
 
-async function persistirCampanhas(){
-  try{
-    await apiPost('save_trafego',{ano:tpYear,mes:tpMonth,dados:{campanhas}});
-    showSaved();
-  }catch(e){showError('Erro ao salvar campanha.');}
+function tpRenderTiposTabs(){
+  const tipos=['todos',...Object.keys(TP_TIPO_LABEL),'sem_classificar'];
+  const wrap=document.getElementById('tpTipoTabs');
+  wrap.innerHTML='';
+  tipos.forEach(t=>{
+    const label=t==='todos'?'Todos':(t==='sem_classificar'?'Sem classificar':TP_TIPO_LABEL[t]);
+    const btn=document.createElement('button');
+    btn.className='period-tab'+(t===tpTipoFiltro?' active':'');
+    btn.textContent=label;
+    btn.onclick=()=>{tpTipoFiltro=t;renderTrafego();};
+    wrap.appendChild(btn);
+  });
 }
 
-function calcularKpisTrafego(){
-  const totalVerba=campanhas.reduce((s,c)=>s+(parseFloat(c.gasto)||0),0);
-  const totalLeads=campanhas.reduce((s,c)=>s+(parseInt(c.leads)||0),0);
-  const totalReun=campanhas.reduce((s,c)=>s+(parseInt(c.reunioes)||0),0);
-  const totalVendas=campanhas.reduce((s,c)=>s+(parseInt(c.venda_direta_qtd)||0)+(parseInt(c.venda_reun_qtd)||0),0);
-  const totalFat=campanhas.reduce((s,c)=>s+(parseFloat(c.venda_direta_val)||0)+(parseFloat(c.venda_reun_val)||0),0);
-  const roas=totalVerba>0?(totalFat/totalVerba).toFixed(2)+'x':'—';
-
-  document.getElementById('tp-total-verba').textContent=totalVerba?'R$ '+totalVerba.toLocaleString('pt-BR'):'R$ —';
-  document.getElementById('tp-total-leads').textContent=totalLeads||'—';
-  document.getElementById('tp-total-reun').textContent=totalReun||'—';
-  document.getElementById('tp-total-vendas').textContent=totalVendas||'—';
-  document.getElementById('tp-total-roas').textContent=roas;
+function tpCampanhasFiltradas(){
+  if(tpTipoFiltro==='todos')return tpCampanhasCache;
+  if(tpTipoFiltro==='sem_classificar')return tpCampanhasCache.filter(c=>!c.tipo_comercial);
+  return tpCampanhasCache.filter(c=>c.tipo_comercial===tpTipoFiltro);
 }
 
-function renderListaCampanhas(){
-  const lista=document.getElementById('listaCampanhas');
-  if(!lista)return;
-  if(!campanhas.length){
-    lista.innerHTML='<div class="empty-state">Nenhuma campanha criada ainda. Clique em "+ Nova campanha" para começar.</div>';
+function tpRenderKpis(){
+  const rows=tpCampanhasFiltradas();
+  const investimento=rows.reduce((s,c)=>s+c.investimento,0);
+  const resultados=rows.reduce((s,c)=>s+c.resultados,0);
+  const vendas=rows.reduce((s,c)=>s+c.vendas_qtd,0);
+  const receita=rows.reduce((s,c)=>s+c.receita,0);
+  const cac=vendas>0?investimento/vendas:null;
+  const roas=receita>0&&investimento>0?receita/investimento:null;
+  document.getElementById('tp-investimento').textContent=investimento>0?'R$ '+investimento.toLocaleString('pt-BR',{maximumFractionDigits:0}):'—';
+  document.getElementById('tp-resultados').textContent=resultados>0?resultados.toLocaleString('pt-BR'):'—';
+  document.getElementById('tp-vendas').textContent=vendas>0?vendas:'—';
+  document.getElementById('tp-receita').textContent=receita>0?'R$ '+receita.toLocaleString('pt-BR',{maximumFractionDigits:0}):'—';
+  document.getElementById('tp-cac').textContent=cac?'R$ '+cac.toLocaleString('pt-BR',{maximumFractionDigits:0}):'—';
+  document.getElementById('tp-roas').textContent=roas?roas.toFixed(2)+'x':'—';
+}
+
+function tpRenderTabela(){
+  const rows=tpCampanhasFiltradas().slice().sort((a,b)=>b.investimento-a.investimento);
+  const wrap=document.getElementById('tpTabelaWrap');
+  if(!rows.length){
+    wrap.innerHTML='<div class="empty-state">Nenhuma campanha com dados nesse período.</div>';
     return;
   }
-  const statusColor={ativa:'var(--g4)',pausada:'var(--amber)',encerrada:'var(--text3)'};
-  const statusBg={ativa:'rgba(45,106,79,.15)',pausada:'rgba(233,168,76,.1)',encerrada:'var(--surface2)'};
-  lista.innerHTML=campanhas.map(c=>{
-    const gasto=parseFloat(c.gasto)||0;
-    const fat=(parseFloat(c.venda_direta_val)||0)+(parseFloat(c.venda_reun_val)||0);
-    const roas=gasto>0?(fat/gasto).toFixed(2)+'x':'—';
-    const vendas=(parseInt(c.venda_direta_qtd)||0)+(parseInt(c.venda_reun_qtd)||0);
-    return`<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
-      <div style="padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer" onclick="editarCampanha('${c.id}')">
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
-            <span style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text)">${c.nome||'Sem nome'}</span>
-            <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:${statusBg[c.status||'ativa']};color:${statusColor[c.status||'ativa']};font-weight:500">${c.status||'ativa'}</span>
-            <span class="badge badge-x" style="font-size:9px">${c.criativo||'vídeo'}</span>
-            <span class="badge badge-x" style="font-size:9px">${c.objetivo||'whatsapp'}</span>
-          </div>
-          <div style="display:flex;gap:16px;flex-wrap:wrap">
-            <span style="font-size:11px;color:var(--text3)">${c.inicio||'—'} ${c.fim?'→ '+c.fim:'→ ativa'}</span>
-            ${c.orcamento?`<span style="font-size:11px;color:var(--text3)">Orç: R$ ${c.orcamento}/dia</span>`:''}
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;text-align:center;flex-shrink:0">
-          <div><div style="font-size:14px;font-weight:600;color:var(--coral)">R$ ${gasto.toLocaleString('pt-BR')}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Gasto</div></div>
-          <div><div style="font-size:14px;font-weight:600;color:var(--teal)">${c.leads||0}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Leads</div></div>
-          <div><div style="font-size:14px;font-weight:600;color:var(--g4)">${vendas}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Vendas</div></div>
-          <div><div style="font-size:14px;font-weight:600;color:var(--purple)">${roas}</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase">ROAS</div></div>
-        </div>
-        <div style="font-size:18px;color:var(--text3)">›</div>
-      </div>
-      ${c.obs?`<div style="padding:0 18px 12px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);padding-top:8px;margin-top:0">${c.obs}</div>`:''}
-    </div>`;
+  const fmtR=v=>'R$ '+v.toLocaleString('pt-BR',{maximumFractionDigits:0});
+  wrap.innerHTML=`<table class="tp-tabela"><thead><tr>
+    <th>Campanha</th><th>Tipo</th><th>Investimento</th><th>Resultado</th><th>Custo/Result.</th><th>Vendas</th><th>Receita</th><th>ROAS</th>
+  </tr></thead><tbody>`+rows.map(c=>{
+    const tipoLbl=c.tipo_comercial?TP_TIPO_LABEL[c.tipo_comercial]:'<span style="color:var(--amber)">classificar</span>';
+    const resLbl=TP_RESULTADO_LABEL[c.tipo_resultado]||'resultados';
+    return `<tr onclick="tpAbrirDetalhe('${c.meta_id}')">
+      <td><span class="tp-status-dot ${c.status==='ACTIVE'?'tp-status-active':'tp-status-paused'}"></span>${c.nome}</td>
+      <td>${tipoLbl}</td>
+      <td>${c.investimento>0?fmtR(c.investimento):'—'}</td>
+      <td>${c.resultados>0?c.resultados+' '+resLbl:'—'}</td>
+      <td>${c.custo_por_resultado?fmtR(c.custo_por_resultado):'—'}</td>
+      <td>${c.vendas_qtd>0?c.vendas_qtd:'—'}</td>
+      <td>${c.receita>0?fmtR(c.receita):'—'}</td>
+      <td>${c.roas?c.roas.toFixed(2)+'x':'—'}</td>
+    </tr>`;
+  }).join('')+'</tbody></table>';
+}
+
+function tpRenderDestaques(){
+  const rows=tpCampanhasCache.filter(c=>c.investimento>0);
+  const wrap=document.getElementById('tpDestaques');
+  if(!rows.length){wrap.innerHTML='<div class="empty-state">Sem dados suficientes ainda neste período.</div>';return;}
+  const cards=[];
+  const comRoas=rows.filter(c=>c.roas);
+  if(comRoas.length){
+    const m=comRoas.reduce((a,b)=>b.roas>a.roas?b:a);
+    cards.push(['Melhor ROAS',m.nome,m.roas.toFixed(2)+'x']);
+  }
+  const comCusto=rows.filter(c=>c.custo_por_resultado);
+  if(comCusto.length){
+    const m=comCusto.reduce((a,b)=>b.custo_por_resultado<a.custo_por_resultado?b:a);
+    cards.push(['Menor custo por resultado',m.nome,'R$ '+m.custo_por_resultado.toLocaleString('pt-BR',{maximumFractionDigits:2})]);
+  }
+  const comReceita=rows.filter(c=>c.receita>0);
+  if(comReceita.length){
+    const m=comReceita.reduce((a,b)=>b.receita>a.receita?b:a);
+    cards.push(['Maior faturamento',m.nome,'R$ '+m.receita.toLocaleString('pt-BR',{maximumFractionDigits:0})]);
+  }
+  const comVendas=rows.filter(c=>c.vendas_qtd>0);
+  if(comVendas.length){
+    const m=comVendas.reduce((a,b)=>b.vendas_qtd>a.vendas_qtd?b:a);
+    cards.push(['Maior volume de vendas',m.nome,m.vendas_qtd+' vendas']);
+  }
+  if(!cards.length){wrap.innerHTML='<div class="empty-state">Ainda sem vendas atribuídas neste período para destacar.</div>';return;}
+  wrap.innerHTML=cards.map(([lbl,nome,val])=>`<div class="tp-destaque-card">
+    <div class="tp-destaque-lbl">${lbl}</div>
+    <div class="tp-destaque-nome">${nome}</div>
+    <div class="tp-destaque-val">${val}</div>
+  </div>`).join('');
+}
+
+function tpRenderAlertas(){
+  const rows=tpCampanhasCache.filter(c=>c.investimento>0);
+  const wrap=document.getElementById('tpAlertas');
+  const alertas=[];
+  const mediaCusto=(()=>{ const cc=rows.filter(c=>c.custo_por_resultado); return cc.length?cc.reduce((s,c)=>s+c.custo_por_resultado,0)/cc.length:null; })();
+  rows.forEach(c=>{
+    if(c.resultados===0&&c.investimento>=50){
+      alertas.push(['bad',`"${c.nome}" investiu R$ ${c.investimento.toLocaleString('pt-BR')} e ainda não gerou resultado.`]);
+    }
+    if(mediaCusto&&c.custo_por_resultado&&c.custo_por_resultado>mediaCusto*1.3){
+      alertas.push(['warn',`"${c.nome}" está com custo por resultado acima da média das suas campanhas.`]);
+    }
+    if(mediaCusto&&c.custo_por_resultado&&c.custo_por_resultado<mediaCusto*0.7){
+      alertas.push(['ok',`"${c.nome}" está com custo por resultado abaixo da média — vale considerar reforçar o orçamento.`]);
+    }
+    if((c.tipo_comercial==='produto_entrada'||c.tipo_comercial==='whatsapp'||c.tipo_comercial==='diagnostico')&&c.investimento>=100&&c.vendas_qtd===0){
+      alertas.push(['bad',`"${c.nome}" já investiu R$ ${c.investimento.toLocaleString('pt-BR')} sem vendas atribuídas.`]);
+    }
+  });
+  if(!alertas.length){wrap.innerHTML='<div class="empty-state">Nenhum alerta relevante neste período.</div>';return;}
+  wrap.innerHTML=alertas.slice(0,8).map(([tipo,txt])=>`<div class="alert-box alert-${tipo}">${txt}</div>`).join('');
+}
+
+function tpRenderGeradorCaixa(){
+  const rows=tpCampanhasCache.filter(c=>(c.oferta_relacionada||'').toLowerCase().includes('gerador de caixa'));
+  const wrap=document.getElementById('tpGCWrap');
+  if(!rows.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  const investimento=rows.reduce((s,c)=>s+c.investimento,0);
+  const vendas=rows.reduce((s,c)=>s+c.vendas_qtd,0);
+  const receita=rows.reduce((s,c)=>s+c.receita,0);
+  const cac=vendas>0?investimento/vendas:null;
+  const roas=receita>0&&investimento>0?receita/investimento:null;
+  const kpis=`<div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:14px">
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--coral)">R$ ${investimento.toLocaleString('pt-BR',{maximumFractionDigits:0})}</div><div class="kpi-lbl">Investimento</div></div>
+    <div class="kpi-card"><div class="kpi-val">${vendas||'—'}</div><div class="kpi-lbl">Vendas</div></div>
+    <div class="kpi-card"><div class="kpi-val">R$ ${receita.toLocaleString('pt-BR',{maximumFractionDigits:0})}</div><div class="kpi-lbl">Receita</div></div>
+    <div class="kpi-card"><div class="kpi-val">${cac?'R$ '+cac.toLocaleString('pt-BR',{maximumFractionDigits:0}):'—'}</div><div class="kpi-lbl">Custo por venda</div></div>
+    <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)">${roas?roas.toFixed(2)+'x':'—'}</div><div class="kpi-lbl">ROAS</div></div>
+  </div>`;
+  const lista=rows.map(c=>`<div class="tp-pill"><span class="tp-pill-nome">${c.nome}</span><span class="tp-pill-val">R$ ${c.investimento.toLocaleString('pt-BR',{maximumFractionDigits:0})} · ${c.vendas_qtd||0} vendas</span></div>`).join('');
+  document.getElementById('tpGCConteudo').innerHTML=kpis+lista;
+}
+
+function tpRenderEvolucao(){
+  const wrap=document.getElementById('tpEvolucao');
+  if(!tpDailyTotais.length){wrap.innerHTML='<div class="empty-state">Sem investimento registrado nesse período.</div>';return;}
+  const max=Math.max(...tpDailyTotais.map(d=>d.investimento),1);
+  wrap.innerHTML=tpDailyTotais.map(d=>{
+    const pct=Math.max(2,(d.investimento/max)*100);
+    const dLabel=d.data.slice(8,10)+'/'+d.data.slice(5,7);
+    return `<div class="tp-bar-row"><span class="tp-bar-date">${dLabel}</span><div class="tp-bar-track"><div class="tp-bar-fill" style="width:${pct}%"></div></div><span class="tp-bar-val">R$ ${d.investimento.toLocaleString('pt-BR',{maximumFractionDigits:0})}</span></div>`;
   }).join('');
 }
 
-function showNovaCampanha(){
-  editingCampId=null;
-  document.getElementById('modalTitle').textContent='Nova campanha';
-  document.getElementById('btnExcluirCamp').style.display='none';
-  const campos=['camp_id','camp_nome','camp_inicio','camp_fim','camp_orcamento','camp_gasto',
-    'camp_leads','camp_reunioes','camp_venda_direta_qtd','camp_venda_direta_val',
-    'camp_venda_reun_qtd','camp_venda_reun_val','camp_obs'];
-  campos.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('camp_criativo').value='video';
-  document.getElementById('camp_objetivo').value='whatsapp';
-  document.getElementById('camp_status').value='ativa';
-  // Set today as start date
-  document.getElementById('camp_inicio').value=today();
-  const modal=document.getElementById('modalCampanha');
-  modal.style.display='flex';
-}
-
-function editarCampanha(id){
-  const c=campanhas.find(x=>x.id===id);
+// ── Detalhe da campanha ──
+async function tpAbrirDetalhe(metaId){
+  const c=tpCampanhasCache.find(x=>x.meta_id===metaId);
   if(!c)return;
-  editingCampId=id;
-  document.getElementById('modalTitle').textContent='Editar campanha';
-  document.getElementById('btnExcluirCamp').style.display='block';
-  document.getElementById('camp_id').value=c.id||'';
-  document.getElementById('camp_nome').value=c.nome||'';
-  document.getElementById('camp_criativo').value=c.criativo||'video';
-  document.getElementById('camp_objetivo').value=c.objetivo||'whatsapp';
-  document.getElementById('camp_inicio').value=c.inicio||'';
-  document.getElementById('camp_fim').value=c.fim||'';
-  document.getElementById('camp_orcamento').value=c.orcamento||'';
-  document.getElementById('camp_gasto').value=c.gasto||'';
-  document.getElementById('camp_leads').value=c.leads||'';
-  document.getElementById('camp_reunioes').value=c.reunioes||'';
-  document.getElementById('camp_venda_direta_qtd').value=c.venda_direta_qtd||'';
-  document.getElementById('camp_venda_direta_val').value=c.venda_direta_val||'';
-  document.getElementById('camp_venda_reun_qtd').value=c.venda_reun_qtd||'';
-  document.getElementById('camp_venda_reun_val').value=c.venda_reun_val||'';
-  document.getElementById('camp_status').value=c.status||'ativa';
-  document.getElementById('camp_obs').value=c.obs||'';
-  document.getElementById('modalCampanha').style.display='flex';
+  tpDetalheAtual=metaId;
+  document.getElementById('tpDetTitulo').textContent=c.nome;
+  const conteudo=document.getElementById('tpDetConteudo');
+  conteudo.innerHTML='<div class="empty-state">Carregando…</div>';
+  document.getElementById('tpModalDetalhe').style.display='flex';
+
+  let adsets=[],ads=[];
+  try{
+    adsets=await supaGet('meta_adsets',{campanha_id:metaId});
+    ads=await supaGet('meta_ads',{campanha_id:metaId});
+  }catch(e){console.error(e);}
+
+  const fmtR=v=>'R$ '+Number(v||0).toLocaleString('pt-BR',{maximumFractionDigits:0});
+  conteudo.innerHTML=`
+    <div class="grid-3" style="margin-bottom:18px">
+      <div class="kpi-card"><div class="kpi-val" style="color:var(--coral)">${fmtR(c.investimento)}</div><div class="kpi-lbl">Investimento no período</div></div>
+      <div class="kpi-card"><div class="kpi-val">${c.resultados||'—'}</div><div class="kpi-lbl">${TP_RESULTADO_LABEL[c.tipo_resultado]||'Resultados'}</div></div>
+      <div class="kpi-card" style="border-color:var(--g2);background:rgba(27,67,50,.08)"><div class="kpi-val" style="color:var(--g4)">${c.roas?c.roas.toFixed(2)+'x':'—'}</div><div class="kpi-lbl">ROAS</div></div>
+    </div>
+
+    <div class="sh"><span class="sh-label">Classificação comercial</span><div class="sh-line"></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">
+      <div class="field-group"><div class="field-label">Tipo</div>
+        <select class="field-input" id="det_tipo" style="cursor:pointer">
+          <option value="">— selecionar —</option>
+          ${Object.entries(TP_TIPO_LABEL).map(([k,v])=>`<option value="${k}" ${c.tipo_comercial===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field-group"><div class="field-label">Oferta relacionada</div><input class="field-input" type="text" id="det_oferta" value="${c.oferta_relacionada||''}" placeholder="ex: Gerador de Caixa"></div>
+    </div>
+    <button class="btn-save" onclick="tpSalvarClassificacao()" style="margin-bottom:24px">Salvar classificação</button>
+
+    <div class="sh"><span class="sh-label">Estrutura da campanha</span><div class="sh-line"></div></div>
+    <div style="margin-bottom:20px">
+      ${adsets.length?adsets.map(as=>{
+        const seus=ads.filter(a=>a.adset_id===as.meta_id);
+        return `<div class="tp-pill" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div style="display:flex;justify-content:space-between;width:100%"><span class="tp-pill-nome">${as.nome}</span><span class="tp-pill-val">${as.status}</span></div>
+          ${seus.map(a=>`<div style="font-size:11px;color:var(--text3);padding-left:12px">↳ ${a.nome} · ${a.status}</div>`).join('')}
+        </div>`;
+      }).join(''):'<div class="empty-state">Sem conjuntos/anúncios sincronizados ainda.</div>'}
+    </div>
+
+    <div class="sh"><span class="sh-label">Registrar venda desta campanha</span><div class="sh-line"></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="field-group"><div class="field-label">Cliente</div><input class="field-input" type="text" id="venda_cliente" placeholder="nome"></div>
+      <div class="field-group"><div class="field-label">Produto</div><input class="field-input" type="text" id="venda_produto" value="${c.oferta_relacionada||''}"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+      <div class="field-group"><div class="field-label">Valor (R$)</div><input class="field-input" type="number" id="venda_valor" placeholder="ex: 197"></div>
+      <div class="field-group"><div class="field-label">Qtd</div><input class="field-input" type="number" id="venda_qtd" value="1"></div>
+      <div class="field-group"><div class="field-label">Data</div><input class="field-input" type="date" id="venda_data" value="${today()}"></div>
+    </div>
+    <button class="btn-save" onclick="tpRegistrarVenda()">Registrar venda</button>
+  `;
 }
 
-async function salvarCampanha(){
-  const campos={
-    id:document.getElementById('camp_id').value||gerarId(),
-    nome:document.getElementById('camp_nome').value,
-    criativo:document.getElementById('camp_criativo').value,
-    objetivo:document.getElementById('camp_objetivo').value,
-    inicio:document.getElementById('camp_inicio').value,
-    fim:document.getElementById('camp_fim').value,
-    orcamento:document.getElementById('camp_orcamento').value,
-    gasto:document.getElementById('camp_gasto').value,
-    leads:document.getElementById('camp_leads').value,
-    reunioes:document.getElementById('camp_reunioes').value,
-    venda_direta_qtd:document.getElementById('camp_venda_direta_qtd').value,
-    venda_direta_val:document.getElementById('camp_venda_direta_val').value,
-    venda_reun_qtd:document.getElementById('camp_venda_reun_qtd').value,
-    venda_reun_val:document.getElementById('camp_venda_reun_val').value,
-    status:document.getElementById('camp_status').value,
-    obs:document.getElementById('camp_obs').value,
-    atualizado:new Date().toISOString().split('T')[0]
-  };
-  if(!campos.nome){showError('Informe o nome da campanha.');return;}
-  const idx=campanhas.findIndex(c=>c.id===campos.id);
-  if(idx>=0)campanhas[idx]=campos;
-  else campanhas.push(campos);
-  await persistirCampanhas();
-  fecharModal();
-  renderListaCampanhas();
-  calcularKpisTrafego();
+async function tpSalvarClassificacao(){
+  if(!tpDetalheAtual)return;
+  const tipo=document.getElementById('det_tipo').value||null;
+  const oferta=document.getElementById('det_oferta').value||null;
+  try{
+    await fetch(SUPA_URL+'/rest/v1/meta_campanhas?meta_id=eq.'+encodeURIComponent(tpDetalheAtual),{
+      method:'PATCH',
+      headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({tipo_comercial:tipo,oferta_relacionada:oferta})
+    });
+    showSaved();
+    tpFecharDetalhe();
+    renderTrafego();
+  }catch(e){showError('Erro ao salvar classificação.');}
 }
 
-async function excluirCampanha(){
-  if(!editingCampId)return;
-  if(!confirm('Excluir esta campanha?'))return;
-  campanhas=campanhas.filter(c=>c.id!==editingCampId);
-  await persistirCampanhas();
-  fecharModal();
-  renderListaCampanhas();
-  calcularKpisTrafego();
+async function tpRegistrarVenda(){
+  if(!tpDetalheAtual)return;
+  const valor=parseFloat(document.getElementById('venda_valor').value)||0;
+  if(valor<=0){showError('Informe o valor da venda.');return;}
+  try{
+    await fetch(SUPA_URL+'/rest/v1/vendas',{
+      method:'POST',
+      headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({
+        cliente_nome:document.getElementById('venda_cliente').value||null,
+        produto:document.getElementById('venda_produto').value||null,
+        valor, quantidade:parseInt(document.getElementById('venda_qtd').value)||1,
+        data_venda:document.getElementById('venda_data').value||today(),
+        origem:'manual', campanha_meta_id:tpDetalheAtual, status:'aprovada'
+      })
+    });
+    showSaved();
+    tpFecharDetalhe();
+    renderTrafego();
+  }catch(e){showError('Erro ao registrar venda.');}
 }
 
-function fecharModal(){
-  document.getElementById('modalCampanha').style.display='none';
-  editingCampId=null;
+function tpFecharDetalhe(){
+  document.getElementById('tpModalDetalhe').style.display='none';
+  tpDetalheAtual=null;
 }
+document.getElementById('tpModalDetalhe').addEventListener('click',function(e){if(e.target===this)tpFecharDetalhe();});
 
-// Fechar modal clicando fora
-document.getElementById('modalCampanha').addEventListener('click',function(e){
-  if(e.target===this)fecharModal();
-});
+// ── Campanha manual ──
+function tpAbrirManual(){
+  ['man_nome','man_oferta','man_investimento','man_resultados','man_vendas','man_receita'].forEach(id=>{document.getElementById(id).value='';});
+  document.getElementById('man_tipo').value='produto_entrada';
+  document.getElementById('man_data').value=today();
+  document.getElementById('tpModalManual').style.display='flex';
+}
+function tpFecharManual(){document.getElementById('tpModalManual').style.display='none';}
+document.getElementById('tpModalManual').addEventListener('click',function(e){if(e.target===this)tpFecharManual();});
+
+async function tpSalvarManual(){
+  const nome=document.getElementById('man_nome').value.trim();
+  if(!nome){showError('Informe o nome da campanha.');return;}
+  const metaId='manual_'+Date.now();
+  const data=document.getElementById('man_data').value||today();
+  const investimento=parseFloat(document.getElementById('man_investimento').value)||0;
+  const resultados=parseInt(document.getElementById('man_resultados').value)||0;
+  const vendasQtd=parseInt(document.getElementById('man_vendas').value)||0;
+  const receita=parseFloat(document.getElementById('man_receita').value)||0;
+  const tipo=document.getElementById('man_tipo').value;
+  const oferta=document.getElementById('man_oferta').value||null;
+  try{
+    await fetch(SUPA_URL+'/rest/v1/meta_campanhas',{
+      method:'POST',
+      headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({meta_id:metaId,nome,status:'ACTIVE',tipo_comercial:tipo,oferta_relacionada:oferta,data_inicio:data})
+    });
+    await fetch(SUPA_URL+'/rest/v1/meta_metricas_diarias',{
+      method:'POST',
+      headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+      body:JSON.stringify({nivel:'campanha',entity_id:metaId,data,investimento,resultados,custo_por_resultado:resultados>0?investimento/resultados:null})
+    });
+    if(vendasQtd>0&&receita>0){
+      await fetch(SUPA_URL+'/rest/v1/vendas',{
+        method:'POST',
+        headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Content-Type':'application/json',Prefer:'return=minimal'},
+        body:JSON.stringify({produto:oferta,valor:receita,quantidade:vendasQtd,data_venda:data,origem:'manual',campanha_meta_id:metaId,status:'aprovada'})
+      });
+    }
+    showSaved();
+    tpFecharManual();
+    renderTrafego();
+  }catch(e){showError('Erro ao salvar campanha manual.');}
+}
 
 // ══════════════════════════════════════════
 // LOGIN
