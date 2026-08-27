@@ -3215,10 +3215,13 @@ async function renderCRM(){
 // FIX 6: migração automática — perdidos de meses anteriores vão para Nutrição
 async function crmMigrarPerdidosParaNutricao(){
   const mesAtual = new Date().toISOString().slice(0,7);
+  // Só migra perdidos de meses ANTERIORES (não do mês atual)
+  // Compara apenas ano-mes: "2026-07" < "2026-08" = migra, "2026-08" = não migra
   const perdidosAntigos = _crmOps.filter(op=>
     op.status==='perdido' &&
     op.pipeline!=='nutricao' &&
-    op.data_perda && op.data_perda.slice(0,7) < mesAtual
+    op.data_perda &&
+    op.data_perda.slice(0,7) < mesAtual // estritamente MENOR = meses anteriores apenas
   );
   if(!perdidosAntigos.length) return;
   for(const op of perdidosAntigos){
@@ -4512,20 +4515,3 @@ ensureScriptRows().then(() => loadScripts());
 </script>
 </body>
 </html>
-",
-  "headers": {
-    "access-control-allow-origin": "*",
-    "age": "127226",
-    "cache-control": "public, max-age=0, must-revalidate",
-    "content-disposition": "inline",
-    "content-encoding": "br",
-    "content-type": "text/html; charset=utf-8",
-    "date": "Thu, 27 Aug 2026 22:57:03 GMT",
-    "etag": "W/"6deb06f602c7e910700108fecdee3f2e"",
-    "last-modified": "Wed, 26 Aug 2026 11:36:36 GMT",
-    "server": "Vercel",
-    "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
-    "transfer-encoding": "chunked",
-    "x-vercel-cache": "HIT",
-    "x-vercel-id": "iad1:iad1::kfqkd-1787871423340-4a5dcd91a2e2"
-  
