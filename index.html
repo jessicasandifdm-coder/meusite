@@ -3207,8 +3207,37 @@ function crmFmtDtHr(dt){if(!dt)return'—';const d=new Date(dt);return d.toLocal
 // ── Carregar ──
 async function renderCRM(){
   await crmCarregar();
+  await crmMigrarPerdidosParaNutricao();
   crmSetPipeline('reunioes', document.querySelector('.crm-pipe-tab'));
   await crmCarregarAbordHoje();
+}
+
+// FIX 6: migração automática — perdidos de meses anteriores vão para Nutrição
+async function crmMigrarPerdidosParaNutricao(){
+  const mesAtual = new Date().toISOString().slice(0,7);
+  const perdidosAntigos = _crmOps.filter(op=>
+    op.status==='perdido' &&
+    op.pipeline!=='nutricao' &&
+    op.data_perda && op.data_perda.slice(0,7) < mesAtual
+  );
+  if(!perdidosAntigos.length) return;
+  for(const op of perdidosAntigos){
+    try{
+      await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+op.id,{
+        method:'PATCH',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({pipeline:'nutricao',status:'nutricao',pipeline_origem:op.pipeline_origem||op.pipeline})
+      });
+      await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
+        method:'POST',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({id:crmGid('ev'),oportunidade_id:op.id,pessoa_id:op.pessoa_id,
+          tipo:'status',descricao:'Migração automática: Perdido ('+op.data_perda?.slice(0,7)+') → Nutrição',
+          status_anterior:'perdido',status_novo:'nutricao',responsavel:'Sistema'})
+      });
+    }catch(e){console.error('Erro ao migrar:',e);}
+  }
+  if(perdidosAntigos.length) await crmCarregar();
 }
 
 async function crmCarregar(){
@@ -3275,7 +3304,20 @@ function crmRenderKanban(cols, ops){
   const el = document.getElementById('crmKanban');
   if(!el) return;
   el.innerHTML = cols.map(col=>{
-    const cards = ops.filter(o=>o.status===col.status);
+    // FIX: ordenar — atrasados primeiro, depois por data_proxima_acao mais próxima
+    const hoje = today();
+    const cards = ops
+      .filter(o=>o.status===col.status)
+      .sort((a,b)=>{
+        const aAtras = a.data_proxima_acao && a.data_proxima_acao < hoje ? 0 : 1;
+        const bAtras = b.data_proxima_acao && b.data_proxima_acao < hoje ? 0 : 1;
+        if(aAtras !== bAtras) return aAtras - bAtras;
+        if(a.data_proxima_acao && b.data_proxima_acao) return a.data_proxima_acao.localeCompare(b.data_proxima_acao);
+        if(a.data_proxima_acao) return -1;
+        if(b.data_proxima_acao) return 1;
+        if(a.reuniao_data && b.reuniao_data) return a.reuniao_data.localeCompare(b.reuniao_data);
+        return 0;
+      });
     return `<div class="crm-col" data-status="${col.status}"
       ondragover="event.preventDefault();this.classList.add('drag-over')"
       ondragleave="this.classList.remove('drag-over')"
@@ -3299,11 +3341,20 @@ function crmCardHtml(op){
     ? `<span class="crm-card-tag" style="color:var(--text3)">via ${CRM_PIPELINES[op.pipeline_origem]?.label||op.pipeline_origem}</span>` : '';
   const reuniaoLine = op.reuniao_data
     ? `<div class="crm-card-reuniao">📅 ${crmFmtDtHr(op.reuniao_data)}</div>` : '';
-  const acaoLine = op.proxima_acao
-    ? `<div class="crm-card-acao">→ ${crmEsc(op.proxima_acao)}${op.data_proxima_acao?' · '+crmFmtDt(op.data_proxima_acao):''}</div>` : '';
+  // FIX: mostra data_proxima_acao (data agendada) + alerta de atraso em vermelho
+  let acaoLine = '';
+  if(op.proxima_acao){
+    const hoje = today();
+    const atrasado = op.data_proxima_acao && op.data_proxima_acao < hoje;
+    const cor = atrasado ? 'var(--coral)' : 'var(--amber)';
+    const prefixo = atrasado ? '🔴 ATRASADO — ' : '→ ';
+    acaoLine = `<div class="crm-card-acao" style="color:${cor}">${prefixo}${crmEsc(op.proxima_acao)}${op.data_proxima_acao?' · '+crmFmtDt(op.data_proxima_acao):''}</div>`;
+  }
   const noshowLine = op.status==='nao_compareceu'
     ? `<div class="crm-card-noshow">⚠ No-show${op.data_no_show?' em '+crmFmtDt(op.data_no_show):''}</div>` : '';
-  return `<div class="crm-card" draggable="true"
+  const atrasadoBorder = (op.proxima_acao && op.data_proxima_acao && op.data_proxima_acao < today())
+    ? 'border-left:3px solid var(--coral);' : '';
+  return `<div class="crm-card" draggable="true" style="${atrasadoBorder}"
     ondragstart="crmDragStart(event,'${op.id}')"
     ondragend="document.querySelectorAll('.crm-col').forEach(c=>c.classList.remove('drag-over'))"
     onclick="crmAbrirFicha('${op.id}')">
@@ -3369,6 +3420,17 @@ async function crmDrop(e, novoStatus){
     await crmCarregar();
     crmFiltrar();
     showSaved();
+    // FIX: feedback visual ao mover para outro pipeline
+    if(pipelineMudou){
+      const el=document.getElementById('saveIndicator');
+      if(el){
+        const pipeLabel=CRM_PIPELINES[novoPipeline]?.label||novoPipeline;
+        el.textContent='→ Movida para '+pipeLabel;
+        el.style.color=novoStatus==='perdido'?'var(--coral)':'var(--g4)';
+        el.classList.add('show');
+        setTimeout(()=>{el.classList.remove('show');el.style.color='';},3000);
+      }
+    }
   }catch(err){console.error('CRM drop:',err);showError('Erro ao mover. Verifique a conexão.');}
 }
 
@@ -3502,7 +3564,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
     <div class="crm-sec-title">Reunião</div>
     <div class="crm-grid2" style="margin-bottom:12px">
       <div class="crm-field"><div class="crm-lbl">Data e hora</div>
-        <input class="crm-inp" type="datetime-local" id="crm_reun_dt" value="${op.reuniao_data?op.reuniao_data.slice(0,16):''}" onchange="crmAtualizarBotoesReuniao()"></div>
+        <input class="crm-inp" type="datetime-local" id="crm_reun_dt" value="${op.reuniao_data?op.reuniao_data.slice(0,16):''}" onchange="if(_crmEditId)crmRenderReunBtns(_crmEditId)"></div>
       <div class="crm-field"><div class="crm-lbl">Produto ofertado</div>
         <input class="crm-inp" id="crm_produto" value="${crmEsc(op.reuniao_produto||'')}" placeholder="ex: Mentoria JS..."></div>
     </div>
@@ -3938,7 +4000,8 @@ async function crmCriarEventoCalendar(opId){
     prod ? `Produto: ${prod}` : '',
     '',
     'Criado pelo CRM JS Mentoria'
-  ].filter(Boolean).join('\n'));
+  ].filter(Boolean).join('\
+'));
 
   const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&add=jessicasandifdm@gmail.com&sf=true&output=xml&location=Google+Meet`;
   window.open(calUrl, '_blank');
@@ -3960,19 +4023,39 @@ function crmFmtDtPT(dtStr){
 
 function crmMsgConfirmacao(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! Tudo bem? 😊\n\nPassando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\n\nJá dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\n\nLink da reunião:\n'+meet:''}\n\nQualquer dúvida, me chama aqui!`;
+  return `Oi ${pn}! Tudo bem? 😊\
+\
+Passando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\
+\
+Já dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\
+\
+Link da reunião:\
+'+meet:''}\
+\
+Qualquer dúvida, me chama aqui!`;
 }
 
 function crmMsgLembrete(nome, dt){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! 👋\n\nSó passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\n\nMal posso esperar! Te vejo amanhã 😊`;
+  return `Oi ${pn}! 👋\
+\
+Só passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\
+\
+Mal posso esperar! Te vejo amanhã 😊`;
 }
 
 function crmMsgDoDia(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
   const d = new Date(dt);
   const hora = String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0');
-  return `Oi ${pn}! Bom dia! ☀️\n\nHoje é o nosso dia! Te espero às ${hora} ✨${meet?'\n\nLink da nossa reunião:\n'+meet:''}\n\nTe vejo daqui a pouco! 😊`;
+  return `Oi ${pn}! Bom dia! ☀️\
+\
+Hoje é o nosso dia! Te espero às ${hora} ✨${meet?'\
+\
+Link da nossa reunião:\
+'+meet:''}\
+\
+Te vejo daqui a pouco! 😊`;
 }
 
 function crmWaLink(wa, msg){
@@ -3987,8 +4070,10 @@ function crmRenderReunBtns(opId){
   if(!wrap) return;
   const op = _crmOps.find(o=>o.id===opId)||{};
   const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
-  const wa = (pessoa.whatsapp||'').replace(/\D/g,'');
-  const dt = op.reuniao_data || document.getElementById('crm_reun_dt')?.value || '';
+  // FIX: lê sempre o campo atual do formulário
+  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\D/g,'');
+  const dt = document.getElementById('crm_reun_dt')?.value || op.reuniao_data || '';
+  const nomeAtual = document.getElementById('crm_nome')?.value || pessoa.nome || '';
   const meet = op.meet_link || '';
 
   // Botão Calendar
@@ -4006,9 +4091,9 @@ function crmRenderReunBtns(opId){
   let waBtns = '';
   if(wa && dt){
     const msgs = [
-      { key:'confirm', icon:'✓', label:'Confirmação',       title:'Enviar confirmação de agendamento', msg: crmMsgConfirmacao(pessoa.nome,dt,meet) },
-      { key:'lemb',    icon:'🔔', label:'Lembrete',          title:'Enviar lembrete (1 dia antes)',     msg: crmMsgLembrete(pessoa.nome,dt) },
-      { key:'dia',     icon:'📅', label:'No dia',            title:'Enviar mensagem no dia da reunião', msg: crmMsgDoDia(pessoa.nome,dt,meet) },
+      { key:'confirm', icon:'✓', label:'Confirmação',       title:'Enviar confirmação de agendamento', msg: crmMsgConfirmacao(nomeAtual,dt,meet) },
+      { key:'lemb',    icon:'🔔', label:'Lembrete',          title:'Enviar lembrete (1 dia antes)',     msg: crmMsgLembrete(nomeAtual,dt) },
+      { key:'dia',     icon:'📅', label:'No dia',            title:'Enviar mensagem no dia da reunião', msg: crmMsgDoDia(nomeAtual,dt,meet) },
     ];
     waBtns = `<div style="margin-bottom:14px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Mensagens rápidas — WhatsApp</div>
@@ -4427,3 +4512,20 @@ ensureScriptRows().then(() => loadScripts());
 </script>
 </body>
 </html>
+",
+  "headers": {
+    "access-control-allow-origin": "*",
+    "age": "127226",
+    "cache-control": "public, max-age=0, must-revalidate",
+    "content-disposition": "inline",
+    "content-encoding": "br",
+    "content-type": "text/html; charset=utf-8",
+    "date": "Thu, 27 Aug 2026 22:57:03 GMT",
+    "etag": "W/"6deb06f602c7e910700108fecdee3f2e"",
+    "last-modified": "Wed, 26 Aug 2026 11:36:36 GMT",
+    "server": "Vercel",
+    "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+    "transfer-encoding": "chunked",
+    "x-vercel-cache": "HIT",
+    "x-vercel-id": "iad1:iad1::kfqkd-1787871423340-4a5dcd91a2e2"
+  
