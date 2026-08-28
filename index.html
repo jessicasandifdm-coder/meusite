@@ -4508,8 +4508,7 @@ async function crmCriarEventoCalendar(opId){
     prod ? `Produto: ${prod}` : '',
     '',
     'Criado pelo CRM JS Mentoria'
-  ].filter(Boolean).join('\\
-'));
+  ].filter(Boolean).join('\n'));
 
   const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&add=jessicasandifdm@gmail.com&sf=true&output=xml&location=Google+Meet`;
   window.open(calUrl, '_blank');
@@ -4531,39 +4530,19 @@ function crmFmtDtPT(dtStr){
 
 function crmMsgConfirmacao(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! Tudo bem? 😊\\
-\\
-Passando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\\
-\\
-Já dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\\
-\\
-Link da reunião:\\
-'+meet:''}\\
-\\
-Qualquer dúvida, me chama aqui!`;
+  return `Oi ${pn}! Tudo bem? 😊\n\nPassando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\n\nJá dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\n\nLink da reunião:\n'+meet:''}\n\nQualquer dúvida, me chama aqui!`;
 }
 
 function crmMsgLembrete(nome, dt){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! 👋\\
-\\
-Só passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\\
-\\
-Mal posso esperar! Te vejo amanhã 😊`;
+  return `Oi ${pn}! 👋\n\nSó passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\n\nMal posso esperar! Te vejo amanhã 😊`;
 }
 
 function crmMsgDoDia(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
   const d = new Date(dt);
   const hora = String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0');
-  return `Oi ${pn}! Bom dia! ☀️\\
-\\
-Hoje é o nosso dia! Te espero às ${hora} ✨${meet?'\\
-\\
-Link da nossa reunião:\\
-'+meet:''}\\
-\\
-Te vejo daqui a pouco! 😊`;
+  return `Oi ${pn}! Bom dia! ☀️\n\nHoje é o nosso dia! Te espero às ${hora} ✨${meet?'\n\nLink da nossa reunião:\n'+meet:''}\n\nTe vejo daqui a pouco! 😊`;
 }
 
 function crmWaLink(wa, msg){
