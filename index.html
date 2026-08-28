@@ -1060,7 +1060,46 @@ button{font-family:var(--font)}
 
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
     <div><p class="page-title">Dashboard Mensal</p><p class="page-sub">Comparativo semana a semana · taxas do funil · metas vs real</p></div>
-    <div class="period-tabs" id="monthTabs"></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="period-tabs" id="monthTabs"></div>
+      <button class="btn-save" onclick="abrirModalVenda()" style="background:rgba(45,106,79,.2);border:1px solid var(--g3);color:var(--g4)">+ Registrar venda</button>
+    </div>
+  </div>
+
+  <!-- Modal registro de venda avulsa -->
+  <div id="modalVendaOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:700;align-items:center;justify-content:center">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:100%;max-width:480px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div style="font-family:var(--display);font-size:16px;font-weight:600;color:var(--text)">Registrar venda</div>
+        <button onclick="fecharModalVenda()" style="background:none;border:none;color:var(--text3);font-size:22px;cursor:pointer">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="field-group"><div class="field-label">Data da venda</div><input class="field-input" type="date" id="vd_data"></div>
+        <div class="field-group"><div class="field-label">Nome do cliente</div><input class="field-input" type="text" id="vd_cliente" placeholder="ex: Maria Silva" style="text-align:left;font-family:var(--font);font-size:13px"></div>
+        <div class="field-group"><div class="field-label">Produto / Mentoria</div><input class="field-input" type="text" id="vd_produto" placeholder="ex: Mentoria Lapidar" style="text-align:left;font-family:var(--font);font-size:13px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="field-group"><div class="field-label">Valor (R$)</div><input class="field-input" type="number" id="vd_valor" placeholder="ex: 3500"></div>
+          <div class="field-group"><div class="field-label">Canal de origem</div>
+            <select class="field-input" id="vd_canal" style="text-align:left;font-family:var(--font);cursor:pointer">
+              <option value="pc">PC / Outbound</option>
+              <option value="bv">BV Automático</option>
+              <option value="stories">Stories</option>
+              <option value="reativacao">Reativação</option>
+              <option value="followup">Follow-up</option>
+              <option value="isca">Isca</option>
+              <option value="indicacao">Indicação</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group"><div class="field-label">Observações</div><textarea class="obs-field" id="vd_obs" placeholder="Contexto, anotações..." style="min-height:48px"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn-save" onclick="salvarVendaAvulsa()" style="flex:1">Salvar venda</button>
+        <button onclick="fecharModalVenda()" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text3);font-size:13px;padding:8px 16px;cursor:pointer">Cancelar</button>
+      </div>
+      <div id="vd_status" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>
+    </div>
   </div>
 
   <!-- KPIs topo — unificado (Registro Diário + CRM) -->
@@ -1151,6 +1190,23 @@ button{font-family:var(--font)}
 
   <!-- Taxas de conversão -->
   <div id="crmConvRateBox" style="margin-bottom:16px"></div>
+
+  <!-- Vendas registradas + Pipeline em R$ -->
+  <div class="sh"><span class="sh-label">Vendas registradas no mês</span><div class="sh-line"></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+    <div class="card" style="border-color:var(--g2);background:rgba(27,67,50,.06)">
+      <div style="font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Faturamento realizado</div>
+      <div style="font-family:var(--display);font-size:28px;font-weight:700;color:var(--g4)" id="fat-realizado">—</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="fat-realizado-qtd">— vendas registradas</div>
+      <div style="margin-top:10px;max-height:120px;overflow-y:auto" id="lista-vendas-mes"></div>
+    </div>
+    <div class="card" style="border-color:var(--amber-dim);background:rgba(233,168,76,.04)">
+      <div style="font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">Em negociação (pipeline)</div>
+      <div style="font-family:var(--display);font-size:28px;font-weight:700;color:var(--amber)" id="pipeline-valor">—</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px" id="pipeline-qtd">— oportunidades abertas</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px">Soma dos valores ofertados em negociação</div>
+    </div>
+  </div>
 
   <!-- Alertas automáticos -->
   <div class="sh"><span class="sh-label">Alertas automáticos</span><div class="sh-line"></div></div>
@@ -2326,6 +2382,27 @@ async function renderMensal(){
   document.getElementById('taxa-noshow').textContent  = pct(noshow, agend);
   document.getElementById('taxa-reun').textContent    = pct(reunioes, agend);
   document.getElementById('taxa-fech').textContent    = pct(vendas, reunioes);
+
+  // ── VENDAS REGISTRADAS NO MÊS ──
+  const vendasMes = await carregarVendasMes(currentYear, currentMonth);
+  const fatTotal = vendasMes.reduce((s,v)=>s+(parseFloat(v.valor)||0),0);
+  const fatEl = document.getElementById('fat-realizado');
+  const fatQtdEl = document.getElementById('fat-realizado-qtd');
+  const listaEl = document.getElementById('lista-vendas-mes');
+  if(fatEl) fatEl.textContent = fatTotal>0 ? 'R$ '+fatTotal.toLocaleString('pt-BR') : 'R$ 0';
+  if(fatQtdEl) fatQtdEl.textContent = vendasMes.length+' venda(s) registrada(s)';
+  if(listaEl) listaEl.innerHTML = vendasMes.slice(0,5).map(v=>`
+    <div style="display:flex;justify-content:space-between;font-size:11px;padding:5px 0;border-bottom:1px solid var(--border)">
+      <span style="color:var(--text2)">${v.cliente_nome||v.canal||'—'} · ${v.data_venda?.slice(5).replace('-','/')}</span>
+      <span style="color:var(--g4);font-weight:500">R$ ${parseFloat(v.valor||0).toLocaleString('pt-BR')}</span>
+    </div>`).join('')+(vendasMes.length>5?`<div style="font-size:10px;color:var(--text3);margin-top:4px">+${vendasMes.length-5} mais...</div>`:'');
+
+  // ── PIPELINE EM R$ ──
+  const pipeline = await carregarPipelineValor();
+  const pipeEl = document.getElementById('pipeline-valor');
+  const pipeQtdEl = document.getElementById('pipeline-qtd');
+  if(pipeEl) pipeEl.textContent = pipeline.total>0 ? 'R$ '+pipeline.total.toLocaleString('pt-BR') : 'R$ 0';
+  if(pipeQtdEl) pipeQtdEl.textContent = pipeline.qtd+' oportunidade(s) em negociação';
 
   // ── SEGUIDORES DO MÊS ──
   const segNovosMes    = aggLeg.seg_novos||0;
@@ -4998,6 +5075,97 @@ async function ensureScriptRows(){
 }
 
 ensureScriptRows().then(() => loadScripts());
+
+// ══════════════════════════════════════════
+// VENDAS AVULSAS
+// ══════════════════════════════════════════
+function abrirModalVenda(){
+  const modal = document.getElementById('modalVendaOverlay');
+  document.getElementById('vd_data').value = today();
+  document.getElementById('vd_cliente').value = '';
+  document.getElementById('vd_produto').value = '';
+  document.getElementById('vd_valor').value = '';
+  document.getElementById('vd_canal').value = 'pc';
+  document.getElementById('vd_obs').value = '';
+  document.getElementById('vd_status').style.display = 'none';
+  modal.style.display = 'flex';
+}
+
+function fecharModalVenda(){
+  document.getElementById('modalVendaOverlay').style.display = 'none';
+}
+
+document.getElementById('modalVendaOverlay')?.addEventListener('click', function(e){
+  if(e.target===this) fecharModalVenda();
+});
+
+async function salvarVendaAvulsa(){
+  const valor = parseFloat(document.getElementById('vd_valor').value)||0;
+  const data  = document.getElementById('vd_data').value || today();
+  const status = document.getElementById('vd_status');
+
+  if(!valor){ showError('Informe o valor da venda.'); return; }
+
+  const venda = {
+    cliente_nome: document.getElementById('vd_cliente').value || null,
+    produto:      document.getElementById('vd_produto').value || null,
+    valor,
+    data_venda:   data,
+    canal:        document.getElementById('vd_canal').value || 'outro',
+    origem:       'manual',
+    observacoes:  document.getElementById('vd_obs').value || null,
+    status:       'aprovada',
+    quantidade:   1
+  };
+
+  if(status){ status.textContent = 'Salvando...'; status.style.color='var(--text3)'; status.style.display='block'; }
+
+  try{
+    const r = await fetch(SUPA_URL+'/rest/v1/vendas', {
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body: JSON.stringify(venda)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(status){ status.textContent='✓ Venda registrada!'; status.style.color='var(--g4)'; }
+    showSaved();
+    setTimeout(()=>{
+      fecharModalVenda();
+      renderMensal(); // atualiza o dashboard
+    }, 1000);
+  }catch(e){
+    if(status){ status.textContent='⚠ Erro ao salvar.'; status.style.color='var(--coral)'; }
+    showError('Erro ao registrar venda.');
+  }
+}
+
+async function carregarVendasMes(ano, mes){
+  const inicio = `${ano}-${String(mes+1).padStart(2,'0')}-01`;
+  const fimDate = new Date(ano, mes+1, 0);
+  const fim = fimDate.toISOString().split('T')[0];
+  try{
+    const r = await fetch(
+      SUPA_URL+'/rest/v1/vendas?data_venda=gte.'+inicio+'&data_venda=lte.'+fim+'&status=neq.cancelada&order=data_venda.desc',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    if(!r.ok) return [];
+    return await r.json();
+  }catch(e){ return []; }
+}
+
+async function carregarPipelineValor(){
+  // Buscar oportunidades em negociação com valor ofertado
+  try{
+    const r = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?status=eq.negociacao&select=id,reuniao_valor_ofertado,valor_venda',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    if(!r.ok) return {total:0, qtd:0};
+    const ops = await r.json();
+    const total = ops.reduce((s,o)=>s+(parseFloat(o.reuniao_valor_ofertado)||0),0);
+    return {total, qtd:ops.length};
+  }catch(e){ return {total:0, qtd:0}; }
+}
 
 // ── Init principal — roda após todas as definições ──
 document.getElementById('regDate').value=today();
