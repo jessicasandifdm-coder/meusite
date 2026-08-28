@@ -1,7 +1,4 @@
- "success": true,
-  "status": 200,
-  "statusText": "OK",
-  "text": "<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -3204,7 +3201,14 @@ function crmAllStatusOpts(currentPipeline, selected){
 
 function crmGid(p='x'){return p+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);}
 function crmEsc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function crmFmtDt(dt){if(!dt)return'—';const d=new Date(dt);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});}
+function crmFmtDt(dt){
+  if(!dt)return'—';
+  // Fix timezone: "2026-08-28" sem hora é tratado como UTC, vira 27/08 no GMT-3
+  // Forçar interpretação como data local adicionando T00:00 sem Z
+  const s = dt.includes('T') ? dt : dt+'T00:00:00';
+  const d = new Date(s);
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'});
+}
 function crmFmtDtHr(dt){if(!dt)return'—';const d=new Date(dt);return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});}
 
 // ── Carregar ──
@@ -3360,6 +3364,11 @@ function crmCardHtml(op){
   }
   const noshowLine = op.status==='nao_compareceu'
     ? `<div class="crm-card-noshow">⚠ No-show${op.data_no_show?' em '+crmFmtDt(op.data_no_show):''}</div>` : '';
+  const qualifLine = op.qualificacao_lead==='qualificado'
+    ? `<div style="font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--g4);margin-top:3px">✓ QUALIFICADO</div>`
+    : op.qualificacao_lead==='desqualificado'
+    ? `<div style="font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--coral);margin-top:3px">✗ DESQUALIFICADO${op.qualificacao_obs?' — '+crmEsc(op.qualificacao_obs.slice(0,30)):''}</div>`
+    : '';
   const atrasadoBorder = (op.proxima_acao && op.data_proxima_acao && op.data_proxima_acao < today())
     ? 'border-left:3px solid var(--coral);' : '';
   return `<div class="crm-card" draggable="true" style="${atrasadoBorder}"
@@ -3368,7 +3377,7 @@ function crmCardHtml(op){
     onclick="crmAbrirFicha('${op.id}')">
     <div class="crm-card-name">${crmEsc(p.nome)}</div>
     <div class="crm-card-row">${fTag}${origemLine}<span style="color:var(--text3)">${crmEsc(op.responsavel)||'—'}</span></div>
-    ${reuniaoLine}${acaoLine}${noshowLine}
+    ${reuniaoLine}${acaoLine}${noshowLine}${qualifLine}
   </div>`;
 }
 
@@ -3471,6 +3480,7 @@ async function crmAbrirFicha(opId){
   document.getElementById('crmModalOverlay').classList.add('open');
   // Renderizar botões Calendar e WA após DOM estar pronto
   setTimeout(()=>crmRenderReunBtns(opId), 0);
+  crmInitQualifStyle();
 }
 
 // ── HTML da Ficha ──
@@ -3522,6 +3532,26 @@ function crmFichaHtml(op, pessoa, eventos=[]){
         </select></div>
       <div class="crm-field"><div class="crm-lbl">Isca enviada</div>
         <input class="crm-inp" id="crm_isca" value="${crmEsc(op.isca_nome||'')}" placeholder="Nome da isca..."></div>
+    </div>
+    <div style="margin-top:10px;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2)">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;color:var(--text3)">Qualificação do lead</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);font-size:12px;color:var(--text2);transition:all .15s" id="lbl_qualif_qualificado">
+          <input type="radio" name="crm_qualificacao" id="crm_qualif_q" value="qualificado" ${(op.qualificacao_lead||'')==='qualificado'?'checked':''} onchange="crmUpdateQualifStyle()" style="accent-color:var(--g4)">
+          <span>✓ Qualificado</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);font-size:12px;color:var(--text2);transition:all .15s" id="lbl_qualif_desqualificado">
+          <input type="radio" name="crm_qualificacao" id="crm_qualif_d" value="desqualificado" ${(op.qualificacao_lead||'')==='desqualificado'?'checked':''} onchange="crmUpdateQualifStyle()" style="accent-color:var(--coral)">
+          <span>✗ Desqualificado</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);font-size:12px;color:var(--text2);transition:all .15s" id="lbl_qualif_pendente">
+          <input type="radio" name="crm_qualificacao" id="crm_qualif_p" value="" ${!(op.qualificacao_lead)?'checked':''} onchange="crmUpdateQualifStyle()" style="accent-color:var(--text3)">
+          <span>— Pendente</span>
+        </label>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px" id="crm_qualif_obs_wrap">
+        <input class="crm-inp" id="crm_qualif_obs" value="${crmEsc(op.qualificacao_obs||'')}" placeholder="Motivo da desqualificação ou observação..." style="font-size:12px;margin-top:4px;${(op.qualificacao_lead||'')==='desqualificado'?'':'display:none'}">
+      </div>
     </div>
     ${(pipeAtual==='reativacao' && op.reat_faturamento) ? `
     <div style="margin-top:14px;background:rgba(155,114,207,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
@@ -3634,12 +3664,12 @@ function crmBuscaDup(){
   if(_crmEditId) return;
   clearTimeout(_dupTimer);
   _dupTimer = setTimeout(()=>{
-    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\D/g,'');
+    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\\\D/g,'');
     const ig = (document.getElementById('crm_ig')?.value||'').toLowerCase().replace('@','');
     const av = document.getElementById('crmDupWarn');
     if(!av||(!wa&&!ig)){if(av)av.classList.remove('show');return;}
     const dup = _crmPessoas.find(p=>{
-      const pwa=(p.whatsapp||'').replace(/\\D/g,'');
+      const pwa=(p.whatsapp||'').replace(/\\\\D/g,'');
       const pig=(p.instagram||'').toLowerCase().replace('@','');
       return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
     });
@@ -3686,10 +3716,10 @@ async function crmSalvar(){
       if(!r.ok) throw new Error('Erro ao atualizar pessoa: '+r.status);
     } else {
       // Verificar duplicata
-      const waClean = wa.replace(/\\D/g,'');
+      const waClean = wa.replace(/\\\\D/g,'');
       const igClean = ig.toLowerCase().replace('@','');
       const dup = _crmPessoas.find(p=>{
-        const pwa=(p.whatsapp||'').replace(/\\D/g,'');
+        const pwa=(p.whatsapp||'').replace(/\\\\D/g,'');
         const pig=(p.instagram||'').toLowerCase().replace('@','');
         return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
       });
@@ -3742,6 +3772,8 @@ async function crmSalvar(){
       data_proxima_acao:document.getElementById('crm_prox_dt')?.value||null,
       reuniao_data:document.getElementById('crm_reun_dt')?.value||null,
       isca_nome:document.getElementById('crm_isca')?.value||'',
+      qualificacao_lead:(()=>{const q=document.querySelector('input[name="crm_qualificacao"]:checked');return q?q.value:'';})(),
+      qualificacao_obs:document.getElementById('crm_qualif_obs')?.value||'',
       reuniao_produto:document.getElementById('crm_produto')?.value||'',
       reuniao_valor_ofertado:parseFloat(document.getElementById('crm_vl_ofert')?.value)||null,
       reuniao_objecao:document.getElementById('crm_objecao')?.value||'',
@@ -4008,7 +4040,7 @@ async function crmCriarEventoCalendar(opId){
     prod ? `Produto: ${prod}` : '',
     '',
     'Criado pelo CRM JS Mentoria'
-  ].filter(Boolean).join('\
+  ].filter(Boolean).join('\\
 '));
 
   const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&add=jessicasandifdm@gmail.com&sf=true&output=xml&location=Google+Meet`;
@@ -4031,24 +4063,24 @@ function crmFmtDtPT(dtStr){
 
 function crmMsgConfirmacao(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! Tudo bem? 😊\
-\
-Passando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\
-\
-Já dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\
-\
-Link da reunião:\
-'+meet:''}\
-\
+  return `Oi ${pn}! Tudo bem? 😊\\
+\\
+Passando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\\
+\\
+Já dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\\
+\\
+Link da reunião:\\
+'+meet:''}\\
+\\
 Qualquer dúvida, me chama aqui!`;
 }
 
 function crmMsgLembrete(nome, dt){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! 👋\
-\
-Só passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\
-\
+  return `Oi ${pn}! 👋\\
+\\
+Só passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\\
+\\
 Mal posso esperar! Te vejo amanhã 😊`;
 }
 
@@ -4056,18 +4088,18 @@ function crmMsgDoDia(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
   const d = new Date(dt);
   const hora = String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0');
-  return `Oi ${pn}! Bom dia! ☀️\
-\
-Hoje é o nosso dia! Te espero às ${hora} ✨${meet?'\
-\
-Link da nossa reunião:\
-'+meet:''}\
-\
+  return `Oi ${pn}! Bom dia! ☀️\\
+\\
+Hoje é o nosso dia! Te espero às ${hora} ✨${meet?'\\
+\\
+Link da nossa reunião:\\
+'+meet:''}\\
+\\
 Te vejo daqui a pouco! 😊`;
 }
 
 function crmWaLink(wa, msg){
-  const n = (wa||'').replace(/\\D/g,'');
+  const n = (wa||'').replace(/\\\\D/g,'');
   const num = n.startsWith('55') ? n : '55'+n;
   return 'https://wa.me/'+num+'?text='+encodeURIComponent(msg);
 }
@@ -4079,7 +4111,7 @@ function crmRenderReunBtns(opId){
   const op = _crmOps.find(o=>o.id===opId)||{};
   const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
   // FIX: lê sempre o campo atual do formulário
-  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\D/g,'');
+  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\\\D/g,'');
   const dt = document.getElementById('crm_reun_dt')?.value || op.reuniao_data || '';
   const nomeAtual = document.getElementById('crm_nome')?.value || pessoa.nome || '';
   // FIX: só mostra botões WA quando o status é de agendamento
@@ -4519,6 +4551,28 @@ async function ensureScriptRows(){
 }
 
 ensureScriptRows().then(() => loadScripts());
+
+// ── Qualificação visual ──
+function crmUpdateQualifStyle(){
+  const val = document.querySelector('input[name="crm_qualificacao"]:checked')?.value||'';
+  const obsInput = document.getElementById('crm_qualif_obs');
+  const lblQ = document.getElementById('lbl_qualif_qualificado');
+  const lblD = document.getElementById('lbl_qualif_desqualificado');
+  const lblP = document.getElementById('lbl_qualif_pendente');
+  if(lblQ) lblQ.style.borderColor = val==='qualificado'?'var(--g3)':'var(--border2)';
+  if(lblQ) lblQ.style.color = val==='qualificado'?'var(--g4)':'var(--text2)';
+  if(lblQ) lblQ.style.background = val==='qualificado'?'rgba(45,106,79,.15)':'var(--surface)';
+  if(lblD) lblD.style.borderColor = val==='desqualificado'?'var(--coral)':'var(--border2)';
+  if(lblD) lblD.style.color = val==='desqualificado'?'var(--coral)':'var(--text2)';
+  if(lblD) lblD.style.background = val==='desqualificado'?'rgba(224,112,112,.1)':'var(--surface)';
+  if(lblP) lblP.style.borderColor = val===''?'var(--text3)':'var(--border2)';
+  if(obsInput) obsInput.style.display = val==='desqualificado'?'':'none';
+}
+
+// Roda ao abrir a ficha para aplicar o estilo salvo
+function crmInitQualifStyle(){
+  setTimeout(crmUpdateQualifStyle, 50);
+}
 
 </script>
 </body>
