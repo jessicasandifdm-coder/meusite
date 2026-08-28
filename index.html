@@ -2046,10 +2046,7 @@ function showSaved(){
   setTimeout(()=>el.classList.remove('show'),2000);
 }
 
-// Init registro
-document.getElementById('regDate').value=today();
-loadDay();
-loadDailyMetas();
+// Init registro — será executado após todas as definições
 
 // ══════════════════════════════════════════
 // API — COMUNICAÇÃO COM BANCO DE DADOS
@@ -5022,6 +5019,11 @@ async function ensureScriptRows(){
 }
 
 ensureScriptRows().then(() => loadScripts());
+
+// ── Init principal — roda após todas as definições ──
+document.getElementById('regDate').value=today();
+loadDay();
+loadDailyMetas();
 
 // ── Qualificação visual ──
 function crmUpdateQualifStyle(){
