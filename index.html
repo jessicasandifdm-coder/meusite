@@ -556,8 +556,7 @@ button{font-family:var(--font)}
 <div class="topbar">
   <div class="logo">JS<span>/</span>Sistema</div>
   <nav class="nav">
-    <button class="nav-btn" onclick="showTab('central')">⚡ Central</button>
-    <button class="nav-btn active" onclick="showTab('visao')">Visão Geral</button>
+    <button class="nav-btn active" onclick="showTab('central')">⚡ Central</button>
     <button class="nav-btn" onclick="showTab('crm')">CRM</button>
     <button class="nav-btn" onclick="showTab('mensal')">Dashboard Mensal</button>
     <button class="nav-btn" onclick="showTab('anual')">Dashboard Anual</button>
@@ -565,6 +564,7 @@ button{font-family:var(--font)}
     <button class="nav-btn" onclick="showTab('scripts')">Scripts</button>
     <button class="nav-btn" onclick="showTab('materiais')">Materiais</button>
     <button class="nav-btn" onclick="showTab('guia')">Guia de Uso</button>
+    <button class="nav-btn" onclick="showTab('visao')">Visão Geral</button>
   </nav>
   <div class="topbar-right">
     <span class="save-indicator" id="saveIndicator">✓ salvo</span>
@@ -580,7 +580,7 @@ button{font-family:var(--font)}
 <!-- ═══════════════════════════════════════════════ -->
 <!-- CENTRAL DE DECISÃO -->
 <!-- ═══════════════════════════════════════════════ -->
-<div class="tab-content" id="tab-central">
+<div class="tab-content active" id="tab-central">
 
   <!-- Header -->
   <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
@@ -666,7 +666,7 @@ button{font-family:var(--font)}
 
 </div>
 
-<div class="tab-content active" id="tab-visao">
+<div class="tab-content" id="tab-visao">
 
   <p class="page-title">Sistema de funis e geração de demanda</p>
   <p class="page-sub">Todos os funis têm um único objetivo final → reunião → oferta → fechamento</p>
@@ -3599,6 +3599,7 @@ function doLogin(){
     sessionStorage.setItem('js_logged','true');
     document.getElementById('loginOverlay').style.display='none';
     errEl.style.display='none';
+    renderCentral();
   } else {
     errEl.style.display='block';
     document.getElementById('loginSenha').value='';
