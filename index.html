@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema Operacional — JS Mentoria</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -284,6 +285,48 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14
 .empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px}
 
 button{font-family:var(--font)}
+/* ══════════════════════════════════════════
+   CENTRAL DE DECISÃO
+══════════════════════════════════════════ */
+.central-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;transition:border-color .2s}
+.central-kpi:hover{border-color:var(--border2)}
+.ck-val{font-family:var(--display);font-size:32px;font-weight:700;color:var(--text);line-height:1;margin-bottom:4px}
+.ck-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.ck-delta{font-size:12px;font-weight:500}
+.ck-delta.up{color:var(--g4)}
+.ck-delta.down{color:var(--coral)}
+.ck-delta.neutral{color:var(--text3)}
+
+/* Alerta central */
+.central-alert{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-radius:var(--radius-sm);font-size:12px;flex:1;min-width:200px}
+.central-alert.critico{background:rgba(224,112,112,.12);border:1px solid rgba(224,112,112,.3);color:var(--coral)}
+.central-alert.atencao{background:rgba(233,168,76,.1);border:1px solid rgba(233,168,76,.25);color:var(--amber)}
+.central-alert.positivo{background:rgba(45,106,79,.1);border:1px solid rgba(64,145,108,.2);color:var(--g4)}
+.central-alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.central-alert-txt{line-height:1.4}
+.central-alert-title{font-weight:600;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+
+/* Barra de progresso de meta */
+.meta-progress-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.meta-progress-label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.meta-progress-nums{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.meta-progress-real{font-family:var(--display);font-size:24px;font-weight:700;color:var(--text);line-height:1}
+.meta-progress-meta{font-size:12px;color:var(--text3)}
+.meta-progress-bar-track{height:8px;background:var(--surface3);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.meta-progress-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.meta-progress-footer{display:flex;justify-content:space-between;font-size:11px}
+.meta-progress-pct{font-weight:600}
+.meta-progress-falta{color:var(--text3)}
+
+/* Gargalo e melhor canal */
+.central-diagnostico-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+.central-gargalo-steps{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.central-gargalo-step{text-align:center}
+.central-gargalo-num{font-family:var(--display);font-size:20px;font-weight:700;line-height:1}
+.central-gargalo-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px}
+.central-gargalo-arrow{color:var(--border2);font-size:18px;margin-top:-8px}
+.central-gargalo-pct{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--surface2)}
+
 
 /* ── LOGIN ── */
 .login-overlay{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:0}
@@ -513,6 +556,7 @@ button{font-family:var(--font)}
 <div class="topbar">
   <div class="logo">JS<span>/</span>Sistema</div>
   <nav class="nav">
+    <button class="nav-btn" onclick="showTab('central')">⚡ Central</button>
     <button class="nav-btn active" onclick="showTab('visao')">Visão Geral</button>
     <button class="nav-btn" onclick="showTab('crm')">CRM</button>
     <button class="nav-btn" onclick="showTab('mensal')">Dashboard Mensal</button>
@@ -533,6 +577,95 @@ button{font-family:var(--font)}
 <!-- ═══════════════════════════════════════════════ -->
 <!-- VISÃO GERAL -->
 <!-- ═══════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════ -->
+<!-- CENTRAL DE DECISÃO -->
+<!-- ═══════════════════════════════════════════════ -->
+<div class="tab-content" id="tab-central">
+
+  <!-- Header -->
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <div>
+      <p class="page-title" style="font-size:28px">Central de Decisão</p>
+      <p class="page-sub" id="centralSubtitle">Painel de comando comercial — visão executiva do mês</p>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="period-tabs" id="centralMonthTabs"></div>
+      <button class="btn-save" onclick="centralRefresh()" id="centralRefreshBtn">↻ Atualizar</button>
+    </div>
+  </div>
+
+  <!-- ── NÍVEL 1: ALERTAS ── -->
+  <div id="centralAlertas" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px"></div>
+
+  <!-- ── NÍVEL 2: RESUMO — 5 KPIs principais ── -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px" id="centralKpis">
+    <div class="central-kpi" id="ck-vendas">
+      <div class="ck-val" id="ck-vendas-val">—</div>
+      <div class="ck-lbl">Vendas</div>
+      <div class="ck-delta" id="ck-vendas-delta"></div>
+    </div>
+    <div class="central-kpi" id="ck-fat">
+      <div class="ck-val" id="ck-fat-val">—</div>
+      <div class="ck-lbl">Faturamento</div>
+      <div class="ck-delta" id="ck-fat-delta"></div>
+    </div>
+    <div class="central-kpi" id="ck-reun">
+      <div class="ck-val" id="ck-reun-val">—</div>
+      <div class="ck-lbl">Reuniões realizadas</div>
+      <div class="ck-delta" id="ck-reun-delta"></div>
+    </div>
+    <div class="central-kpi" id="ck-conv">
+      <div class="ck-val" id="ck-conv-val">—</div>
+      <div class="ck-lbl">Taxa de fechamento</div>
+      <div class="ck-delta" id="ck-conv-delta"></div>
+    </div>
+    <div class="central-kpi" id="ck-noshow">
+      <div class="ck-val" id="ck-noshow-val">—</div>
+      <div class="ck-lbl">No-show</div>
+      <div class="ck-delta" id="ck-noshow-delta"></div>
+    </div>
+  </div>
+
+  <!-- ── NÍVEL 3: METAS COM PROGRESSO VISUAL ── -->
+  <div class="sh"><span class="sh-label">Metas do mês</span><div class="sh-line"></div></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px" id="centralMetas"></div>
+
+  <!-- ── NÍVEL 4: DIAGNÓSTICO ── -->
+  <div class="sh"><span class="sh-label">Diagnóstico</span><div class="sh-line"></div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+    <div id="centralGargalo" class="card"></div>
+    <div id="centralMelhorCanal" class="card"></div>
+  </div>
+
+  <!-- ── NÍVEL 5: VISÃO DO FUNIL + GRÁFICOS ── -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
+    <!-- Pizza: situação das oportunidades -->
+    <div class="card">
+      <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Situação das oportunidades</div>
+      <canvas id="centralPizzaChart" height="200"></canvas>
+    </div>
+    <!-- Barras: resultado por canal -->
+    <div class="card">
+      <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Resultado por canal</div>
+      <canvas id="centralBarrasChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- ── NÍVEL 6: EVOLUÇÃO DO MÊS ── -->
+  <div class="card" style="margin-bottom:24px">
+    <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução do mês — abordagens e reuniões por semana</div>
+    <canvas id="centralLinhaChart" height="120"></canvas>
+  </div>
+
+  <!-- ── BOTÃO: abrir análise completa ── -->
+  <div style="text-align:center;padding:8px 0 24px">
+    <button onclick="showTabByName('mensal')" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text2);font-family:var(--font);font-size:13px;font-weight:500;padding:12px 28px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--g3)';this.style.color='var(--g4)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">
+      Ver análise completa → Dashboard Mensal
+    </button>
+  </div>
+
+</div>
+
 <div class="tab-content active" id="tab-visao">
 
   <p class="page-title">Sistema de funis e geração de demanda</p>
@@ -1735,6 +1868,7 @@ function showTab(id){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   event.target.classList.add('active');
+  if(id==='central'){renderCentral();}
   if(id==='crm'){renderCRM();}
   if(id==='mensal'){renderMensal();}
   if(id==='anual'){renderAnual();}
@@ -3029,6 +3163,343 @@ async function tpSalvarManual(){
     tpFecharManual();
     renderTrafego();
   }catch(e){showError('Erro ao salvar campanha manual.');}
+}
+
+
+// ══════════════════════════════════════════
+// CENTRAL DE DECISÃO
+// ══════════════════════════════════════════
+let centralMonth = new Date().getMonth();
+let centralYear  = new Date().getFullYear();
+let _chartPizza  = null;
+let _chartBarras = null;
+let _chartLinha  = null;
+
+async function renderCentral(){
+  // Month tabs
+  const tabs = document.getElementById('centralMonthTabs');
+  if(tabs){
+    tabs.innerHTML = '';
+    MONTHS_PT.forEach((m,i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'period-tab'+(i===centralMonth?' active':'');
+      btn.textContent = m;
+      btn.onclick = ()=>{ centralMonth=i; renderCentral(); };
+      tabs.appendChild(btn);
+    });
+  }
+  const sub = document.getElementById('centralSubtitle');
+  if(sub) sub.textContent = `Painel de comando — ${MONTHS_PT[centralMonth]}/${centralYear}`;
+
+  // Carregar dados
+  const allDays = await getAllDaysAsync(centralYear);
+  const monthDays = allDays.filter(d=>{
+    const [y,m] = d._date.split('-').map(Number);
+    return y===centralYear && m-1===centralMonth;
+  });
+  const agg = aggregateDays(monthDays);
+
+  // Dados do mês anterior para comparação
+  const prevMonth = centralMonth===0 ? 11 : centralMonth-1;
+  const prevYear  = centralMonth===0 ? centralYear-1 : centralYear;
+  const prevDays  = allDays.filter(d=>{
+    const [y,m] = d._date.split('-').map(Number);
+    return y===prevYear && m-1===prevMonth;
+  });
+  const prevAgg = aggregateDays(prevDays);
+
+  // Dados CRM
+  let crmD = {abord:0,agend:0,noshow:0,ganho:0,fat_ganho:0,ops:0};
+  try{ crmD = await crmBuscarDadosMes(centralYear, centralMonth); }catch(e){}
+
+  // Metas
+  let metasData = {};
+  try{
+    const mr = await apiGet({action:'get_metas',ano:centralYear,mes:centralMonth});
+    metasData = mr.dados||{};
+  }catch(e){}
+
+  // Valores consolidados
+  const vendas   = (agg.vendas||0) + (crmD.ganho||0);
+  const fat      = (agg.valor||0)  + (crmD.fat_ganho||0);
+  const agend    = (agg.agendadas||0) + (crmD.agend||0);
+  const reunioes = (agg.reunioes||0)  + (crmD.agend||0);
+  const noshow   = Math.max(0,(agg.agendadas||0)-(agg.reunioes||0)) + (crmD.noshow||0);
+  const abord    = (agg.abord||0) + (crmD.abord||0);
+  const taxaFech = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
+  const taxaNS   = agend>0   ? Math.round(noshow/agend*100)    : 0;
+
+  const prevVendas   = (prevAgg.vendas||0);
+  const prevFat      = (prevAgg.valor||0);
+  const prevReun     = (prevAgg.reunioes||0);
+  const prevTaxaFech = prevReun>0 ? Math.round(prevVendas/prevReun*100) : 0;
+
+  // ── KPIs ──
+  function setKpi(id, val, prev, isMoney, isBad){
+    const el  = document.getElementById('ck-'+id+'-val');
+    const del = document.getElementById('ck-'+id+'-delta');
+    if(el) el.textContent = isMoney ? (val>0?'R$ '+val.toLocaleString('pt-BR'):'—') : (val||'0');
+    if(del && prev!==null){
+      const diff = val - prev;
+      const pct  = prev>0 ? Math.round(diff/prev*100) : 0;
+      const up   = isBad ? diff<0 : diff>0;
+      const cls  = diff===0?'neutral':up?'up':'down';
+      const sign = diff>0?'+':'';
+      del.className = 'ck-delta '+cls;
+      del.textContent = diff!==0 ? `${sign}${isMoney?'R$ '+Math.abs(diff).toLocaleString('pt-BR'):diff} (${sign}${pct}% vs mês ant.)` : '= mês anterior';
+    }
+  }
+
+  setKpi('vendas',  vendas,     prevVendas,    false, false);
+  setKpi('fat',     fat,        prevFat,       true,  false);
+  setKpi('reun',    reunioes,   prevReun,      false, false);
+  setKpi('conv',    taxaFech+'%', prevTaxaFech+'%', false, false);
+  setKpi('noshow',  taxaNS+'%', null,          false, true);
+
+  // Cores dos cards KPI
+  const kpiColors = [
+    {id:'ck-vendas', borderColor:'var(--g2)', bg:'rgba(27,67,50,.08)', valColor:'var(--g4)'},
+    {id:'ck-fat',    borderColor:'var(--g2)', bg:'rgba(27,67,50,.08)', valColor:'var(--g4)'},
+    {id:'ck-reun',   borderColor:'', bg:'', valColor:''},
+    {id:'ck-conv',   borderColor:'var(--purple-dim)', bg:'rgba(155,114,207,.06)', valColor:'var(--purple)'},
+    {id:'ck-noshow', borderColor:'var(--coral-dim)', bg:'rgba(224,112,112,.06)', valColor:'var(--coral)'},
+  ];
+  kpiColors.forEach(k=>{
+    const el = document.getElementById(k.id);
+    if(el&&k.borderColor){ el.style.borderColor=k.borderColor; el.style.background=k.bg; }
+    const val = document.getElementById(k.id+'-val');
+    if(val&&k.valColor) val.style.color=k.valColor;
+  });
+
+  // ── ALERTAS ──
+  const alertasEl = document.getElementById('centralAlertas');
+  const alertas = [];
+  if(abord>0){
+    const taxaAgend = abord>0 ? agend/abord : 0;
+    if(taxaAgend<0.03 && abord>20) alertas.push({tipo:'critico', titulo:'Gargalo crítico', txt:`Só ${pct(agend,abord)} das abordagens chegam a reunião. Volume adequado mas conversão muito baixa.`});
+    else if(taxaAgend<0.06 && abord>10) alertas.push({tipo:'atencao', titulo:'Atenção: poucas reuniões', txt:`Taxa abordagem→reunião em ${pct(agend,abord)}. Revisar qualificação e abordagem.`});
+    if(taxaNS>=30) alertas.push({tipo:'critico', titulo:`No-show elevado: ${taxaNS}%`, txt:'Mais de 30% das reuniões agendadas não acontecem. Reforçar pré-aquecimento.'});
+    else if(taxaNS>=15) alertas.push({tipo:'atencao', titulo:`No-show: ${taxaNS}%`, txt:'Acompanhar comparecimento. Enviar lembrete no dia anterior e no dia.'});
+    if(taxaFech>=25) alertas.push({tipo:'positivo', titulo:'Fechamento saudável', txt:`${taxaFech}% das reuniões viram venda. Funil funcionando bem.`});
+    if(vendas>prevVendas && prevVendas>0) alertas.push({tipo:'positivo', titulo:'Crescimento nas vendas', txt:`+${vendas-prevVendas} venda(s) vs mês anterior.`});
+    if(metasData.vendas && vendas>=parseFloat(metasData.vendas)) alertas.push({tipo:'positivo', titulo:'Meta de vendas atingida!', txt:`${vendas} de ${metasData.vendas} vendas — parabéns!`});
+  }
+  if(!alertas.length) alertas.push({tipo:'atencao', titulo:'Sem dados suficientes', txt:'Preencha o Registro Diário e o CRM para ativar os alertas automáticos.'});
+
+  alertasEl.innerHTML = alertas.slice(0,4).map(a=>`
+    <div class="central-alert ${a.tipo}">
+      <div class="central-alert-icon">${a.tipo==='critico'?'🔴':a.tipo==='atencao'?'🟡':'🟢'}</div>
+      <div class="central-alert-txt">
+        <div class="central-alert-title">${a.titulo}</div>
+        <div>${a.txt}</div>
+      </div>
+    </div>`).join('');
+
+  // ── METAS COM BARRA DE PROGRESSO ──
+  const metasEl = document.getElementById('centralMetas');
+  function metaCard(label, meta, real, isMoney){
+    if(!meta) return `<div class="meta-progress-card">
+      <div class="meta-progress-label">${label}</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:8px">Meta não definida</div>
+      <button onclick="showTabByName('mensal')" style="font-size:11px;color:var(--g4);background:none;border:none;cursor:pointer;margin-top:8px;padding:0;font-family:var(--font)">→ Definir meta</button>
+    </div>`;
+    const pctVal = Math.min(Math.round(real/meta*100),100);
+    const falta  = Math.max(0, meta-real);
+    const color  = pctVal>=100?'var(--g4)':pctVal>=60?'var(--amber)':'var(--coral)';
+    return `<div class="meta-progress-card">
+      <div class="meta-progress-label">${label}</div>
+      <div class="meta-progress-nums">
+        <span class="meta-progress-real" style="color:${color}">${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</span>
+        <span class="meta-progress-meta">/ ${isMoney?'R$ '+parseFloat(meta).toLocaleString('pt-BR'):meta}</span>
+      </div>
+      <div class="meta-progress-bar-track">
+        <div class="meta-progress-bar-fill" style="width:${pctVal}%;background:${color}"></div>
+      </div>
+      <div class="meta-progress-footer">
+        <span class="meta-progress-pct" style="color:${color}">${pctVal}%</span>
+        <span class="meta-progress-falta">${falta>0?(isMoney?'Falta R$ '+falta.toLocaleString('pt-BR'):'Faltam '+falta):'✓ Atingido'}</span>
+      </div>
+    </div>`;
+  }
+  metasEl.innerHTML =
+    metaCard('Abordagens',  metasData.abord,  abord,    false) +
+    metaCard('Reuniões',    metasData.reun,   reunioes, false) +
+    metaCard('Vendas',      metasData.vendas, vendas,   false) +
+    metaCard('Faturamento', metasData.fat,    fat,      true);
+
+  // ── DIAGNÓSTICO: GARGALO ──
+  const gargaloEl = document.getElementById('centralGargalo');
+  const resp = agg.resp||0;
+  const conv = agg.convites||0;
+  // Identificar qual etapa tem maior queda
+  const taxas = [
+    {de:'Abord.',  ate:'Respostas', num:abord, den:abord, val:resp,  t:abord>0?resp/abord:0},
+    {de:'Respostas',ate:'Convites', num:resp,  den:resp,  val:conv,  t:resp>0?conv/resp:0},
+    {de:'Convites', ate:'Agend.',   num:conv,  den:conv,  val:agend, t:conv>0?agend/conv:0},
+    {de:'Agend.',   ate:'Reun.',    num:agend, den:agend, val:reunioes, t:agend>0?reunioes/agend:0},
+    {de:'Reun.',    ate:'Vendas',   num:reunioes, den:reunioes, val:vendas, t:reunioes>0?vendas/reunioes:0},
+  ];
+  const gargalo = taxas.filter(t=>t.num>0).reduce((min,t)=>t.t<min.t?t:min, {t:1,de:'—',ate:'—',num:0,val:0});
+  if(gargaloEl) gargaloEl.innerHTML = `
+    <div class="central-diagnostico-title" style="color:var(--coral)">🔴 Principal gargalo</div>
+    <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px">${gargalo.de} → ${gargalo.ate}</div>
+    <div class="central-gargalo-steps">
+      ${taxas.filter(t=>t.num>0).map((t,i)=>`
+        ${i>0?'<div class="central-gargalo-arrow">→</div>':''}
+        <div class="central-gargalo-step">
+          <div class="central-gargalo-num" style="color:${t===gargalo?'var(--coral)':'var(--text)'}">${t.val}</div>
+          <div class="central-gargalo-lbl">${t.ate}</div>
+          <div class="central-gargalo-pct" style="color:${t===gargalo?'var(--coral)':t.t>=0.3?'var(--g4)':'var(--amber)'}">${Math.round(t.t*100)}%</div>
+        </div>`).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--text3);line-height:1.5;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
+      ${gargalo.de==='Abord.'?'Volume de respostas baixo — revisar script e critério de seleção dos perfis.':
+        gargalo.de==='Respostas'?'Poucas respostas viram convite — treinar condução da conversa.':
+        gargalo.de==='Convites'?'Convites não viram agendamentos — verificar fit do lead.':
+        gargalo.de==='Agend.'?'Muitas reuniões não acontecem — reforçar pré-aquecimento.':
+        'Reuniões sem fechamento — revisar oferta e diagnóstico.'}
+    </div>`;
+
+  // ── DIAGNÓSTICO: MELHOR CANAL ──
+  const canais = [
+    {nome:'PC / Outbound',  vend:agg.pc?.vend||0, reun:agg.pc?.reun||0},
+    {nome:'BV',             vend:agg.bv?.vend||0, reun:agg.bv?.reun||0},
+    {nome:'Stories',        vend:agg.st?.vend||0, reun:agg.st?.reun||0},
+    {nome:'Follow-up',      vend:agg.fu?.vend||0, reun:agg.fu?.reun||0},
+    {nome:'Reativação',     vend:agg.re?.vend||0, reun:agg.re?.reun||0},
+    {nome:'Isca',           vend:agg.is?.vend||0, reun:agg.is?.reun||0},
+  ].filter(c=>c.reun>0);
+
+  const melhorCanal = canais.length ? canais.reduce((best,c)=>{
+    const t = c.reun>0?c.vend/c.reun:0;
+    const bt = best.reun>0?best.vend/best.reun:0;
+    return t>bt?c:best;
+  }, canais[0]) : null;
+
+  const melhorEl = document.getElementById('centralMelhorCanal');
+  if(melhorEl) melhorEl.innerHTML = melhorCanal ? `
+    <div class="central-diagnostico-title" style="color:var(--g4)">🏆 Melhor canal do mês</div>
+    <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--g4);margin-bottom:12px">${melhorCanal.nome}</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text3)">Reuniões realizadas</span><span style="font-weight:600;color:var(--text)">${melhorCanal.reun}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text3)">Vendas geradas</span><span style="font-weight:600;color:var(--g4)">${melhorCanal.vend}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text3)">Taxa de fechamento</span><span style="font-weight:600;color:var(--g4)">${Math.round(melhorCanal.vend/melhorCanal.reun*100)}%</span></div>
+    </div>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">Considere aumentar o volume neste funil para escalar o resultado.</div>
+  ` : `<div class="central-diagnostico-title" style="color:var(--g4)">🏆 Melhor canal</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:8px">Sem dados suficientes ainda neste mês.</div>`;
+
+  // ── GRÁFICO PIZZA: situação das oportunidades ──
+  // Buscar ops do mês via CRM
+  let opsStatus = {agendado:0, nao_compareceu:0, negociacao:0, ganho:0, perdido:0, outros:0};
+  try{
+    const inicio = `${centralYear}-${String(centralMonth+1).padStart(2,'0')}-01`;
+    const fimDate = new Date(centralYear, centralMonth+1, 0);
+    const fim = fimDate.toISOString().split('T')[0];
+    const r = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim+'&select=status',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if(r.ok){
+      const ops = await r.json();
+      ops.forEach(o=>{
+        if(o.status==='agendado') opsStatus.agendado++;
+        else if(o.status==='nao_compareceu') opsStatus.nao_compareceu++;
+        else if(o.status==='negociacao') opsStatus.negociacao++;
+        else if(o.status==='ganho') opsStatus.ganho++;
+        else if(o.status==='perdido') opsStatus.perdido++;
+        else opsStatus.outros++;
+      });
+    }
+  }catch(e){}
+
+  const pizzaCtx = document.getElementById('centralPizzaChart');
+  if(pizzaCtx){
+    if(_chartPizza) _chartPizza.destroy();
+    _chartPizza = new Chart(pizzaCtx, {
+      type:'doughnut',
+      data:{
+        labels:['Agendado','No-show','Negociação','Ganho','Perdido','Outros'],
+        datasets:[{
+          data:[opsStatus.agendado, opsStatus.nao_compareceu, opsStatus.negociacao, opsStatus.ganho, opsStatus.perdido, opsStatus.outros],
+          backgroundColor:['#9b72cf','#e07070','#e9a84c','#74c69d','#435744','#253022'],
+          borderColor:'#111510', borderWidth:2
+        }]
+      },
+      options:{
+        responsive:true, plugins:{
+          legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:12}},
+          tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} leads`}}
+        }
+      }
+    });
+  }
+
+  // ── GRÁFICO BARRAS: resultado por canal ──
+  const barrasCtx = document.getElementById('centralBarrasChart');
+  const canalNomes = ['PC','BV','Stories','Follow-up','Reativação','Isca'];
+  const canalVendas = [agg.pc?.vend||0, agg.bv?.vend||0, agg.st?.vend||0, agg.fu?.vend||0, agg.re?.vend||0, agg.is?.vend||0];
+  const canalReun   = [agg.pc?.reun||0, agg.bv?.reun||0, agg.st?.reun||0, agg.fu?.reun||0, agg.re?.reun||0, agg.is?.reun||0];
+  if(barrasCtx){
+    if(_chartBarras) _chartBarras.destroy();
+    _chartBarras = new Chart(barrasCtx, {
+      type:'bar',
+      data:{
+        labels:canalNomes,
+        datasets:[
+          {label:'Reuniões',data:canalReun,backgroundColor:'rgba(77,184,200,.35)',borderColor:'#4db8c8',borderWidth:1,borderRadius:4},
+          {label:'Vendas',  data:canalVendas,backgroundColor:'rgba(116,198,157,.6)',borderColor:'#74c69d',borderWidth:1,borderRadius:4}
+        ]
+      },
+      options:{
+        responsive:true,
+        scales:{
+          x:{ticks:{color:'#7a9b7e',font:{size:11}},grid:{color:'#253022'}},
+          y:{ticks:{color:'#7a9b7e',font:{size:11},stepSize:1},grid:{color:'#253022'},beginAtZero:true}
+        },
+        plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:12}}}
+      }
+    });
+  }
+
+  // ── GRÁFICO LINHA: evolução por semana ──
+  const linhaCtx = document.getElementById('centralLinhaChart');
+  const semanas = {1:[],2:[],3:[],4:[],5:[]};
+  monthDays.forEach(d=>{
+    const dayNum = parseInt(d._date.split('-')[2]);
+    const wk = Math.min(Math.ceil(dayNum/7),5);
+    semanas[wk].push(d);
+  });
+  const semLabels = ['S1','S2','S3','S4','S5'];
+  const semAbord  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).abord||0);
+  const semReun   = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).reunioes||0);
+  if(linhaCtx){
+    if(_chartLinha) _chartLinha.destroy();
+    _chartLinha = new Chart(linhaCtx, {
+      type:'line',
+      data:{
+        labels:semLabels,
+        datasets:[
+          {label:'Abordagens',data:semAbord,borderColor:'#4db8c8',backgroundColor:'rgba(77,184,200,.08)',fill:true,tension:.4,pointBackgroundColor:'#4db8c8',pointRadius:4},
+          {label:'Reuniões',  data:semReun, borderColor:'#74c69d',backgroundColor:'rgba(116,198,157,.08)',fill:true,tension:.4,pointBackgroundColor:'#74c69d',pointRadius:4}
+        ]
+      },
+      options:{
+        responsive:true,
+        scales:{
+          x:{ticks:{color:'#7a9b7e',font:{size:11}},grid:{color:'#253022'}},
+          y:{ticks:{color:'#7a9b7e',font:{size:11},stepSize:1},grid:{color:'#253022'},beginAtZero:true}
+        },
+        plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:12}}}
+      }
+    });
+  }
+}
+
+async function centralRefresh(){
+  const btn = document.getElementById('centralRefreshBtn');
+  if(btn){btn.textContent='↻ Atualizando...';btn.disabled=true;}
+  invalidateCache();
+  await renderCentral();
+  if(btn){btn.textContent='↻ Atualizar';btn.disabled=false;}
 }
 
 // ══════════════════════════════════════════
