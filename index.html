@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+{
+  "success": true,
+  "status": 200,
+  "statusText": "OK",
+  "text": "<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -3342,7 +3346,9 @@ function crmCardHtml(op){
   const fTag = `<span class="crm-card-tag ${op.funil}">${CRM_FUNIL_LABELS[op.funil]||op.funil}</span>`;
   const origemLine = op.pipeline_origem
     ? `<span class="crm-card-tag" style="color:var(--text3)">via ${CRM_PIPELINES[op.pipeline_origem]?.label||op.pipeline_origem}</span>` : '';
-  const reuniaoLine = op.reuniao_data
+  // Só mostra a data da reunião se ainda está em status de agendamento
+  const mostrarReuniao = ['agendado','nao_compareceu'].includes(op.status);
+  const reuniaoLine = (op.reuniao_data && mostrarReuniao)
     ? `<div class="crm-card-reuniao">📅 ${crmFmtDtHr(op.reuniao_data)}</div>` : '';
   // FIX: mostra data_proxima_acao (data agendada) + alerta de atraso em vermelho
   let acaoLine = '';
@@ -3509,7 +3515,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       <div class="crm-field"><div class="crm-lbl">Origem</div>
         <select class="crm-sel" id="crm_origem">${origemOpts}</select></div>
       <div class="crm-field"><div class="crm-lbl">Status</div>
-        <select class="crm-sel" id="crm_status">${crmAllStatusOpts(pipeAtual, op.status||'')}</select></div>
+        <select class="crm-sel" id="crm_status" onchange="if(_crmEditId)crmRenderReunBtns(_crmEditId)">${crmAllStatusOpts(pipeAtual, op.status||'')}</select></div>
       <div class="crm-field"><div class="crm-lbl">Responsável</div>
         <select class="crm-sel" id="crm_resp">
           <option value="Amanda" ${(op.responsavel||'Amanda')==='Amanda'?'selected':''}>Amanda</option>
@@ -3629,12 +3635,12 @@ function crmBuscaDup(){
   if(_crmEditId) return;
   clearTimeout(_dupTimer);
   _dupTimer = setTimeout(()=>{
-    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\D/g,'');
+    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\D/g,'');
     const ig = (document.getElementById('crm_ig')?.value||'').toLowerCase().replace('@','');
     const av = document.getElementById('crmDupWarn');
     if(!av||(!wa&&!ig)){if(av)av.classList.remove('show');return;}
     const dup = _crmPessoas.find(p=>{
-      const pwa=(p.whatsapp||'').replace(/\D/g,'');
+      const pwa=(p.whatsapp||'').replace(/\\D/g,'');
       const pig=(p.instagram||'').toLowerCase().replace('@','');
       return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
     });
@@ -3681,10 +3687,10 @@ async function crmSalvar(){
       if(!r.ok) throw new Error('Erro ao atualizar pessoa: '+r.status);
     } else {
       // Verificar duplicata
-      const waClean = wa.replace(/\D/g,'');
+      const waClean = wa.replace(/\\D/g,'');
       const igClean = ig.toLowerCase().replace('@','');
       const dup = _crmPessoas.find(p=>{
-        const pwa=(p.whatsapp||'').replace(/\D/g,'');
+        const pwa=(p.whatsapp||'').replace(/\\D/g,'');
         const pig=(p.instagram||'').toLowerCase().replace('@','');
         return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
       });
@@ -4062,7 +4068,7 @@ Te vejo daqui a pouco! 😊`;
 }
 
 function crmWaLink(wa, msg){
-  const n = (wa||'').replace(/\D/g,'');
+  const n = (wa||'').replace(/\\D/g,'');
   const num = n.startsWith('55') ? n : '55'+n;
   return 'https://wa.me/'+num+'?text='+encodeURIComponent(msg);
 }
@@ -4074,9 +4080,12 @@ function crmRenderReunBtns(opId){
   const op = _crmOps.find(o=>o.id===opId)||{};
   const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
   // FIX: lê sempre o campo atual do formulário
-  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\D/g,'');
+  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\D/g,'');
   const dt = document.getElementById('crm_reun_dt')?.value || op.reuniao_data || '';
   const nomeAtual = document.getElementById('crm_nome')?.value || pessoa.nome || '';
+  // FIX: só mostra botões WA quando o status é de agendamento
+  const statusAtual = document.getElementById('crm_status')?.value || op.status || '';
+  const mostrarWA = ['agendado','nao_compareceu'].includes(statusAtual);
   const meet = op.meet_link || '';
 
   // Botão Calendar
@@ -4092,7 +4101,7 @@ function crmRenderReunBtns(opId){
 
   // Botões WhatsApp
   let waBtns = '';
-  if(wa && dt){
+  if(wa && dt && mostrarWA){
     const msgs = [
       { key:'confirm', icon:'✓', label:'Confirmação',       title:'Enviar confirmação de agendamento', msg: crmMsgConfirmacao(nomeAtual,dt,meet) },
       { key:'lemb',    icon:'🔔', label:'Lembrete',          title:'Enviar lembrete (1 dia antes)',     msg: crmMsgLembrete(nomeAtual,dt) },
