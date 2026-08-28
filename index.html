@@ -3250,6 +3250,12 @@ let _chartBarras = null;
 let _chartLinha  = null;
 
 async function renderCentral(){
+  // Mostrar loading enquanto carrega
+  const container = document.getElementById('tab-central');
+  if(container && !container.querySelector('#centralKpis').children.length){
+    document.getElementById('centralAlertas').innerHTML = '<div class="central-alert atencao" style="width:100%"><div class="central-alert-icon">⏳</div><div class="central-alert-txt"><div class="central-alert-title">Carregando</div><div>Buscando dados do mês...</div></div></div>';
+  }
+
   // Month tabs
   const tabs = document.getElementById('centralMonthTabs');
   if(tabs){
@@ -3265,8 +3271,9 @@ async function renderCentral(){
   const sub = document.getElementById('centralSubtitle');
   if(sub) sub.textContent = `Painel de comando — ${MONTHS_PT[centralMonth]}/${centralYear}`;
 
-  // Carregar dados
-  const allDays = await getAllDaysAsync(centralYear);
+  // Carregar dados — com proteção contra erro
+  let allDays = [];
+  try{ allDays = await getAllDaysAsync(centralYear); }catch(e){ allDays = []; }
   const monthDays = allDays.filter(d=>{
     const [y,m] = d._date.split('-').map(Number);
     return y===centralYear && m-1===centralMonth;
@@ -3282,9 +3289,9 @@ async function renderCentral(){
   });
   const prevAgg = aggregateDays(prevDays);
 
-  // Dados CRM
-  let crmD = {abord:0,agend:0,noshow:0,ganho:0,fat_ganho:0,ops:0};
-  try{ crmD = await crmBuscarDadosMes(centralYear, centralMonth); }catch(e){}
+  // Dados CRM — com proteção
+  let crmD = {abord:0,agend:0,noshow:0,ganho:0,fat_ganho:0,ops:0,bv_total:0,bv_qualif:0};
+  try{ crmD = await crmBuscarDadosMes(centralYear, centralMonth); }catch(e){ console.warn('CRM central:', e); }
 
   // Metas
   let metasData = {};
@@ -3587,6 +3594,8 @@ function checkSession(){
   const s = sessionStorage.getItem('js_logged');
   if(s === 'true'){
     document.getElementById('loginOverlay').style.display = 'none';
+    // Renderizar Central ao voltar ao sistema (já logado)
+    setTimeout(()=>renderCentral(), 100);
   }
 }
 
@@ -3599,7 +3608,8 @@ function doLogin(){
     sessionStorage.setItem('js_logged','true');
     document.getElementById('loginOverlay').style.display='none';
     errEl.style.display='none';
-    renderCentral();
+    // Pequeno delay para garantir DOM pronto antes de renderizar
+    setTimeout(()=>renderCentral(), 50);
   } else {
     errEl.style.display='block';
     document.getElementById('loginSenha').value='';
@@ -4210,12 +4220,12 @@ function crmBuscaDup(){
   if(_crmEditId) return;
   clearTimeout(_dupTimer);
   _dupTimer = setTimeout(()=>{
-    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\\\D/g,'');
+    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\\\\\\\D/g,'');
     const ig = (document.getElementById('crm_ig')?.value||'').toLowerCase().replace('@','');
     const av = document.getElementById('crmDupWarn');
     if(!av||(!wa&&!ig)){if(av)av.classList.remove('show');return;}
     const dup = _crmPessoas.find(p=>{
-      const pwa=(p.whatsapp||'').replace(/\\\\D/g,'');
+      const pwa=(p.whatsapp||'').replace(/\\\\\\\\D/g,'');
       const pig=(p.instagram||'').toLowerCase().replace('@','');
       return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
     });
@@ -4262,10 +4272,10 @@ async function crmSalvar(){
       if(!r.ok) throw new Error('Erro ao atualizar pessoa: '+r.status);
     } else {
       // Verificar duplicata
-      const waClean = wa.replace(/\\\\D/g,'');
+      const waClean = wa.replace(/\\\\\\\\D/g,'');
       const igClean = ig.toLowerCase().replace('@','');
       const dup = _crmPessoas.find(p=>{
-        const pwa=(p.whatsapp||'').replace(/\\\\D/g,'');
+        const pwa=(p.whatsapp||'').replace(/\\\\\\\\D/g,'');
         const pig=(p.instagram||'').toLowerCase().replace('@','');
         return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
       });
@@ -4318,7 +4328,7 @@ async function crmSalvar(){
       data_proxima_acao:document.getElementById('crm_prox_dt')?.value||null,
       reuniao_data:document.getElementById('crm_reun_dt')?.value||null,
       isca_nome:document.getElementById('crm_isca')?.value||'',
-      qualificacao_lead:(()=>{const q=document.querySelector('input[name="crm_qualificacao"]:checked');return q?q.value:'';})(),
+      qualificacao_lead:(()=>{const q=document.querySelector('input[name="crm_qualificacao"]:checked');return q&&q.value?q.value:'';})(),
       qualificacao_obs:document.getElementById('crm_qualif_obs')?.value||'',
       reuniao_produto:document.getElementById('crm_produto')?.value||'',
       reuniao_valor_ofertado:parseFloat(document.getElementById('crm_vl_ofert')?.value)||null,
@@ -4586,7 +4596,8 @@ async function crmCriarEventoCalendar(opId){
     prod ? `Produto: ${prod}` : '',
     '',
     'Criado pelo CRM JS Mentoria'
-  ].filter(Boolean).join('\n'));
+  ].filter(Boolean).join('\
+'));
 
   const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&add=jessicasandifdm@gmail.com&sf=true&output=xml&location=Google+Meet`;
   window.open(calUrl, '_blank');
@@ -4608,23 +4619,43 @@ function crmFmtDtPT(dtStr){
 
 function crmMsgConfirmacao(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! Tudo bem? 😊\n\nPassando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\n\nJá dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\n\nLink da reunião:\n'+meet:''}\n\nQualquer dúvida, me chama aqui!`;
+  return `Oi ${pn}! Tudo bem? 😊\
+\
+Passando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\
+\
+Já dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\
+\
+Link da reunião:\
+'+meet:''}\
+\
+Qualquer dúvida, me chama aqui!`;
 }
 
 function crmMsgLembrete(nome, dt){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! 👋\n\nSó passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\n\nMal posso esperar! Te vejo amanhã 😊`;
+  return `Oi ${pn}! 👋\
+\
+Só passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\
+\
+Mal posso esperar! Te vejo amanhã 😊`;
 }
 
 function crmMsgDoDia(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
   const d = new Date(dt);
   const hora = String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0');
-  return `Oi ${pn}! Bom dia! ☀️\n\nHoje é o nosso dia! Te espero às ${hora} ✨${meet?'\n\nLink da nossa reunião:\n'+meet:''}\n\nTe vejo daqui a pouco! 😊`;
+  return `Oi ${pn}! Bom dia! ☀️\
+\
+Hoje é o nosso dia! Te espero às ${hora} ✨${meet?'\
+\
+Link da nossa reunião:\
+'+meet:''}\
+\
+Te vejo daqui a pouco! 😊`;
 }
 
 function crmWaLink(wa, msg){
-  const n = (wa||'').replace(/\\\\D/g,'');
+  const n = (wa||'').replace(/\\\\\\\\D/g,'');
   const num = n.startsWith('55') ? n : '55'+n;
   return 'https://wa.me/'+num+'?text='+encodeURIComponent(msg);
 }
@@ -4636,7 +4667,7 @@ function crmRenderReunBtns(opId){
   const op = _crmOps.find(o=>o.id===opId)||{};
   const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
   // FIX: lê sempre o campo atual do formulário
-  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\\\D/g,'');
+  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\\\\\\\D/g,'');
   const dt = document.getElementById('crm_reun_dt')?.value || op.reuniao_data || '';
   const nomeAtual = document.getElementById('crm_nome')?.value || pessoa.nome || '';
   // FIX: só mostra botões WA quando o status é de agendamento
