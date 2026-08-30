@@ -4313,12 +4313,12 @@ function crmBuscaDup(){
   if(_crmEditId) return;
   clearTimeout(_dupTimer);
   _dupTimer = setTimeout(()=>{
-    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
+    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\D/g,'');
     const ig = (document.getElementById('crm_ig')?.value||'').toLowerCase().replace('@','');
     const av = document.getElementById('crmDupWarn');
     if(!av||(!wa&&!ig)){if(av)av.classList.remove('show');return;}
     const dup = _crmPessoas.find(p=>{
-      const pwa=(p.whatsapp||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
+      const pwa=(p.whatsapp||'').replace(/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\D/g,'');
       const pig=(p.instagram||'').toLowerCase().replace('@','');
       return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
     });
@@ -4365,10 +4365,10 @@ async function crmSalvar(){
       if(!r.ok) throw new Error('Erro ao atualizar pessoa: '+r.status);
     } else {
       // Verificar duplicata
-      const waClean = wa.replace(/\\\\\\\\\\\\\\\\D/g,'');
+      const waClean = wa.replace(/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\D/g,'');
       const igClean = ig.toLowerCase().replace('@','');
       const dup = _crmPessoas.find(p=>{
-        const pwa=(p.whatsapp||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
+        const pwa=(p.whatsapp||'').replace(/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\D/g,'');
         const pig=(p.instagram||'').toLowerCase().replace('@','');
         return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
       });
@@ -4543,7 +4543,7 @@ async function crmExcluirLeadCompleto(){
   const pessoa = _crmPessoas.find(p=>p.id===pessoaId);
   const nome = pessoa?.nome || 'este lead';
 
-  if(!confirm(`Excluir "${nome}" completamente?\n\nIsso vai remover:\n• A pessoa\n• Todas as oportunidades dela\n• Todo o histórico\n\nEssa ação não pode ser desfeita.`)) return;
+  if(!confirm('Excluir "'+nome+'" completamente?\n\nIsso vai remover:\n• A pessoa\n• Todas as oportunidades dela\n• Todo o histórico\n\nEssa ação não pode ser desfeita.')) return;
 
   try{
     // Buscar todas as oportunidades da pessoa
@@ -4551,8 +4551,12 @@ async function crmExcluirLeadCompleto(){
       {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
     const ops = rOps.ok ? await rOps.json() : [];
 
-    // Excluir eventos de cada oportunidade
+    // Excluir eventos e formulários de cada oportunidade
     for(const o of ops){
+      await fetch(SUPA_URL+'/rest/v1/crm_formularios?oportunidade_id=eq.'+o.id,{
+        method:'DELETE',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
+      });
       await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+o.id,{
         method:'DELETE',
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
@@ -4566,10 +4570,14 @@ async function crmExcluirLeadCompleto(){
     });
 
     // Excluir a pessoa
-    await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
+    const rPes = await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
       method:'DELETE',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
     });
+    if(!rPes.ok){
+      const txt = await rPes.text();
+      throw new Error('Erro ao excluir pessoa: HTTP '+rPes.status+' — '+txt);
+    }
 
     crmFecharModal();
     await crmCarregar();
@@ -4610,15 +4618,15 @@ async function crmVerificarLeadsNovos(){
     }
 
     // Mostrar toast apenas uma vez por sessão quando há novos
-    const toastKey = 'toast_shown_'+new Date().toDateString();
-    if(count > 0 && !sessionStorage.getItem(toastKey)){
+    // Toast aparece 1x por abertura de página (não fica reaparecendo a cada atualização automática)
+    if(count > 0 && !window._toastLeadMostrado){
       const desc = document.getElementById('toastDesc');
       if(desc) desc.textContent = count === 1
         ? '1 nova aplicação aguardando análise.'
         : `${count} novas aplicações aguardando análise.`;
       const toast = document.getElementById('leadAlertToast');
       if(toast) toast.classList.add('show');
-      sessionStorage.setItem(toastKey, '1');
+      window._toastLeadMostrado = true;
       // Auto-fechar após 8 segundos
       setTimeout(()=>crmFecharToast(), 8000);
     }
@@ -4814,7 +4822,8 @@ async function crmCriarEventoCalendar(opId){
     prod ? `Produto: ${prod}` : '',
     '',
     'Criado pelo CRM JS Mentoria'
-  ].filter(Boolean).join('\n'));
+  ].filter(Boolean).join('\
+'));
 
   const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&add=jessicasandifdm@gmail.com&sf=true&output=xml&location=Google+Meet`;
   window.open(calUrl, '_blank');
@@ -4836,22 +4845,42 @@ function crmFmtDtPT(dtStr){
 
 function crmMsgConfirmacao(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
-  return 'Oi '+pn+'! Tudo bem? 😊\n\nPassando pra confirmar nossa conversa: '+crmFmtDtPT(dt)+'.\n\nJá dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱'+(meet?'\n\nLink da reunião:\n'+meet:'')+'\n\nQualquer dúvida, me chama aqui!';
+  return 'Oi '+pn+'! Tudo bem? 😊\
+\
+Passando pra confirmar nossa conversa: '+crmFmtDtPT(dt)+'.\
+\
+Já dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱'+(meet?'\
+\
+Link da reunião:\
+'+meet:'')+'\
+\
+Qualquer dúvida, me chama aqui!';
 }
 
 function crmMsgLembrete(nome, dt){
   const pn = (nome||'').split(' ')[0];
-  return 'Oi '+pn+'! 👋\n\nSó passando pra lembrar que amanhã temos nossa conversa: '+crmFmtDtPT(dt)+'.\n\nMal posso esperar! Te vejo amanhã 😊';
+  return 'Oi '+pn+'! 👋\
+\
+Só passando pra lembrar que amanhã temos nossa conversa: '+crmFmtDtPT(dt)+'.\
+\
+Mal posso esperar! Te vejo amanhã 😊';
 }
 
 function crmMsgDoDia(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
   const d = new Date(dt);
   const hora = String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0');
-  return 'Oi '+pn+'! Bom dia! ☀️\n\nHoje é o nosso dia! Te espero às '+hora+' ✨'+(meet?'\n\nLink da nossa reunião:\n'+meet:'')+'\n\nTe vejo daqui a pouco! 😊';
+  return 'Oi '+pn+'! Bom dia! ☀️\
+\
+Hoje é o nosso dia! Te espero às '+hora+' ✨'+(meet?'\
+\
+Link da nossa reunião:\
+'+meet:'')+'\
+\
+Te vejo daqui a pouco! 😊';
 }
 function crmWaLink(wa, msg){
-  const n = (wa||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
+  const n = (wa||'').replace(/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\D/g,'');
   const num = n.startsWith('55') ? n : '55'+n;
   return 'https://wa.me/'+num+'?text='+encodeURIComponent(msg);
 }
@@ -4863,7 +4892,7 @@ function crmRenderReunBtns(opId){
   const op = _crmOps.find(o=>o.id===opId)||{};
   const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
   // FIX: lê sempre o campo atual do formulário
-  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
+  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\D/g,'');
   const dt = document.getElementById('crm_reun_dt')?.value || op.reuniao_data || '';
   const nomeAtual = document.getElementById('crm_nome')?.value || pessoa.nome || '';
   // FIX: só mostra botões WA quando o status é de agendamento
