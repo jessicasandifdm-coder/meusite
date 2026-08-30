@@ -821,6 +821,7 @@ button{font-family:var(--font)}
       <p class="page-sub" id="crmSubtitle">Reuniões — acompanhe cada oportunidade até o fechamento</p>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <a href="/form-lapidar.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(196,154,60,.1);border:1px solid rgba(196,154,60,.25);border-radius:var(--radius-sm);color:var(--amber);font-size:12px;font-weight:500;padding:8px 14px;text-decoration:none" onmouseover="this.style.background='rgba(196,154,60,.2)'" onmouseout="this.style.background='rgba(196,154,60,.1)'">↗ Form. Lapidar</a>
       <a href="/form-bv.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(45,106,79,.12);border:1px solid rgba(64,145,108,.25);border-radius:var(--radius-sm);color:var(--g4);font-size:12px;font-weight:500;padding:8px 14px;text-decoration:none" onmouseover="this.style.background='rgba(45,106,79,.22)'" onmouseout="this.style.background='rgba(45,106,79,.12)'">↗ Formulário BV</a>
       <a href="/form-reativacao.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:rgba(155,114,207,.1);border:1px solid rgba(155,114,207,.25);border-radius:var(--radius-sm);color:var(--purple);font-size:12px;font-weight:500;padding:8px 14px;text-decoration:none" onmouseover="this.style.background='rgba(155,114,207,.2)'" onmouseout="this.style.background='rgba(155,114,207,.1)'">↗ Diagnóstico</a>
       <button class="crm-add-btn" onclick="crmNovaOportunidade()">+ Nova oportunidade</button>
@@ -834,6 +835,7 @@ button{font-family:var(--font)}
     <button class="crm-pipe-tab" onclick="crmSetPipeline('iscas',this)">Iscas</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('reativacao',this)">Reativação</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('nutricao',this)">Nutrição</button>
+    <button class="crm-pipe-tab" onclick="crmSetPipeline('aplicacao',this)">Aplicação Lapidar</button>
   </div>
 
   <!-- KPIs dinâmicos por pipeline -->
@@ -3732,6 +3734,26 @@ const CRM_PIPELINES = {
     ],
     showAbord: false,
   },
+
+  aplicacao: {
+    label: 'Aplicação Lapidar',
+    sub: 'Leads do formulário de aplicação — da análise ao fechamento',
+    cols: [
+      { status:'lap_nova',            label:'Nova aplicação',       color:'var(--teal)'   },
+      { status:'qualificado',         label:'Qualificado',          color:'var(--g4)'     },
+      { status:'desqualificado',      label:'Desqualificado',       color:'var(--coral)'  },
+      { status:'proposta_apresentada',label:'Proposta apresentada', color:'var(--amber)'  },
+      { status:'ganho',               label:'Ganho',                color:'var(--g4)'     },
+      { status:'perda',               label:'Perda',                color:'var(--coral)'  },
+    ],
+    kpis: (ops) => [
+      { label:'Total aplicações', val: ops.length,                                              color:'' },
+      { label:'Qualificadas',     val: ops.filter(o=>o.lap_qualificacao==='qualificado').length, color:'var(--g4)'    },
+      { label:'Desqualificadas',  val: ops.filter(o=>o.lap_qualificacao==='desqualificado').length, color:'var(--coral)' },
+      { label:'Propostas',        val: ops.filter(o=>o.status==='proposta_apresentada').length,  color:'var(--amber)' },
+    ],
+    showAbord: false,
+  },
 };
 
 // Status que, ao serem definidos, mudam o pipeline automaticamente
@@ -4109,6 +4131,24 @@ function crmFichaHtml(op, pessoa, eventos=[]){
         <input class="crm-inp" id="crm_qualif_obs" value="${crmEsc(op.qualificacao_obs||'')}" placeholder="Motivo da desqualificação ou observação..." style="font-size:12px;margin-top:4px;${(op.qualificacao_lead||'')==='desqualificado'?'':'display:none'}">
       </div>
     </div>
+    ${(pipeAtual==='aplicacao' && op.lap_faturamento) ? `
+    <div style="margin-top:14px;background:rgba(196,154,60,.06);border:1px solid rgba(196,154,60,.2);border-radius:8px;padding:14px 16px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:10px">Aplicação Lapidar — Respostas do Formulário</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+        <div><span style="color:var(--text3)">Qualificação:</span> <b style="color:${op.lap_qualificacao==='qualificado'?'var(--g4)':'var(--coral)'}">${op.lap_qualificacao==='qualificado'?'✓ Qualificada':'✗ Desqualificada'}</b></div>
+        <div><span style="color:var(--text3)">Faturamento:</span> <b>${op.lap_faturamento||'—'}</b></div>
+        <div><span style="color:var(--text3)">Tempo de loja:</span> ${op.lap_tempo_loja||'—'}</div>
+        <div><span style="color:var(--text3)">Canal de vendas:</span> ${op.lap_canal_vendas||'—'}</div>
+        <div><span style="color:var(--text3)">Ciclo de interesse:</span> <b>${op.lap_ciclo||'—'}</b></div>
+        <div><span style="color:var(--text3)">Comprometimento:</span> ${crmEsc(op.lap_comprometimento||'—')}</div>
+        <div><span style="color:var(--text3)">Desafio:</span> ${op.lap_desafio||'—'}</div>
+      </div>
+      ${op.lap_transformacao?'<div style="margin-top:8px;font-size:12px"><span style="color:var(--text3)">Transformação desejada:</span> '+crmEsc(op.lap_transformacao)+'</div>':''}
+      ${op.lap_impedimento?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Impedimento:</span> '+crmEsc(op.lap_impedimento)+'</div>':''}
+      ${op.lap_motivacao?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Motivação:</span> '+crmEsc(op.lap_motivacao)+'</div>':''}
+      ${op.lap_resultado?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Resultado desejado:</span> '+crmEsc(op.lap_resultado)+'</div>':''}
+      ${op.lap_info_extra?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Info extra:</span> '+crmEsc(op.lap_info_extra)+'</div>':''}
+    </div>` : ''}
     ${(pipeAtual==='reativacao' && op.reat_faturamento) ? `
     <div style="margin-top:14px;background:rgba(155,114,207,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:10px">Diagnóstico Estratégico — Respostas do Formulário</div>
