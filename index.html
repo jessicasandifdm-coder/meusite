@@ -529,6 +529,46 @@ button{font-family:var(--font)}
 
 /* ── CRM: integração Calendar / WhatsApp ── */
 .crm-transcricao-wrap{margin-top:14px}
+
+/* ── Badge de notificação nos tabs ── */
+.crm-pipe-tab{position:relative}
+.crm-tab-badge{
+  position:absolute;
+  top:4px;right:4px;
+  min-width:16px;height:16px;
+  background:var(--coral);
+  color:#fff;
+  font-size:9px;font-weight:700;
+  border-radius:20px;
+  display:none;align-items:center;justify-content:center;
+  padding:0 4px;
+  line-height:1;
+  animation:pulseBadge 2s ease-in-out infinite;
+}
+.crm-tab-badge.show{display:inline-flex}
+@keyframes pulseBadge{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.1)}}
+
+/* ── Alerta flutuante de lead novo ── */
+.lead-alert-toast{
+  position:fixed;
+  bottom:24px;right:24px;
+  background:var(--surface);
+  border:1px solid var(--g3);
+  border-radius:var(--radius);
+  padding:14px 18px;
+  max-width:320px;
+  z-index:800;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  display:none;
+  animation:slideInToast .3s ease;
+  cursor:pointer;
+}
+.lead-alert-toast.show{display:flex;gap:12px;align-items:flex-start}
+@keyframes slideInToast{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.toast-icon{font-size:20px;flex-shrink:0}
+.toast-title{font-size:13px;font-weight:600;color:var(--g4);margin-bottom:2px}
+.toast-desc{font-size:12px;color:var(--text3)}
+.toast-close{margin-left:auto;font-size:16px;color:var(--text3);cursor:pointer;flex-shrink:0;padding-left:8px}
 </style>
 </head>
 <body>
@@ -835,7 +875,7 @@ button{font-family:var(--font)}
     <button class="crm-pipe-tab" onclick="crmSetPipeline('iscas',this)">Iscas</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('reativacao',this)">Reativação</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('nutricao',this)">Nutrição</button>
-    <button class="crm-pipe-tab" onclick="crmSetPipeline('aplicacao',this)">Aplicação Lapidar</button>
+    <button class="crm-pipe-tab" onclick="crmSetPipeline('aplicacao',this);crmLimparBadge()">Aplicação Lapidar<span class="crm-tab-badge" id="badgeAplicacao"></span></button>
   </div>
 
   <!-- KPIs dinâmicos por pipeline -->
@@ -883,7 +923,8 @@ button{font-family:var(--font)}
     <div class="crm-modal-body" id="crmModalBody"></div>
     <div class="crm-modal-footer">
       <button class="btn-save" onclick="crmSalvar()">Salvar</button>
-      <button id="crmBtnExcluir" style="display:none;background:rgba(224,112,112,.12);border:1px solid var(--coral-dim);border-radius:var(--radius-sm);color:var(--coral);font-size:12px;padding:8px 14px;cursor:pointer" onclick="crmExcluir()">Excluir</button>
+      <button id="crmBtnExcluir" style="display:none;background:rgba(224,112,112,.12);border:1px solid var(--coral-dim);border-radius:var(--radius-sm);color:var(--coral);font-size:12px;padding:8px 14px;cursor:pointer" onclick="crmExcluir()">Excluir oportunidade</button>
+      <button id="crmBtnExcluirLead" style="display:none;background:rgba(224,112,112,.08);border:1px solid rgba(224,112,112,.3);border-radius:var(--radius-sm);color:var(--coral);font-size:12px;padding:8px 14px;cursor:pointer" onclick="crmExcluirLeadCompleto()" title="Remove a pessoa e TODAS as oportunidades dela">🗑 Excluir lead completo</button>
       <span class="crm-save-st" id="crmSaveSt"></span>
     </div>
   </div>
@@ -1915,6 +1956,15 @@ button{font-family:var(--font)}
 
 </div>
 
+<!-- Toast de lead novo -->
+<div class="lead-alert-toast" id="leadAlertToast" onclick="crmIrParaAplicacao()">
+  <div class="toast-icon">🔔</div>
+  <div>
+    <div class="toast-title">Nova aplicação recebida</div>
+    <div class="toast-desc" id="toastDesc">Há leads novos aguardando análise na aba Aplicação Lapidar.</div>
+  </div>
+  <div class="toast-close" onclick="event.stopPropagation();crmFecharToast()">✕</div>
+</div>
 </div><!-- /main -->
 
 <script>
@@ -3597,7 +3647,7 @@ function checkSession(){
   if(s === 'true'){
     document.getElementById('loginOverlay').style.display = 'none';
     // Renderizar Central ao voltar ao sistema (já logado)
-    setTimeout(()=>renderCentral(), 100);
+    setTimeout(()=>{ renderCentral(); setTimeout(()=>crmVerificarLeadsNovos(), 1500); }, 100);
   }
 }
 
@@ -3795,6 +3845,8 @@ async function renderCRM(){
   await crmMigrarPerdidosParaNutricao();
   crmSetPipeline('reunioes', document.querySelector('.crm-pipe-tab'));
   await crmCarregarAbordHoje();
+  // Verificar leads novos ao abrir o CRM
+  crmVerificarLeadsNovos();
 }
 
 // FIX 6: migração automática — perdidos de meses anteriores vão para Nutrição
@@ -4054,6 +4106,7 @@ async function crmAbrirFicha(opId){
   }catch(e){}
   document.getElementById('crmModalTitle').textContent = pessoa.nome||'Oportunidade';
   document.getElementById('crmBtnExcluir').style.display = 'inline-block';
+  document.getElementById('crmBtnExcluirLead').style.display = 'inline-block';
   document.getElementById('crmModalBody').innerHTML = crmFichaHtml(op, pessoa, eventos);
   document.getElementById('crmModalOverlay').classList.add('open');
   // Renderizar botões Calendar e WA após DOM estar pronto
@@ -4260,12 +4313,12 @@ function crmBuscaDup(){
   if(_crmEditId) return;
   clearTimeout(_dupTimer);
   _dupTimer = setTimeout(()=>{
-    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\\\\\\\D/g,'');
+    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
     const ig = (document.getElementById('crm_ig')?.value||'').toLowerCase().replace('@','');
     const av = document.getElementById('crmDupWarn');
     if(!av||(!wa&&!ig)){if(av)av.classList.remove('show');return;}
     const dup = _crmPessoas.find(p=>{
-      const pwa=(p.whatsapp||'').replace(/\\\\\\\\D/g,'');
+      const pwa=(p.whatsapp||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
       const pig=(p.instagram||'').toLowerCase().replace('@','');
       return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
     });
@@ -4312,10 +4365,10 @@ async function crmSalvar(){
       if(!r.ok) throw new Error('Erro ao atualizar pessoa: '+r.status);
     } else {
       // Verificar duplicata
-      const waClean = wa.replace(/\\\\\\\\D/g,'');
+      const waClean = wa.replace(/\\\\\\\\\\\\\\\\D/g,'');
       const igClean = ig.toLowerCase().replace('@','');
       const dup = _crmPessoas.find(p=>{
-        const pwa=(p.whatsapp||'').replace(/\\\\\\\\D/g,'');
+        const pwa=(p.whatsapp||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
         const pig=(p.instagram||'').toLowerCase().replace('@','');
         return (waClean&&pwa&&pwa===waClean)||(igClean&&pig&&pig===igClean);
       });
@@ -4463,10 +4516,14 @@ async function crmAddNota(){
   }catch(e){showError('Erro ao registrar anotação.');}
 }
 
-// ── Excluir ──
+// ── Excluir oportunidade ──
 async function crmExcluir(){
   if(!_crmEditId||!confirm('Excluir esta oportunidade? O histórico será removido.')) return;
   try{
+    await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+_crmEditId,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
+    });
     await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+_crmEditId,{
       method:'DELETE',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
@@ -4476,6 +4533,127 @@ async function crmExcluir(){
     crmFiltrar();
     showSaved();
   }catch(e){showError('Erro ao excluir.');}
+}
+
+// ── Excluir lead completo (pessoa + todas oportunidades + eventos) ──
+async function crmExcluirLeadCompleto(){
+  const op = _crmOps.find(o=>o.id===_crmEditId);
+  if(!op) return;
+  const pessoaId = op.pessoa_id;
+  const pessoa = _crmPessoas.find(p=>p.id===pessoaId);
+  const nome = pessoa?.nome || 'este lead';
+
+  if(!confirm(`Excluir "${nome}" completamente?\n\nIsso vai remover:\n• A pessoa\n• Todas as oportunidades dela\n• Todo o histórico\n\nEssa ação não pode ser desfeita.`)) return;
+
+  try{
+    // Buscar todas as oportunidades da pessoa
+    const rOps = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?pessoa_id=eq.'+pessoaId+'&select=id',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    const ops = rOps.ok ? await rOps.json() : [];
+
+    // Excluir eventos de cada oportunidade
+    for(const o of ops){
+      await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+o.id,{
+        method:'DELETE',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
+      });
+    }
+
+    // Excluir todas as oportunidades
+    await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?pessoa_id=eq.'+pessoaId,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
+    });
+
+    // Excluir a pessoa
+    await fetch(SUPA_URL+'/rest/v1/crm_pessoas?id=eq.'+pessoaId,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}
+    });
+
+    crmFecharModal();
+    await crmCarregar();
+    crmFiltrar();
+    showSaved();
+    const el = document.getElementById('saveIndicator');
+    if(el){ el.textContent='🗑 Lead excluído completamente'; el.style.color='var(--coral)'; el.classList.add('show'); setTimeout(()=>{el.classList.remove('show');el.style.color='';},3000); }
+  }catch(e){
+    console.error(e);
+    showError('Erro ao excluir lead. Tente novamente.');
+  }
+}
+
+// ── Notificação de leads novos ──
+let _leadAlertShown = false;
+let _leadsNovoCount = 0;
+
+async function crmVerificarLeadsNovos(){
+  try{
+    const r = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.aplicacao&status=eq.lap_nova&select=id',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    if(!r.ok) return;
+    const novos = await r.json();
+    const count = novos.length;
+    _leadsNovoCount = count;
+
+    // Atualizar badge no tab
+    const badge = document.getElementById('badgeAplicacao');
+    if(badge){
+      if(count > 0){
+        badge.textContent = count > 9 ? '9+' : count;
+        badge.classList.add('show');
+      } else {
+        badge.classList.remove('show');
+      }
+    }
+
+    // Mostrar toast apenas uma vez por sessão quando há novos
+    const toastKey = 'toast_shown_'+new Date().toDateString();
+    if(count > 0 && !sessionStorage.getItem(toastKey)){
+      const desc = document.getElementById('toastDesc');
+      if(desc) desc.textContent = count === 1
+        ? '1 nova aplicação aguardando análise.'
+        : `${count} novas aplicações aguardando análise.`;
+      const toast = document.getElementById('leadAlertToast');
+      if(toast) toast.classList.add('show');
+      sessionStorage.setItem(toastKey, '1');
+      // Auto-fechar após 8 segundos
+      setTimeout(()=>crmFecharToast(), 8000);
+    }
+  }catch(e){ console.warn('Erro ao verificar leads novos:', e); }
+}
+
+function crmFecharToast(){
+  const toast = document.getElementById('leadAlertToast');
+  if(toast) toast.classList.remove('show');
+}
+
+function crmIrParaAplicacao(){
+  crmFecharToast();
+  // Clicar no tab de Aplicação Lapidar
+  const tabs = document.querySelectorAll('.crm-pipe-tab');
+  tabs.forEach(t=>{ if(t.textContent.includes('Aplicação')) t.click(); });
+  // Navegar para o CRM se não estiver lá
+  const crmTab = document.getElementById('tab-crm');
+  if(!crmTab?.classList.contains('active')){
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    crmTab?.classList.add('active');
+    document.querySelectorAll('.nav-btn').forEach(b=>{
+      if(b.getAttribute('onclick')?.includes("'crm'")) b.classList.add('active');
+    });
+    renderCRM().then(()=>{
+      const lapTab = document.querySelectorAll('.crm-pipe-tab');
+      lapTab.forEach(t=>{ if(t.textContent.includes('Aplicação')) t.click(); });
+    });
+  }
+}
+
+function crmLimparBadge(){
+  const badge = document.getElementById('badgeAplicacao');
+  if(badge) badge.classList.remove('show');
 }
 
 // ── Abordagens ──
@@ -4636,8 +4814,7 @@ async function crmCriarEventoCalendar(opId){
     prod ? `Produto: ${prod}` : '',
     '',
     'Criado pelo CRM JS Mentoria'
-  ].filter(Boolean).join('\
-'));
+  ].filter(Boolean).join('\n'));
 
   const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${titulo}&dates=${fmt(start)}/${fmt(end)}&details=${desc}&add=jessicasandifdm@gmail.com&sf=true&output=xml&location=Google+Meet`;
   window.open(calUrl, '_blank');
@@ -4659,43 +4836,22 @@ function crmFmtDtPT(dtStr){
 
 function crmMsgConfirmacao(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! Tudo bem? 😊\
-\
-Passando pra confirmar nossa conversa: ${crmFmtDtPT(dt)}.\
-\
-Já dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱${meet?'\
-\
-Link da reunião:\
-'+meet:''}\
-\
-Qualquer dúvida, me chama aqui!`;
+  return 'Oi '+pn+'! Tudo bem? 😊\n\nPassando pra confirmar nossa conversa: '+crmFmtDtPT(dt)+'.\n\nJá dei uma olhada no seu perfil e estou animada pra te mostrar o que identifiquei! Se puder entrar com o Instagram aberto já ajuda bastante 📱'+(meet?'\n\nLink da reunião:\n'+meet:'')+'\n\nQualquer dúvida, me chama aqui!';
 }
 
 function crmMsgLembrete(nome, dt){
   const pn = (nome||'').split(' ')[0];
-  return `Oi ${pn}! 👋\
-\
-Só passando pra lembrar que amanhã temos nossa conversa: ${crmFmtDtPT(dt)}.\
-\
-Mal posso esperar! Te vejo amanhã 😊`;
+  return 'Oi '+pn+'! 👋\n\nSó passando pra lembrar que amanhã temos nossa conversa: '+crmFmtDtPT(dt)+'.\n\nMal posso esperar! Te vejo amanhã 😊';
 }
 
 function crmMsgDoDia(nome, dt, meet){
   const pn = (nome||'').split(' ')[0];
   const d = new Date(dt);
   const hora = String(d.getHours()).padStart(2,'0')+'h'+String(d.getMinutes()).padStart(2,'0');
-  return `Oi ${pn}! Bom dia! ☀️\
-\
-Hoje é o nosso dia! Te espero às ${hora} ✨${meet?'\
-\
-Link da nossa reunião:\
-'+meet:''}\
-\
-Te vejo daqui a pouco! 😊`;
+  return 'Oi '+pn+'! Bom dia! ☀️\n\nHoje é o nosso dia! Te espero às '+hora+' ✨'+(meet?'\n\nLink da nossa reunião:\n'+meet:'')+'\n\nTe vejo daqui a pouco! 😊';
 }
-
 function crmWaLink(wa, msg){
-  const n = (wa||'').replace(/\\\\\\\\D/g,'');
+  const n = (wa||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
   const num = n.startsWith('55') ? n : '55'+n;
   return 'https://wa.me/'+num+'?text='+encodeURIComponent(msg);
 }
@@ -4707,7 +4863,7 @@ function crmRenderReunBtns(opId){
   const op = _crmOps.find(o=>o.id===opId)||{};
   const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
   // FIX: lê sempre o campo atual do formulário
-  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\\\\\\\D/g,'');
+  const wa = (document.getElementById('crm_wa')?.value || pessoa.whatsapp||'').replace(/\\\\\\\\\\\\\\\\D/g,'');
   const dt = document.getElementById('crm_reun_dt')?.value || op.reuniao_data || '';
   const nomeAtual = document.getElementById('crm_nome')?.value || pessoa.nome || '';
   // FIX: só mostra botões WA quando o status é de agendamento
