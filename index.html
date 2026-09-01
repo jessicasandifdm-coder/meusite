@@ -2300,69 +2300,79 @@ let currentYear=new Date().getFullYear();
 // CRM → DASHBOARDS: buscar dados reais do CRM
 // ══════════════════════════════════════════
 async function crmBuscarDadosMes(ano, mes){
+  // Primeiro e último dia do mês
   const inicio = `${ano}-${String(mes+1).padStart(2,'0')}-01`;
   const fimDate = new Date(ano, mes+1, 0);
   const fim = fimDate.toISOString().split('T')[0];
-  const iISO = inicio+'T00:00:00Z';
-  const fISO = fim+'T23:59:59Z';
-  const H = {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
 
   try{
-    // Abordagens (tabela própria)
-    const [rAbord, rAgend, rNoShow, rRealiz, rGanho, rBv, rVendas, rReagend] = await Promise.all([
-      fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim, {headers:H}),
-      // Agendadas no mês (por data_agendamento)
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&select=id,reagendamento_count', {headers:H}),
-      // No-shows no mês
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_no_show=gte.'+iISO+'&data_no_show=lte.'+fISO+'&select=id', {headers:H}),
-      // Realizadas no mês (por data_realizada — quando a reunião efetivamente aconteceu)
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+iISO+'&data_realizada=lte.'+fISO+'&select=id', {headers:H}),
-      // Ganhos no mês
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+iISO+'&data_ganho=lte.'+fISO+'&select=id,valor_venda', {headers:H}),
-      // BV do mês
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim+'&select=id,bv_qualificacao', {headers:H}),
-      // Vendas avulsas
-      fetch(SUPA_URL+'/rest/v1/vendas?data_venda=gte.'+inicio+'&data_venda=lte.'+fim+'&status=neq.cancelada&select=id,valor', {headers:H}),
-      // Reagendamentos no mês (agendamentos onde reagendamento_count > 0 e data_agendamento no mês)
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&reagendamento_count=gt.0&select=id,reagendamento_count', {headers:H}),
-    ]);
+    // Abordagens do mês
+    const rAbord = await fetch(
+      SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const abordRows = rAbord.ok ? await rAbord.json() : [];
 
-    const abordRows  = rAbord.ok  ? await rAbord.json()  : [];
-    const agendRows  = rAgend.ok  ? await rAgend.json()  : [];
+    // Oportunidades criadas no mês
+    const rOps = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const opsRows = rOps.ok ? await rOps.json() : [];
+
+    // Reuniões agendadas no mês (pelo data_agendamento)
+    const rAgend = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+inicio+'T00:00:00Z&data_agendamento=lte.'+fim+'T23:59:59Z',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const agendRows = rAgend.ok ? await rAgend.json() : [];
+
+    // No-shows (pelo data_no_show)
+    const rNoShow = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_no_show=gte.'+inicio+'T00:00:00Z&data_no_show=lte.'+fim+'T23:59:59Z',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
     const noshowRows = rNoShow.ok ? await rNoShow.json() : [];
-    const realizRows = rRealiz.ok ? await rRealiz.json() : [];
-    const ganhoRows  = rGanho.ok  ? await rGanho.json()  : [];
-    const bvRows     = rBv.ok     ? await rBv.json()     : [];
-    const vendasRows = rVendas.ok ? await rVendas.json() : [];
-    const reagendRows= rReagend.ok? await rReagend.json(): [];
 
-    // Agendamentos únicos = total agendadas - reagendamentos (evita dupla contagem)
-    const totalAgend     = agendRows.length;
-    const totalReagend   = reagendRows.reduce((s,r)=>s+(r.reagendamento_count||0),0);
-    const agendOriginal  = totalAgend - totalReagend; // primeiros agendamentos
+    // Ganhos no mês (pelo data_ganho)
+    const rGanho = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+inicio+'T00:00:00Z&data_ganho=lte.'+fim+'T23:59:59Z',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const ganhoRows = rGanho.ok ? await rGanho.json() : [];
+
+    // Agregar abordagens
+    const totAbord    = abordRows.reduce((s,r)=>s+(r.total||0),0);
+    const totAbordPc  = abordRows.reduce((s,r)=>s+(r.pc||0),0);
+    const totAbordIs  = abordRows.reduce((s,r)=>s+(r.isca||0),0);
+    const totAbordRe  = abordRows.reduce((s,r)=>s+(r.reativacao||0),0);
+    const totAbordFu  = abordRows.reduce((s,r)=>s+(r.outros||0),0);
+
+    // Leads BV do mês
+    const rBv = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    const bvRows = rBv.ok ? await rBv.json() : [];
 
     return {
-      abord:        abordRows.reduce((s,r)=>s+(r.total||0),0),
-      abord_pc:     abordRows.reduce((s,r)=>s+(r.pc||0),0),
-      abord_isca:   abordRows.reduce((s,r)=>s+(r.isca||0),0),
-      abord_reat:   abordRows.reduce((s,r)=>s+(r.reativacao||0),0),
-      abord_fu:     abordRows.reduce((s,r)=>s+(r.outros||0),0),
-      agend:        totalAgend,          // total de agendamentos incluindo reagendamentos
-      agend_original: agendOriginal,     // apenas primeiros agendamentos (sem reagendamento)
-      reagend:      totalReagend,        // quantos foram reagendamentos
-      realizadas:   realizRows.length,   // reuniões que efetivamente aconteceram (data_realizada)
-      noshow:       noshowRows.length,   // no-shows
+      abord:        totAbord,
+      abord_pc:     totAbordPc,
+      abord_isca:   totAbordIs,
+      abord_reat:   totAbordRe,
+      abord_fu:     totAbordFu,
+      ops:          opsRows.length,
+      agend:        agendRows.length,
+      noshow:       noshowRows.length,
       ganho:        ganhoRows.length,
       fat_ganho:    ganhoRows.reduce((s,r)=>s+(parseFloat(r.valor_venda)||0),0),
-      vendas_avulsas: vendasRows.length,
-      fat_avulsas:  vendasRows.reduce((s,r)=>s+(parseFloat(r.valor)||0),0),
       bv_total:     bvRows.length,
       bv_qualif:    bvRows.filter(r=>r.bv_qualificacao==='qualificado').length,
       bv_desqualif: bvRows.filter(r=>r.bv_qualificacao==='desqualificado').length,
     };
   }catch(e){
     console.error('Erro buscar dados CRM mês:', e);
-    return {abord:0,abord_pc:0,abord_isca:0,abord_reat:0,abord_fu:0,agend:0,agend_original:0,reagend:0,realizadas:0,noshow:0,ganho:0,fat_ganho:0,vendas_avulsas:0,fat_avulsas:0};
+    return {abord:0,abord_pc:0,abord_isca:0,abord_reat:0,abord_fu:0,ops:0,agend:0,noshow:0,ganho:0,fat_ganho:0};
   }
 }
 
@@ -2391,19 +2401,13 @@ async function renderMensal(){
   try{ crmDados = await crmBuscarDadosMes(currentYear, currentMonth); }
   catch(e){ console.error('CRM mensal:', e); }
 
-  // ── SOMA: registro diário (legado) + CRM (novo) ──
-  // Lógica correta:
-  // - Agendadas: qualquer data_agendamento no mês (inclui reagendamentos)
-  // - Realizadas: data_realizada no mês (quando saiu para negociação/ganho/perdido)
-  // - No-show: data_no_show no mês
-  // - Reagendamentos: subset das agendadas (para info, não soma dupla)
+  // ── SOMA: unificar as duas fontes ──
   const abord    = (aggLeg.abord||0)     + (crmDados.abord||0);
   const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);
-  const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0);
+  const reunioes = (aggLeg.reunioes||0)  + (crmDados.agend||0); // CRM usa agend como realizadas
   const noshow   = Math.max(0,(aggLeg.agendadas||0)-(aggLeg.reunioes||0)) + (crmDados.noshow||0);
-  const reagend  = crmDados.reagend||0;
   const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);
-  const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
+  const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0);
   const abordPc  = (aggLeg.pc?.abord||0) + (crmDados.abord_pc||0);
   const abordIs  = (aggLeg.is?.leads||0) + (crmDados.abord_isca||0);
   const abordRe  = (aggLeg.re?.abord||0) + (crmDados.abord_reat||0);
@@ -2637,15 +2641,17 @@ async function renderMensal(){
     </tr>`;
   }
   const metaAbord = parseFloat(metasData.abord)||0;
+  const metaAgend = parseFloat(metasData.agend)||0;
   const metaReun  = parseFloat(metasData.reun)||0;
   const metaVend  = parseFloat(metasData.vendas)||0;
   const metaFat   = parseFloat(metasData.fat)||0;
   const tbody = document.getElementById('metasTableBody');
   if(tbody) tbody.innerHTML =
-    metaRow('Abordagens',metaAbord,abord,false)+
-    metaRow('Reuniões agendadas',metaReun,agend,false)+
-    metaRow('Ganhos / Vendas',metaVend,vendas,false)+
-    metaRow('Faturamento (R$)',metaFat,fat,true);
+    metaRow('Abordagens',         metaAbord, abord,    false)+
+    metaRow('Reuniões agendadas', metaAgend, agend,    false)+
+    metaRow('Reuniões realizadas',metaReun,  reunioes, false)+
+    metaRow('Ganhos / Vendas',    metaVend,  vendas,   false)+
+    metaRow('Faturamento (R$)',   metaFat,   fat,      true);
 }
 
 
@@ -2715,6 +2721,7 @@ async function renderMetasTable(){
   const monthDays=allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===currentMonth;});
   const agg=aggregateDays(monthDays);
   const metaAbord=parseFloat(metasData.abord)||0;
+  const metaAgendP=parseFloat(metasData.agend)||0;
   const metaReun=parseFloat(metasData.reun)||0;
   const metaVend=parseFloat(metasData.vendas)||0;
   const metaFat=parseFloat(metasData.fat)||0;
@@ -2739,8 +2746,8 @@ async function renderMetasTable(){
     metaRow('Abordagens',metaAbord,agg.abord,false)+
     metaRow('Respostas',metaResp,agg.resp,false)+
     metaRow('Convites p/ reunião',metaConvites,agg.convites,false)+
-    metaRow('Reuniões agendadas',metaAgend,agg.agendadas||0,false)+
-    metaRow('Reuniões realizadas',metaReun,agg.reunioes,false)+
+    metaRow('Reuniões agendadas',metaAgendP||metaAgend,agg.agendadas||0,false)+
+    metaRow('Reuniões realizadas',metaReun,agg.reunioes||0,false)+
     metaRow('Vendas mentoria (qtd)',metaVend,agg.vendas,false)+
     metaRow('Faturamento mentoria (R$)',metaFat,agg.valor||0,true)+
     metaRow('Vendas curso (qtd)',metaVC,agg.vcurso||0,false);
@@ -4026,7 +4033,6 @@ async function crmDrop(e, novoStatus){
   const novoPipeline = CRM_STATUS_PIPELINE_RULES[novoStatus] || op.pipeline;
   const pipelineMudou = novoPipeline !== op.pipeline;
 
-  // Campos de data automáticos
   const datesUpdate = {};
   if(novoStatus==='agendado')        datesUpdate.data_agendamento = agora;
   if(novoStatus==='nao_compareceu')  datesUpdate.data_no_show     = agora;
@@ -4037,9 +4043,9 @@ async function crmDrop(e, novoStatus){
   if(['agendado','nao_compareceu'].includes(statusAnterior) && ['negociacao','ganho','perdido'].includes(novoStatus)){
     datesUpdate.data_realizada = agora;
   }
-  // Reagendamento: voltou de no-show para agendado
+  // Reagendamento
   if(novoStatus==='agendado' && statusAnterior==='nao_compareceu'){
-    datesUpdate.reagendamento_count = (op.reagendamento_count||0) + 1;
+    datesUpdate.reagendamento_count = (op.reagendamento_count||0)+1;
   }
 
   // Registrar pipeline de origem ao ir para nutrição
@@ -4407,16 +4413,12 @@ async function crmSalvar(){
     if(novoStatus==='negociacao'     && statusAnterior!=='negociacao')  datesUpdate.data_negociacao   = agora;
     if(novoStatus==='ganho')                                            datesUpdate.data_ganho        = agora;
     if(novoStatus==='perdido')                                          datesUpdate.data_perda        = agora;
-    // Reunião realizada: quando sai de agendado/nao_compareceu para negociacao/ganho/perdido
-    const statusRealizacao = ['negociacao','ganho','perdido'];
-    const statusOrigem     = ['agendado','nao_compareceu'];
-    if(statusOrigem.includes(statusAnterior) && statusRealizacao.includes(novoStatus)){
+    if(['agendado','nao_compareceu'].includes(statusAnterior) && ['negociacao','ganho','perdido'].includes(novoStatus)){
       datesUpdate.data_realizada = agora;
     }
-    // Reagendamento: de nao_compareceu volta para agendado
     if(novoStatus==='agendado' && statusAnterior==='nao_compareceu'){
-      const opAtual = _crmOps.find(o=>o.id===_crmEditId)||{};
-      datesUpdate.reagendamento_count = (opAtual.reagendamento_count||0) + 1;
+      const _opR=_crmOps.find(o=>o.id===_crmEditId)||{};
+      datesUpdate.reagendamento_count=(_opR.reagendamento_count||0)+1;
     }
 
     const pipelineOrigemUpdate = {};
@@ -4566,7 +4568,6 @@ async function crmExcluirLeadCompleto(){
       {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
     const ops = rOps.ok ? await rOps.json() : [];
 
-    // Excluir formulários e eventos (ordem correta pelas foreign keys)
     for(const o of ops){
       await fetch(SUPA_URL+'/rest/v1/crm_formularios?oportunidade_id=eq.'+o.id,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}});
       await fetch(SUPA_URL+'/rest/v1/crm_eventos?oportunidade_id=eq.'+o.id,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Prefer':'return=minimal'}});
@@ -4611,19 +4612,13 @@ async function crmVerificarLeadsNovos(){
     const count = novos.length;
     _leadsNovoCount = count;
 
-    // Badge — persiste até você abrir o tab hoje
     const badge = document.getElementById('badgeAplicacao');
-    const badgeSeen = localStorage.getItem('lap_badge_'+new Date().toDateString());
+    const _badgeSeen = localStorage.getItem('lap_badge_'+new Date().toDateString());
     if(badge){
-      if(count > 0 && !badgeSeen){
-        badge.textContent = count > 9 ? '9+' : count;
-        badge.classList.add('show');
-      } else {
-        badge.classList.remove('show');
-      }
+      if(count > 0 && !_badgeSeen){ badge.textContent=count>9?'9+':count; badge.classList.add('show'); }
+      else badge.classList.remove('show');
     }
 
-    // Toast 1x por dia (localStorage persiste entre F5)
     const toastKey = 'lap_toast_'+new Date().toDateString();
     if(count > 0 && !localStorage.getItem(toastKey)){
       const desc = document.getElementById('toastDesc');
