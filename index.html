@@ -1201,11 +1201,13 @@ button{font-family:var(--font)}
   <div class="sh"><span class="sh-label">Comparativo semana a semana</span><div class="sh-line"></div></div>
   <div class="card" style="margin-bottom:14px;padding:0;overflow:hidden">
     <div style="overflow-x:auto">
+      <div id="melhorSemana" style="margin-bottom:8px"></div>
       <table class="canal-table" id="semanaTable">
         <thead><tr>
           <th>Semana</th>
           <th>Abordagens</th>
-          <th>Oportunidades</th>
+          <th style="color:var(--text3)">Follow-ups</th>
+          <th>Realizadas</th>
           <th>Agendadas</th>
           <th>No-show</th>
           <th>Ganhos</th>
@@ -1344,16 +1346,19 @@ button{font-family:var(--font)}
   <div class="card">
     <div style="font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">Evolução mensal</div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:14px">Meses anteriores: registro diário + CRM somados. A partir de setembro/2026: somente CRM.</div>
-    <div style="overflow-x:auto"><table class="canal-table" id="anualTable">
+    <div style="overflow-x:auto"><div id="anualDestaques"></div>
+    <table class="canal-table" id="anualTable">
       <thead><tr>
         <th>Mês</th>
         <th>Abordagens</th>
-        <th>Reuniões ag.</th>
+        <th style="color:var(--text3)">Follow-ups</th>
+        <th>Agendadas</th>
+        <th>Realizadas</th>
         <th>No-show</th>
         <th>Ganhos</th>
         <th>Fat. (R$)</th>
         <th>% Abord→Reun</th>
-        <th>% Fechamento</th>
+        <th>% Reun→Venda</th>
       </tr></thead>
       <tbody id="anualTableBody"></tbody>
     </table></div>
@@ -2264,7 +2269,8 @@ function getN(data,f){return parseInt(data[f])||0;}
 
 function aggregateDays(days){
   return{
-    abord: days.reduce((s,d)=>s+getN(d,'pc_abord')+getN(d,'re_abord')+getN(d,'bv_sdr')+getN(d,'st_inter')+getN(d,'fu_retom'),0),
+    abord: days.reduce((s,d)=>s+getN(d,'pc_abord')+getN(d,'re_abord')+getN(d,'bv_sdr')+getN(d,'st_inter'),0), // SEM fu_retom — follow-up não é abordagem nova
+    followup: days.reduce((s,d)=>s+getN(d,'fu_retom'),0), // follow-ups separados
     resp: days.reduce((s,d)=>s+getN(d,'pc_resp')+getN(d,'re_resp')+getN(d,'fu_resp')+getN(d,'st_sdr'),0),
     conv: days.reduce((s,d)=>s+getN(d,'pc_conv')+getN(d,'st_conv')+getN(d,'bv_form'),0),
     convites: days.reduce((s,d)=>s+getN(d,'pc_convites')+getN(d,'st_convites')+getN(d,'bv_convites')+getN(d,'fu_convites')+getN(d,'re_convites')+getN(d,'is_convites'),0),
@@ -2523,6 +2529,19 @@ async function renderMensal(){
   let semRows = '';
   let totS={abord:0,agend:0,noshow:0,ganho:0,fat:0};
 
+  // Pre-calcular melhores semanas (valores comerciais)
+  let melhorSemGanho = 0, melhorSemFat = 0;
+  for(let _i=1;_i<=5;_i++){
+    const _sd=semanas[_i]; const _sa=aggregateDays(_sd);
+    const _ds=(i)=>`${currentYear}-${String(currentMonth+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+    const _s1=(_i-1)*7+1, _s2=Math.min(_i*7,fimDate.getDate());
+    const _gs=crmOpsDoMes.filter(o=>o.data_ganho&&o.data_ganho.slice(0,10)>=_ds(_s1)&&o.data_ganho.slice(0,10)<=_ds(_s2));
+    const _g=(_sa.vendas||0)+_gs.length;
+    const _f=(_sa.valor||0)+_gs.reduce((s,o)=>s+(parseFloat(o.valor_venda)||0),0);
+    if(_g>melhorSemGanho) melhorSemGanho=_g;
+    if(_f>melhorSemFat)   melhorSemFat=_f;
+  }
+
   for(let i=1;i<=5;i++){
     const sd = semanas[i];
     const sa = aggregateDays(sd);
@@ -2548,7 +2567,10 @@ async function renderMensal(){
     }
 
     // Somar legado + CRM
+    const crmRealiz = crmOpsDoMes.filter(o=>o.data_realizada&&o.data_realizada.slice(0,10)>=dateStart&&o.data_realizada.slice(0,10)<=dateEnd);
     const sAbord  = (sa.abord||0) + crmAbordSem;
+    const sFuSem  = (sa.followup||0); // follow-ups separados de abordagens
+    const sRealiz = (sa.reunioes||0) + crmRealiz.length; // reuniões que aconteceram
     const sAgend  = (sa.agendadas||0) + crmAgend.length;
     const sNoshow = Math.max(0,(sa.agendadas||0)-(sa.reunioes||0)) + crmNoshow.length;
     const sGanho  = (sa.vendas||0) + crmGanho.length;
@@ -2557,34 +2579,49 @@ async function renderMensal(){
     if(sAbord===0 && sAgend===0 && sGanho===0) continue; // pular semanas vazias
 
     totS.abord  += sAbord;
+    totS.fu     += sFuSem;
+    totS.realiz += sRealiz;
     totS.agend  += sAgend;
     totS.noshow += sNoshow;
     totS.ganho  += sGanho;
     totS.fat    += sFat;
 
-    semRows += `<tr>
-      <td style="font-weight:500">Semana ${i}</td>
+    semRows += `<tr ${sGanho>0&&sGanho===melhorSemGanho?'style="background:rgba(27,67,50,.08)"':''}>
+      <td style="font-weight:500">S${i} ${sGanho>0&&sGanho===melhorSemGanho?'🏆':''} ${sFat>0&&sFat===melhorSemFat?'💰':''}</td>
       <td>${sAbord||0}</td>
-      <td>${crmOps.length||0}</td>
+      <td style="color:var(--text3)">${sFuSem||0}</td>
+      <td>${sRealiz||0}</td>
+      <td style="color:var(--text3)">${sFuSem||0}</td>
+      <td>${sRealiz||0}</td>
       <td>${sAgend||0}</td>
       <td>${sNoshow||0}</td>
       <td style="color:var(--g4);font-weight:500">${sGanho||0}</td>
       <td>${sFat?'R$ '+sFat.toLocaleString('pt-BR'):'—'}</td>
       <td>${sAbord>0?pct(sAgend,sAbord):'—'}</td>
-      <td>${sAgend>0?pct(sGanho,sAgend):'—'}</td>
+      <td>${sRealiz>0?pct(sGanho,sRealiz):'—'}</td>
     </tr>`;
   }
   semRows += `<tr class="total-row">
     <td>TOTAL</td>
     <td>${totS.abord}</td>
-    <td>${crmOpsDoMes.length}</td>
+    <td style="color:var(--text3)">${totS.fu}</td>
+    <td>${totS.realiz}</td>
     <td>${totS.agend}</td>
     <td>${totS.noshow}</td>
     <td style="color:var(--g4);font-weight:600">${totS.ganho}</td>
     <td>${totS.fat?'R$ '+totS.fat.toLocaleString('pt-BR'):'—'}</td>
     <td>${totS.abord>0?pct(totS.agend,totS.abord):'—'}</td>
-    <td>${totS.agend>0?pct(totS.ganho,totS.agend):'—'}</td>
+    <td>${totS.realiz>0?pct(totS.ganho,totS.realiz):'—'}</td>
   </tr>`;
+  // Destaque melhor semana
+  const _msEl2 = document.getElementById('melhorSemana');
+  if(_msEl2) _msEl2.innerHTML = melhorSemGanho>0 ? `
+    <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div class="card" style="flex:1;border-color:var(--g2);background:rgba(27,67,50,.05);padding:12px 16px">
+        <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:3px">🏆 Melhor semana</div>
+        <div style="font-size:12px;color:var(--text2)">Semana com mais vendas e faturamento está marcada com 🏆 💰 na tabela abaixo</div>
+      </div>
+    </div>` : '';
   if(semBody) semBody.innerHTML = semRows || '<tr><td colspan="9" style="text-align:center;color:var(--text3)">Sem dados neste mês.</td></tr>';
 
   // ── ALERTAS E INSIGHTS ──
@@ -2760,60 +2797,98 @@ async function renderAnual(){
   const allDays = await getAllDaysAsync(currentYear);
   const grid = document.getElementById('yearGrid');
   grid.innerHTML = '';
-  let totAbord=0, totReun=0, totVend=0, totFat=0;
+  let totAbord=0,totFu=0,totReun=0,totRealiz=0,totVend=0,totFat=0;
   const rows = [];
 
   for(let i=0;i<12;i++){
-    // Dados registro diário
     const mDays = allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===i;});
     const agg = aggregateDays(mDays);
-
-    // Dados CRM
-    let crmD = {abord:0,agend:0,noshow:0,ganho:0,fat_ganho:0};
+    let crmD = {abord:0,agend:0,realizadas:0,noshow:0,ganho:0,fat_ganho:0,fat_avulsas:0};
     try{ crmD = await crmBuscarDadosMes(currentYear, i); }catch(e){}
 
-    // Somar
     const sAbord  = (agg.abord||0)     + (crmD.abord||0);
+    const sFu     = (agg.followup||0);
     const sAgend  = (agg.agendadas||0) + (crmD.agend||0);
+    const sRealiz = (agg.reunioes||0)  + (crmD.realizadas||0);
     const sNoshow = Math.max(0,(agg.agendadas||0)-(agg.reunioes||0)) + (crmD.noshow||0);
     const sGanho  = (agg.vendas||0)    + (crmD.ganho||0);
-    const sFat    = (agg.valor||0)     + (crmD.fat_ganho||0);
+    const sFat    = (agg.valor||0)     + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
+    const sConv   = sRealiz>0 ? Math.round(sGanho/sRealiz*100) : 0;
 
-    totAbord += sAbord;
-    totReun  += sAgend;
-    totVend  += sGanho;
-    totFat   += sFat;
+    totAbord  += sAbord; totFu += sFu; totReun += sAgend;
+    totRealiz += sRealiz; totVend += sGanho; totFat += sFat;
 
-    // Card do grid
     const card = document.createElement('div');
     card.className = 'month-card'+(i===currentMonth?' active':'');
-    card.innerHTML = `<div class="month-name">${MONTHS_PT[i]}/26</div>
-      <div class="month-val ${sGanho>0?'has-data':''}">${sGanho>0?sGanho:'—'}<span style="font-size:12px;font-weight:400;color:var(--text3)"> ganhos</span></div>`;
+    card.innerHTML = `<div class="month-name">${MONTHS_PT[i]}/${currentYear.toString().slice(2)}</div>
+      <div class="month-val ${sGanho>0?'has-data':''}">${sGanho>0?sGanho:'—'}<span style="font-size:11px;font-weight:400;color:var(--text3)"> vend</span></div>
+      ${sFat>0?`<div style="font-size:10px;color:var(--g4);margin-top:1px">R$ ${sFat.toLocaleString('pt-BR')}</div>`:''}`;
     card.onclick = ()=>{
-      currentMonth=i;
-      showTabByName('mensal');
+      currentMonth=i; showTabByName('mensal');
       document.querySelectorAll('.nav-btn').forEach((b,bi)=>{if(bi===2)b.classList.add('active');else b.classList.remove('active');});
     };
     grid.appendChild(card);
-    rows.push({m:MONTHS_PT[i],sAbord,sAgend,sNoshow,sGanho,sFat});
+    rows.push({i,m:MONTHS_PT[i],sAbord,sFu,sAgend,sRealiz,sNoshow,sGanho,sFat,sConv});
   }
 
+  // Melhores meses
+  const rdados = rows.filter(r=>r.sGanho>0||r.sFat>0);
+  const mV = rdados.length ? rdados.reduce((b,r)=>r.sGanho>b.sGanho?r:b, rdados[0]) : null;
+  const mF = rdados.length ? rdados.reduce((b,r)=>r.sFat>b.sFat?r:b, rdados[0]) : null;
+  const rConv = rows.filter(r=>r.sConv>0);
+  const mC = rConv.length ? rConv.reduce((b,r)=>r.sConv>b.sConv?r:b, rConv[0]) : null;
+
   document.getElementById('anual-abord').textContent  = totAbord||'0';
-  document.getElementById('anual-reun').textContent   = totReun||'0';
+  document.getElementById('anual-reun').textContent   = totRealiz||'0';
   document.getElementById('anual-vendas').textContent = totVend||'0';
   document.getElementById('anual-fat').textContent    = totFat?'R$ '+totFat.toLocaleString('pt-BR'):'—';
 
+  // Destaques
+  const destEl = document.getElementById('anualDestaques');
+  if(destEl) destEl.innerHTML = (mV||mF||mC) ? `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+      ${mV?`<div class="card" style="flex:1;min-width:160px;border-color:var(--g2);background:rgba(27,67,50,.06)">
+        <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">🏆 Melhor em vendas</div>
+        <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--g4)">${mV.m}</div>
+        <div style="font-size:12px;color:var(--text2)">${mV.sGanho} vendas</div>
+      </div>`:''}
+      ${mF?`<div class="card" style="flex:1;min-width:160px;border-color:var(--g2);background:rgba(27,67,50,.06)">
+        <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">💰 Maior faturamento</div>
+        <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--g4)">${mF.m}</div>
+        <div style="font-size:12px;color:var(--text2)">R$ ${mF.sFat.toLocaleString('pt-BR')}</div>
+      </div>`:''}
+      ${mC?`<div class="card" style="flex:1;min-width:160px;border-color:var(--purple-dim);background:rgba(155,114,207,.04)">
+        <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">🎯 Melhor conversão</div>
+        <div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--purple)">${mC.m}</div>
+        <div style="font-size:12px;color:var(--text2)">${mC.sConv}% reun→venda</div>
+      </div>`:''}
+    </div>` : '';
+
+  // Tabela expandida
   const tbody = document.getElementById('anualTableBody');
-  if(tbody) tbody.innerHTML = rows.map(r=>`<tr>
-    <td>${r.m}/26</td>
-    <td>${r.sAbord||0}</td>
-    <td>${r.sAgend||0}</td>
-    <td>${r.sNoshow||0}</td>
-    <td style="color:var(--g4);font-weight:500">${r.sGanho||0}</td>
-    <td>${r.sFat?'R$ '+r.sFat.toLocaleString('pt-BR'):'—'}</td>
-    <td>${r.sAbord>0?pct(r.sAgend,r.sAbord):'—'}</td>
-    <td>${r.sAgend>0?pct(r.sGanho,r.sAgend):'—'}</td>
-  </tr>`).join('');
+  if(tbody) tbody.innerHTML = rows.map(r=>{
+    const isBV = mV&&r.i===mV.i, isBF = mF&&r.i===mF.i;
+    return `<tr style="${(isBV||isBF)?'background:rgba(27,67,50,.08);':''}">
+      <td style="font-weight:500">${r.m}/${currentYear.toString().slice(2)} ${isBV?'🏆':''} ${isBF?'💰':''}</td>
+      <td>${r.sAbord||0}</td>
+      <td style="color:var(--text3)">${r.sFu||0}</td>
+      <td>${r.sAgend||0}</td>
+      <td>${r.sRealiz||0}</td>
+      <td>${r.sNoshow||0}</td>
+      <td style="color:var(--g4);font-weight:500">${r.sGanho||0}</td>
+      <td>${r.sFat?'R$ '+r.sFat.toLocaleString('pt-BR'):'—'}</td>
+      <td>${r.sAbord>0?pct(r.sAgend,r.sAbord):'—'}</td>
+      <td>${r.sRealiz>0?pct(r.sGanho,r.sRealiz):'—'}</td>
+    </tr>`;
+  }).join('')+`<tr class="total-row">
+    <td>TOTAL ${currentYear}</td><td>${totAbord}</td>
+    <td style="color:var(--text3)">${totFu}</td>
+    <td>${totReun}</td><td>${totRealiz}</td><td>—</td>
+    <td style="color:var(--g4);font-weight:600">${totVend}</td>
+    <td>${totFat?'R$ '+totFat.toLocaleString('pt-BR'):'—'}</td>
+    <td>${totAbord>0?pct(totReun,totAbord):'—'}</td>
+    <td>${totRealiz>0?pct(totVend,totRealiz):'—'}</td>
+  </tr>`;
 }
 
 
