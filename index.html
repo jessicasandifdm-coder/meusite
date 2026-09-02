@@ -651,12 +651,12 @@ button{font-family:var(--font)}
     </div>
     <div class="central-kpi" id="ck-reun">
       <div class="ck-val" id="ck-reun-val">—</div>
-      <div class="ck-lbl">Reuniões realizadas</div>
+      <div class="ck-lbl">Realizadas</div>
       <div class="ck-delta" id="ck-reun-delta"></div>
     </div>
     <div class="central-kpi" id="ck-conv">
       <div class="ck-val" id="ck-conv-val">—</div>
-      <div class="ck-lbl">Taxa de fechamento</div>
+      <div class="ck-lbl">Fechamento (reun→venda)</div>
       <div class="ck-delta" id="ck-conv-delta"></div>
     </div>
     <div class="central-kpi" id="ck-noshow">
@@ -998,7 +998,8 @@ button{font-family:var(--font)}
   <div class="canal-section">
     <div class="canal-header"><div><div class="canal-title">PC — Outbound</div><div class="canal-goal">Funil 2 · Meta: 20 abordagens/dia</div></div><span class="badge badge-t">Funil 2</span></div>
     <div class="canal-fields">
-      <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="pc_abord" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Abordagens <span style="font-size:10px;color:var(--text3)">(novos contatos)</span></div><input class="field-input" type="number" id="pc_abord" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Follow-ups <span style="font-size:10px;color:var(--text3)">(retomadas)</span></div><input class="field-input" type="number" id="pc_followup" min="0" oninput="updateSummary()" style="border-color:rgba(77,184,200,.25)"></div>
       <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="pc_resp" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Conv. iniciadas</div><input class="field-input" type="number" id="pc_conv" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="pc_convites" min="0" oninput="updateSummary()"></div>
@@ -1046,7 +1047,8 @@ button{font-family:var(--font)}
   <div class="canal-section">
     <div class="canal-header"><div><div class="canal-title">Reativação</div><div class="canal-goal">Funil 5 · Meta: 10 abordagens/dia</div></div><span class="badge badge-a">Funil 5</span></div>
     <div class="canal-fields">
-      <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="re_abord" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Abordagens <span style="font-size:10px;color:var(--text3)">(novos contatos)</span></div><input class="field-input" type="number" id="re_abord" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Follow-ups <span style="font-size:10px;color:var(--text3)">(retomadas)</span></div><input class="field-input" type="number" id="re_followup" min="0" oninput="updateSummary()" style="border-color:rgba(77,184,200,.25)"></div>
       <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="re_resp" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Conversas iniciadas</div><input class="field-input" type="number" id="re_conv" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="re_convites" min="0" oninput="updateSummary()"></div>
@@ -1063,7 +1065,8 @@ button{font-family:var(--font)}
     <div class="canal-fields">
       <div class="field-group"><div class="field-label">Leads capturados</div><input class="field-input" type="number" id="is_leads" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Iscas entregues</div><input class="field-input" type="number" id="is_entregues" min="0" oninput="updateSummary()"></div>
-      <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="is_sdr" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">SDR contactou <span style="font-size:10px;color:var(--text3)">(abordagens)</span></div><input class="field-input" type="number" id="is_sdr" min="0" oninput="updateSummary()"></div>
+      <div class="field-group"><div class="field-label">Follow-ups <span style="font-size:10px;color:var(--text3)">(retomadas)</span></div><input class="field-input" type="number" id="is_followup" min="0" oninput="updateSummary()" style="border-color:rgba(77,184,200,.25)"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="is_convites" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="is_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="is_reunioes" min="0" oninput="updateSummary()"></div>
@@ -1252,6 +1255,10 @@ button{font-family:var(--font)}
       <div style="font-size:11px;color:var(--text3);margin-top:6px">Soma dos valores ofertados em negociação</div>
     </div>
   </div>
+
+  <!-- Desempenho por canal -->
+  <div class="sh"><span class="sh-label">Desempenho por canal</span><div class="sh-line"></div></div>
+  <div id="canalDesemp" style="margin-bottom:20px"></div>
 
   <!-- Alertas automáticos -->
   <div class="sh"><span class="sh-label">Alertas automáticos</span><div class="sh-line"></div></div>
@@ -2022,11 +2029,11 @@ const MONTHS_PT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','No
 // REGISTRO DIÁRIO
 // ══════════════════════════════════════════
 const FIELDS=['seg_total','seg_novos','seg_perdidos','bv_auto','bv_video','bv_form','bv_sdr','bv_convites','bv_agend','bv_reunioes','bv_vendas','bv_valor','bv_vcurso','bv_vcurso_val',
-  'pc_abord','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val','pc_seguidores',
+  'pc_abord','pc_followup','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val','pc_seguidores',
   'st_inter','st_sdr','st_conv','st_convites','st_agend','st_reunioes','st_vendas',
   'fu_retom','fu_resp','fu_convites','fu_agend','fu_reunioes','fu_vendas','fu_valor','fu_vcurso','fu_vcurso_val',
-  're_abord','re_resp','re_conv','re_convites','re_agend','re_reunioes','re_vendas','re_valor',
-  'is_leads','is_entregues','is_sdr','is_convites','is_agend','is_reunioes','is_vendas',
+  're_abord','re_followup','re_resp','re_conv','re_convites','re_agend','re_reunioes','re_vendas','re_valor',
+  'is_leads','is_entregues','is_sdr','is_followup','is_convites','is_agend','is_reunioes','is_vendas',
   'obs_dia'];
 
 async function saveDay(){
@@ -2270,7 +2277,7 @@ function getN(data,f){return parseInt(data[f])||0;}
 function aggregateDays(days){
   return{
     abord: days.reduce((s,d)=>s+getN(d,'pc_abord')+getN(d,'re_abord')+getN(d,'bv_sdr')+getN(d,'st_inter'),0), // SEM fu_retom — follow-up não é abordagem nova
-    followup: days.reduce((s,d)=>s+getN(d,'fu_retom'),0), // follow-ups separados
+    followup: days.reduce((s,d)=>s+getN(d,'fu_retom')+getN(d,'pc_followup')+getN(d,'re_followup')+getN(d,'is_followup'),0), // follow-ups por canal + geral
     resp: days.reduce((s,d)=>s+getN(d,'pc_resp')+getN(d,'re_resp')+getN(d,'fu_resp')+getN(d,'st_sdr'),0),
     conv: days.reduce((s,d)=>s+getN(d,'pc_conv')+getN(d,'st_conv')+getN(d,'bv_form'),0),
     convites: days.reduce((s,d)=>s+getN(d,'pc_convites')+getN(d,'st_convites')+getN(d,'bv_convites')+getN(d,'fu_convites')+getN(d,'re_convites')+getN(d,'is_convites'),0),
@@ -2285,11 +2292,11 @@ function aggregateDays(days){
     pc_seguidores: days.reduce((s,d)=>s+getN(d,'pc_seguidores'),0),
     // por canal
     bv:{auto:days.reduce((s,d)=>s+getN(d,'bv_auto'),0),sdr:days.reduce((s,d)=>s+getN(d,'bv_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'bv_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'bv_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'bv_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'bv_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'bv_vcurso'),0)},
-    pc:{abord:days.reduce((s,d)=>s+getN(d,'pc_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'pc_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'pc_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'pc_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'pc_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'pc_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'pc_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'pc_vcurso'),0)},
+    pc:{abord:days.reduce((s,d)=>s+getN(d,'pc_abord'),0),fu:days.reduce((s,d)=>s+getN(d,'pc_followup'),0),resp:days.reduce((s,d)=>s+getN(d,'pc_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'pc_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'pc_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'pc_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'pc_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'pc_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'pc_vcurso'),0)},
     st:{inter:days.reduce((s,d)=>s+getN(d,'st_inter'),0),sdr:days.reduce((s,d)=>s+getN(d,'st_sdr'),0),conv:days.reduce((s,d)=>s+getN(d,'st_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'st_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'st_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'st_vendas'),0)},
     fu:{ret:days.reduce((s,d)=>s+getN(d,'fu_retom'),0),resp:days.reduce((s,d)=>s+getN(d,'fu_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'fu_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'fu_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'fu_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'fu_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'fu_vcurso'),0)},
-    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'re_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),agend:days.reduce((s,d)=>s+getN(d,'re_agend'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'re_valor'),0)},
-    is:{leads:days.reduce((s,d)=>s+getN(d,'is_leads'),0),sdr:days.reduce((s,d)=>s+getN(d,'is_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'is_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'is_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'is_vendas'),0)},
+    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),fu:days.reduce((s,d)=>s+getN(d,'re_followup'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'re_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),agend:days.reduce((s,d)=>s+getN(d,'re_agend'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'re_valor'),0)},
+    is:{leads:days.reduce((s,d)=>s+getN(d,'is_leads'),0),sdr:days.reduce((s,d)=>s+getN(d,'is_sdr'),0),fu:days.reduce((s,d)=>s+getN(d,'is_followup'),0),convites:days.reduce((s,d)=>s+getN(d,'is_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'is_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'is_vendas'),0)},
   };
 }
 
@@ -2623,6 +2630,68 @@ async function renderMensal(){
       </div>
     </div>` : '';
   if(semBody) semBody.innerHTML = semRows || '<tr><td colspan="9" style="text-align:center;color:var(--text3)">Sem dados neste mês.</td></tr>';
+
+  // ── DESEMPENHO POR CANAL ──
+  const canalDeEl = document.getElementById('canalDesemp');
+  if(canalDeEl){
+    const canais = [
+      { nome:'PC / Outbound', icon:'📤', cor:'var(--teal)',
+        abord: agg.pc?.abord||0, fu: agg.pc?.fu||0, reun: (agg.pc?.reun||0),
+        vend: agg.pc?.vend||0, fat: agg.pc?.valor||0 },
+      { nome:'BV Automático',  icon:'⚡', cor:'var(--purple)',
+        abord: agg.bv?.auto||0, fu: 0, reun: agg.bv?.reun||0,
+        vend: agg.bv?.vend||0, fat: agg.bv?.valor||0 },
+      { nome:'Reativação',     icon:'🔄', cor:'var(--amber)',
+        abord: agg.re?.abord||0, fu: agg.re?.fu||0, reun: agg.re?.reun||0,
+        vend: agg.re?.vend||0, fat: agg.re?.valor||0 },
+      { nome:'Isca',           icon:'🎣', cor:'var(--g4)',
+        abord: agg.is?.sdr||0, fu: agg.is?.fu||0, reun: agg.is?.reun||0,
+        vend: agg.is?.vend||0, fat: 0 },
+      { nome:'Follow-up',      icon:'💬', cor:'var(--coral)',
+        abord: 0, fu: agg.fu?.ret||0, reun: agg.fu?.reun||0,
+        vend: agg.fu?.vend||0, fat: agg.fu?.valor||0 },
+      { nome:'Stories',        icon:'📱', cor:'var(--text2)',
+        abord: agg.st?.inter||0, fu: 0, reun: agg.st?.reun||0,
+        vend: agg.st?.vend||0, fat: 0 },
+    ].filter(c=>c.abord>0||c.fu>0||c.reun>0||c.vend>0);
+
+    if(canais.length===0){
+      canalDeEl.innerHTML = '<div style="font-size:13px;color:var(--text3);padding:12px 0">Sem dados por canal neste mês. Preencha o Registro Diário.</div>';
+    } else {
+      // Melhor canal por fechamento
+      const melhorC = canais.filter(c=>c.reun>0).reduce((b,c)=>(!b||c.vend/c.reun>b.vend/b.reun)?c:b, null);
+
+      canalDeEl.innerHTML = `
+        ${melhorC?`<div style="font-size:12px;color:var(--g4);margin-bottom:10px;font-weight:500">🏆 Melhor canal em fechamento: <strong>${melhorC.nome}</strong> — ${melhorC.reun>0?Math.round(melhorC.vend/melhorC.reun*100):0}% de conversão</div>`:''}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">
+        ${canais.map(c=>{
+          const conv = c.reun>0 ? Math.round(c.vend/c.reun*100) : 0;
+          const isMelhor = melhorC && c.nome===melhorC.nome;
+          return `<div class="card" style="padding:14px 16px;${isMelhor?'border-color:var(--g3);background:rgba(27,67,50,.06)':''}">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span style="font-size:16px">${c.icon}</span>
+              <span style="font-size:12px;font-weight:600;color:${c.cor}">${c.nome}</span>
+              ${isMelhor?'<span style="font-size:9px;background:var(--g4);color:#fff;border-radius:20px;padding:1px 6px;letter-spacing:.06em">MELHOR</span>':''}
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">
+              <div style="font-size:11px;color:var(--text3)">Abordagens</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);text-align:right">${c.abord||0}</div>
+              ${c.fu>0?`<div style="font-size:11px;color:var(--text3)">Follow-ups</div>
+              <div style="font-size:13px;color:var(--teal);text-align:right">${c.fu}</div>`:''}
+              <div style="font-size:11px;color:var(--text3)">Reuniões</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);text-align:right">${c.reun||0}</div>
+              <div style="font-size:11px;color:var(--text3)">Vendas</div>
+              <div style="font-size:13px;font-weight:700;color:var(--g4);text-align:right">${c.vend||0}</div>
+              ${c.fat>0?`<div style="font-size:11px;color:var(--text3)">Faturamento</div>
+              <div style="font-size:12px;color:var(--g4);text-align:right">R$ ${c.fat.toLocaleString('pt-BR')}</div>`:''}
+              ${c.reun>0?`<div style="font-size:11px;color:var(--text3)">Conversão</div>
+              <div style="font-size:13px;font-weight:600;color:${conv>=25?'var(--g4)':conv>=15?'var(--amber)':'var(--coral)'};text-align:right">${conv}%</div>`:''}
+            </div>
+          </div>`;
+        }).join('')}
+        </div>`;
+    }
+  }
 
   // ── ALERTAS E INSIGHTS ──
   const alertas = document.getElementById('alertasBox');
@@ -3432,12 +3501,12 @@ async function renderCentral(){
 
   // Valores consolidados
   const vendas   = (agg.vendas||0) + (crmD.ganho||0);
-  const fat      = (agg.valor||0)  + (crmD.fat_ganho||0);
+  const fat      = (agg.valor||0)  + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
   const agend    = (agg.agendadas||0) + (crmD.agend||0);
-  const reunioes = (agg.reunioes||0)  + (crmD.agend||0);
+  const reunioes = (agg.reunioes||0)  + (crmD.realizadas||0); // reuniões que aconteceram (data_realizada)
   const noshow   = Math.max(0,(agg.agendadas||0)-(agg.reunioes||0)) + (crmD.noshow||0);
-  const abord    = (agg.abord||0) + (crmD.abord||0);
-  const taxaFech = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
+  const taxaFechamento = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
+  const taxaFech = taxaFechamento;
   const taxaNS   = agend>0   ? Math.round(noshow/agend*100)    : 0;
 
   const prevVendas   = (prevAgg.vendas||0);
@@ -3646,9 +3715,10 @@ async function renderCentral(){
 
   // ── GRÁFICO BARRAS: resultado por canal ──
   const barrasCtx = document.getElementById('centralBarrasChart');
-  const canalNomes = ['PC','BV','Stories','Follow-up','Reativação','Isca'];
-  const canalVendas = [agg.pc?.vend||0, agg.bv?.vend||0, agg.st?.vend||0, agg.fu?.vend||0, agg.re?.vend||0, agg.is?.vend||0];
-  const canalReun   = [agg.pc?.reun||0, agg.bv?.reun||0, agg.st?.reun||0, agg.fu?.reun||0, agg.re?.reun||0, agg.is?.reun||0];
+  const canalNomes = ['PC','BV','Reativação','Follow-up','Isca','Stories'];
+  const canalVendas = [agg.pc?.vend||0, agg.bv?.vend||0, agg.re?.vend||0, agg.fu?.vend||0, agg.is?.vend||0, agg.st?.vend||0];
+  const canalReun   = [agg.pc?.reun||0, agg.bv?.reun||0, agg.re?.reun||0, agg.fu?.reun||0, agg.is?.reun||0, agg.st?.reun||0];
+  const canalAbord  = [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.fu?.ret||0, agg.is?.sdr||0, agg.st?.inter||0];
   if(barrasCtx){
     if(_chartBarras) _chartBarras.destroy();
     _chartBarras = new Chart(barrasCtx, {
