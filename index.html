@@ -2227,21 +2227,29 @@ async function renderMensal(){
   try{ crmDados = await crmBuscarDadosMes(currentYear, currentMonth); }
   catch(e){ console.error('CRM mensal:', e); }
 
-  // ── SOMA: fontes consolidadas (regra definitiva) ──
-  // ABORDAGENS: get_anual anti-dup (integra registro_diario + crm_abordagens sem duplicar)
-  // REUNIÕES/VENDAS/FAT: legado + CRM (períodos diferentes, sem duplicidade)
-  // AGEND/NOSHOW: apenas CRM (crm_oportunidades tem data precisa)
-  const abord    = (aggLeg.abord||0);                               // get_anual anti-dup
-  const followup = (aggLeg.followup||0) + (aggLeg.pc_fu||0) + (aggLeg.reat_fu||0) + (aggLeg.isca_fu||0);
-  const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);    // legado + CRM (períodos diferentes)
-  const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0); // legado histórico + CRM novo
-  const noshow   = (crmDados.noshow||0);                            // crm_oportunidades
-  const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);    // legado histórico + CRM ganhos
+  // ── FONTES DE DADOS POR PERÍODO ──
+  // Setembro/2026 em diante: crm_abordagens é a única fonte (sem registro_diario)
+  // Até agosto/2026: registro_diario é a fonte (crm_abordagens pode ter ou não)
+  // REGRA: se crmDados.abord > 0 E não há aggLeg → usar crmDados
+  //        se aggLeg tem dados → usar aggLeg (legado)
+  //        NUNCA somar os dois (anti-duplicidade)
+  const temLegado  = (aggLeg.abord||0) > 0;
+  const temCrmAbord = (crmDados.abord||0) > 0;
+
+  // Abordagens: fonte única por período
+  const abord    = temLegado ? (aggLeg.abord||0) : (crmDados.abord||0);
+  const abordPc  = temLegado ? (aggLeg.pc?.abord||0) : (crmDados.abord_pc||0);
+  const abordIs  = temLegado ? (aggLeg.is?.leads||0) : (crmDados.abord_isca||0);
+  const abordRe  = temLegado ? (aggLeg.re?.abord||0) : (crmDados.abord_reat||0);
+  const abordFu  = temLegado ? ((aggLeg.pc_fu||0)+(aggLeg.reat_fu||0)+(aggLeg.isca_fu||0)) : (crmDados.abord_fu||0);
+  const followup = abordFu;
+
+  // Reuniões/vendas/fat: legado histórico + CRM (períodos diferentes, sem dup)
+  const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);
+  const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0);
+  const noshow   = (aggLeg.noshow||0)    + (crmDados.noshow||0);
+  const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);
   const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
-  const abordPc  = (aggLeg.pc?.abord||0) + (crmDados.abord_pc||0);
-  const abordIs  = (aggLeg.is?.leads||0) + (crmDados.abord_isca||0);
-  const abordRe  = (aggLeg.re?.abord||0) + (crmDados.abord_reat||0);
-  const abordFu  = (crmDados.abord_fu||0);
 
   // ── KPIs TOPO ──
   const setEl = (id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
@@ -2301,7 +2309,7 @@ async function renderMensal(){
 
   // ── TAXA CONVERSÃO CRM ──
   const rateBox = document.getElementById('crmConvRateBox');
-  if(rateBox && (abord>0||crmDados.ops>0)){
+  if(rateBox && (abordC>0||crmDados.ops>0)){
     rateBox.innerHTML = `<div style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--text3);margin-bottom:16px">
       ${abord>0?`<span>Abord → Reun: <b style="color:var(--purple)">${pct(agend,abord)}</b></span>`:''}
       ${agend>0?`<span>Agend → Realizada: <b style="color:var(--g4)">${pct(reunioes,agend)}</b></span>`:''}
@@ -3328,12 +3336,14 @@ async function renderCentral(){
     metasData = mr.dados||{};
   }catch(e){}
 
-  // Valores consolidados
-  const vendas   = (agg.vendas||0)   + (crmD.ganho||0);
-  const fat      = (agg.valor||0)    + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
-  const agend    = (agg.agendadas||0) + (crmD.agend||0);
-  const reunioes = (agg.reunioes||0) + (crmD.realizadas||0);
-  const noshow   = (crmD.noshow||0);
+  // Valores consolidados — mesma lógica do Dashboard Mensal (anti-duplicata)
+  const temLegC   = (agg.abord||0) > 0;
+  const abordC    = temLegC ? (agg.abord||0)    : (crmD.abord||0);
+  const vendas    = (agg.vendas||0)   + (crmD.ganho||0);
+  const fat       = (agg.valor||0)    + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
+  const agend     = (agg.agendadas||0) + (crmD.agend||0);
+  const reunioes  = (agg.reunioes||0) + (crmD.realizadas||0);
+  const noshow    = (agg.noshow||0)   + (crmD.noshow||0);
   const taxaFechamento = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
   const taxaFech = taxaFechamento;
   const taxaNS   = agend>0   ? Math.round(noshow/agend*100)    : 0;
@@ -3525,8 +3535,9 @@ async function renderCentral(){
   const pizzaCtx = document.getElementById('centralPizzaChart');
   if(pizzaCtx){
     if(_chartPizza){ _chartPizza.destroy(); _chartPizza=null; }
-    // requestAnimationFrame garante que o DOM está pintado antes de criar o chart
     await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const totalOps = opsStatus.agendado+opsStatus.nao_compareceu+opsStatus.negociacao+opsStatus.ganho+opsStatus.perdido+opsStatus.outros;
+    if(totalOps > 0){
     _chartPizza = new Chart(pizzaCtx, {
       type:'doughnut',
       data:{
@@ -3544,6 +3555,7 @@ async function renderCentral(){
         }
       }
     });
+    } else { pizzaCtx.parentElement.innerHTML='<div style="text-align:center;padding:60px 0;font-size:13px;color:var(--text3)">Sem oportunidades neste mês</div>'; }
   }
 
   // ── GRÁFICO BARRAS: resultado por canal ──
