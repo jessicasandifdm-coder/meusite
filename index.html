@@ -2162,7 +2162,7 @@ async function crmBuscarDadosMes(ano, mes){
     const [rAbord, rAgend, rNoShow, rRealiz, rGanho, rBv, rVendas] = await Promise.all([
       fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim, {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&select=id,reagendamento_count', {headers:H}),
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_no_show=gte.'+iISO+'&data_no_show=lte.'+fISO+'&select=id', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&status=eq.nao_compareceu&select=id', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+iISO+'&data_realizada=lte.'+fISO+'&select=id', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+iISO+'&data_ganho=lte.'+fISO+'&select=id,valor_venda', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim+'&select=id,bv_qualificacao', {headers:H}),
@@ -2229,29 +2229,35 @@ async function renderMensal(){
   try{ crmDados = await crmBuscarDadosMes(currentYear, currentMonth); }
   catch(e){ console.error('CRM mensal:', e); }
 
-  // ── FONTES DE DADOS POR PERÍODO ──
-  // Setembro/2026 em diante: crm_abordagens é a única fonte (sem registro_diario)
-  // Até agosto/2026: registro_diario é a fonte (crm_abordagens pode ter ou não)
-  // REGRA: se crmDados.abord > 0 E não há aggLeg → usar crmDados
-  //        se aggLeg tem dados → usar aggLeg (legado)
-  //        NUNCA somar os dois (anti-duplicidade)
-  const temLegado  = (aggLeg.abord||0) > 0;
-  const temCrmAbord = (crmDados.abord||0) > 0;
+  // ── REGRA DE FONTE POR PERÍODO ──
+  // CRM (crm_oportunidades) é fonte oficial para reuniões/noshow/realizadas/ganhos
+  // quando existe dado no CRM para aquele mês.
+  // Registro Diário é fonte para meses anteriores ao CRM (jan-jul/2026).
+  // ABORDAGENS: registro_diario + crm_abordagens complementar (anti-dup por dia via get_anual)
+  // NUNCA somar legado + CRM para as MESMAS métricas de reunião.
 
-  // Abordagens: fonte única por período
-  const abord    = temLegado ? (aggLeg.abord||0) : (crmDados.abord||0);
-  const abordPc  = temLegado ? (aggLeg.pc?.abord||0) : (crmDados.abord_pc||0);
-  const abordIs  = temLegado ? (aggLeg.is?.leads||0) : (crmDados.abord_isca||0);
-  const abordRe  = temLegado ? (aggLeg.re?.abord||0) : (crmDados.abord_reat||0);
-  const abordFu  = temLegado ? ((aggLeg.pc_fu||0)+(aggLeg.reat_fu||0)+(aggLeg.isca_fu||0)) : (crmDados.abord_fu||0);
+  const temCRM    = (crmDados.agend||0) > 0 || (crmDados.realizadas||0) > 0
+                    || (crmDados.noshow||0) > 0 || (crmDados.ganho||0) > 0;
+  const temLegado = (aggLeg.abord||0) > 0;
+
+  // Abordagens: get_anual já faz anti-dup por dia (crm_abordagens prioridade em dias sobrepostos)
+  const abord   = temLegado ? (aggLeg.abord||0) : (crmDados.abord||0);
+  const abordPc = temLegado ? (aggLeg.pc?.abord||0)  : (crmDados.abord_pc||0);
+  const abordIs = temLegado ? (aggLeg.is?.leads||0)  : (crmDados.abord_isca||0);
+  const abordRe = temLegado ? (aggLeg.re?.abord||0)  : (crmDados.abord_reat||0);
+  const abordFu = temLegado
+    ? ((aggLeg.pc_fu||0)+(aggLeg.reat_fu||0)+(aggLeg.isca_fu||0)+(aggLeg.followup||0))
+    : (crmDados.abord_fu||0);
   const followup = abordFu;
 
-  // Reuniões/vendas/fat: legado histórico + CRM (períodos diferentes, sem dup)
-  const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);
-  const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0);
-  const noshow   = (aggLeg.noshow||0)    + (crmDados.noshow||0);
-  const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);
-  const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
+  // Reuniões/noshow/realizadas/ganhos:
+  // Se o CRM tem dados → usar APENAS o CRM (fonte precisa, sem duplicidade)
+  // Se não tem CRM → usar registro_diario (meses históricos jan-jul)
+  const agend    = temCRM ? (crmDados.agend||0)      : (aggLeg.agendadas||0);
+  const reunioes = temCRM ? (crmDados.realizadas||0) : (aggLeg.reunioes||0);
+  const noshow   = temCRM ? (crmDados.noshow||0)     : 0;
+  const vendas   = (aggLeg.vendas||0) + (crmDados.ganho||0);  // legado histórico + ganhos CRM (produtos diferentes)
+  const fat      = (aggLeg.valor||0)  + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
 
   // ── KPIs TOPO ──
   const setEl = (id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
@@ -3338,14 +3344,15 @@ async function renderCentral(){
     metasData = mr.dados||{};
   }catch(e){}
 
-  // Valores consolidados — mesma lógica do Dashboard Mensal (anti-duplicata)
+  // Valores consolidados — mesma regra do Dashboard Mensal
+  const temCRMc   = (crmD.agend||0)>0 || (crmD.realizadas||0)>0 || (crmD.noshow||0)>0 || (crmD.ganho||0)>0;
   const temLegC   = (agg.abord||0) > 0;
-  const abordC    = temLegC ? (agg.abord||0)    : (crmD.abord||0);
+  const abordC    = temLegC ? (agg.abord||0) : (crmD.abord||0);
   const vendas    = (agg.vendas||0)   + (crmD.ganho||0);
   const fat       = (agg.valor||0)    + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
-  const agend     = (agg.agendadas||0) + (crmD.agend||0);
-  const reunioes  = (agg.reunioes||0) + (crmD.realizadas||0);
-  const noshow    = (agg.noshow||0)   + (crmD.noshow||0);
+  const agend     = temCRMc ? (crmD.agend||0)      : (agg.agendadas||0);
+  const reunioes  = temCRMc ? (crmD.realizadas||0) : (agg.reunioes||0);
+  const noshow    = temCRMc ? (crmD.noshow||0)     : 0;
   const taxaFechamento = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
   const taxaFech = taxaFechamento;
   const taxaNS   = agend>0   ? Math.round(noshow/agend*100)    : 0;
