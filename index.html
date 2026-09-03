@@ -996,7 +996,7 @@ button{font-family:var(--font)}
     <div class="kpi-card"><div class="kpi-val" id="kpi-abord-pc">—</div><div class="kpi-lbl">Abordagens PC</div></div>
     <div class="kpi-card"><div class="kpi-val" id="kpi-abord-isca">—</div><div class="kpi-lbl">Abordagens Isca</div></div>
     <div class="kpi-card"><div class="kpi-val" id="kpi-abord-reat">—</div><div class="kpi-lbl">Abordagens Reat.</div></div>
-    <div class="kpi-card"><div class="kpi-val" id="kpi-abord-fu">—</div><div class="kpi-lbl">Abordagens Follow-up</div></div>
+    <div class="kpi-card" style="border-color:var(--border)"><div class="kpi-val" style="color:var(--text2)" id="kpi-abord-fu">—</div><div class="kpi-lbl">Follow-ups <span style="font-size:9px;color:var(--text3)">(não conta como abordagem)</span></div></div>
   </div>
   <!-- IDs legados mantidos por compatibilidade -->
   <span id="kpi-resp" style="display:none"></span>
@@ -1122,16 +1122,8 @@ button{font-family:var(--font)}
         <input class="field-input" type="number" id="meta_abord" placeholder="ex: 900">
         <div style="font-size:10px;color:var(--text3);margin-top:3px">Topo do funil</div>
       </div>
-      <div class="field-group">
-        <div class="field-label" style="color:var(--amber)">Respostas/mês</div>
-        <input class="field-input" type="number" id="meta_resp" placeholder="ex: 270">
-        <div style="font-size:10px;color:var(--text3);margin-top:3px">~30% das abordagens</div>
-      </div>
-      <div class="field-group">
-        <div class="field-label" style="color:var(--amber)">Convites/mês</div>
-        <input class="field-input" type="number" id="meta_convites" placeholder="ex: 80">
-        <div style="font-size:10px;color:var(--text3);margin-top:3px">~30% das respostas</div>
-      </div>
+      
+      
       <div class="field-group">
         <div class="field-label" style="color:var(--g4)">Reuniões agendadas</div>
         <input class="field-input" type="number" id="meta_agend" placeholder="ex: 30">
@@ -1154,11 +1146,7 @@ button{font-family:var(--font)}
         <input class="field-input" type="number" id="meta_fat" placeholder="ex: 21000">
         <div style="font-size:10px;color:var(--text3);margin-top:3px">Qtd × ticket médio</div>
       </div>
-      <div class="field-group">
-        <div class="field-label">Vendas curso (qtd)</div>
-        <input class="field-input" type="number" id="meta_vcurso" placeholder="ex: 10">
-        <div style="font-size:10px;color:var(--text3);margin-top:3px">Opcional</div>
-      </div>
+      
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <button class="btn-save" onclick="saveMetas()" id="btnSalvarMetas">Salvar projeção</button>
@@ -2112,8 +2100,8 @@ function getN(data,f){return parseInt(data[f])||0;}
 
 function aggregateDays(days){
   return{
-    abord: days.reduce((s,d)=>s+getN(d,'pc_abord')+getN(d,'re_abord')+getN(d,'bv_sdr')+getN(d,'st_inter'),0), // SEM follow-ups — abordagens novas apenas
-    followup: days.reduce((s,d)=>s+getN(d,'fu_retom'),0), // follow-ups do legado (registro_diario)
+    abord: days.reduce((s,d)=>s+getN(d,'pc_abord')+getN(d,'re_abord')+getN(d,'is_sdr'),0), // SOMENTE primeiros contatos (PC+Reat+Isca)
+    followup: days.reduce((s,d)=>s+getN(d,'fu_retom')+getN(d,'pc_fu')+getN(d,'reat_fu')+getN(d,'isca_fu'),0), // follow-ups (não conta como abordagem)
     pc_fu:    days.reduce((s,d)=>s+getN(d,'pc_fu'),0),
     reat_fu:  days.reduce((s,d)=>s+getN(d,'reat_fu'),0),
     isca_fu:  days.reduce((s,d)=>s+getN(d,'isca_fu'),0),
@@ -2177,11 +2165,13 @@ async function crmBuscarDadosMes(ano, mes){
     const vendasRows = rVendas.ok ? await rVendas.json() : [];
     const totalReagend = agendRows.reduce((s,r)=>s+(r.reagendamento_count||0),0);
     return {
-      abord:          abordRows.reduce((s,r)=>s+(r.total||0),0), // só abordagens novas
+      // Abordagens = SOMENTE primeiros contatos (pc + isca + reativacao)
+      abord:          abordRows.reduce((s,r)=>s+(r.pc||0)+(r.isca||0)+(r.reativacao||0),0),
       abord_pc:       abordRows.reduce((s,r)=>s+(r.pc||0),0),
       abord_isca:     abordRows.reduce((s,r)=>s+(r.isca||0),0),
       abord_reat:     abordRows.reduce((s,r)=>s+(r.reativacao||0),0),
-      abord_fu:       abordRows.reduce((s,r)=>s+(r.outros||0),0), // fu total (legado)
+      // Follow-ups = segundo contato, NUNCA conta como abordagem
+      followup:       abordRows.reduce((s,r)=>s+(r.pc_fu||0)+(r.reat_fu||0)+(r.isca_fu||0)+(r.outros||0),0),
       abord_pc_fu:    abordRows.reduce((s,r)=>s+(r.pc_fu||0),0),
       abord_reat_fu:  abordRows.reduce((s,r)=>s+(r.reat_fu||0),0),
       abord_isca_fu:  abordRows.reduce((s,r)=>s+(r.isca_fu||0),0),
@@ -2261,7 +2251,7 @@ async function renderMensal(){
 
   // ── KPIs TOPO ──
   const setEl = (id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
-  setEl('kpi-abord',   abord||0);
+  setEl('kpi-abord',   abord||0);     // SOMENTE primeiros contatos
   setEl('kpi-agend',   agend||0);
   setEl('kpi-reun',    reunioes||0);
   setEl('kpi-noshow',  noshow||0);
@@ -2269,9 +2259,11 @@ async function renderMensal(){
   setEl('kpi-abord-pc',  abordPc||0);
   setEl('kpi-abord-isca',abordIs||0);
   setEl('kpi-abord-reat',abordRe||0);
-  setEl('kpi-abord-fu',  abordFu||0);
+  setEl('kpi-abord-fu',  abordFu||0); // follow-ups (exibido separado)
   const nsPctEl = document.getElementById('kpi-noshow-pct');
   if(nsPctEl) nsPctEl.textContent = agend>0 ? Math.round(noshow/agend*100)+'% das agendadas' : '';
+  // Taxa abordagem → reunião (métrica principal de conversão)
+  const taxaAbordReun = abord>0 ? Math.round(agend/abord*100) : 0;
 
   // ── TAXAS DO FUNIL ──
   document.getElementById('taxa-resp').textContent    = pct(aggLeg.resp, aggLeg.abord);
@@ -2560,7 +2552,7 @@ async function renderMensal(){
     const mr = await apiGet({action:'get_metas',ano:currentYear,mes:m});
     metasData = mr.dados||{};
   }catch(e){ console.error('Erro ao carregar metas:',e); }
-  ['abord','resp','convites','agend','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
+  ['abord','agend','reun','vendas','fat'].forEach(k=>{
     const el = document.getElementById('meta_'+k);
     if(el) el.value = metasData[k]||'';
   });
@@ -2587,18 +2579,18 @@ async function renderMensal(){
   const metaFat   = parseFloat(metasData.fat)||0;
   const tbody = document.getElementById('metasTableBody');
   if(tbody) tbody.innerHTML =
-    metaRow('Abordagens',         metaAbord, abord,    false)+
-    metaRow('Reuniões agendadas', metaAgend, agend,    false)+
-    metaRow('Reuniões realizadas',metaReun,  reunioes, false)+
-    metaRow('Ganhos / Vendas',    metaVend,  vendas,   false)+
-    metaRow('Faturamento (R$)',   metaFat,   fat,      true);
+    metaRow('Abordagens (1º contato)', metaAbord, abord,    false)+
+    metaRow('Reuniões agendadas',       metaAgend, agend,    false)+
+    metaRow('Reuniões realizadas',      metaReun,  reunioes, false)+
+    metaRow('Vendas (Ganhos)',          metaVend,  vendas,   false)+
+    metaRow('Faturamento (R$)',         metaFat,   fat,      true);
 }
 
 
 async function saveMetas(){
   const m=currentMonth;
   const dados={};
-  ['abord','resp','convites','agend','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
+  ['abord','agend','reun','vendas','fat'].forEach(k=>{
     const el=document.getElementById('meta_'+k);
     if(el)dados[k]=el.value||'';
   });
@@ -2621,7 +2613,7 @@ async function saveMetas(){
 }
 
 function lockMetasFields(locked){
-  ['abord','resp','convites','agend','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
+  ['abord','agend','reun','vendas','fat'].forEach(k=>{
     const el=document.getElementById('meta_'+k);
     if(el){
       el.readOnly=locked;
@@ -2651,7 +2643,7 @@ async function renderMetasTable(){
   try{
     const mr=await apiGet({action:'get_metas',ano:currentYear,mes:m});
     metasData=mr.dados||{};
-    ['abord','resp','convites','agend','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
+    ['abord','agend','reun','vendas','fat'].forEach(k=>{
       const el=document.getElementById('meta_'+k);
       if(el&&metasData[k])el.value=metasData[k];
     });
@@ -4067,8 +4059,15 @@ async function crmDrop(e, novoStatus){
   if(novoStatus==='agendado')        datesUpdate.data_agendamento = agora;
   if(novoStatus==='nao_compareceu')  datesUpdate.data_no_show     = agora;
   if(novoStatus==='negociacao')      datesUpdate.data_negociacao   = agora;
-  if(novoStatus==='ganho')           datesUpdate.data_ganho        = agora;
-  if(novoStatus==='perdido')         datesUpdate.data_perda        = agora;
+  if(novoStatus==='ganho'){
+    datesUpdate.data_ganho = agora;
+    const vlVenda = parseFloat(document.getElementById('crm_vl_venda')?.value)||0;
+    if(!vlVenda){
+      const vlOfert = parseFloat(document.getElementById('crm_vl_ofert')?.value)||0;
+      setTimeout(()=>showError(vlOfert>0?'Confirme o valor da venda: R$ '+vlOfert.toLocaleString('pt-BR'):'⚠ Venda sem valor! Preencha o valor da venda na ficha.'),500);
+    }
+  }
+  if(novoStatus==='perdido') datesUpdate.data_perda = agora;
   // Reunião realizada: saiu de agendado/no-show para negociação/ganho/perdido
   if(['agendado','nao_compareceu'].includes(statusAnterior) && ['negociacao','ganho','perdido'].includes(novoStatus)){
     datesUpdate.data_realizada = agora;
