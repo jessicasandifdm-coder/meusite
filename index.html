@@ -682,19 +682,19 @@ button{font-family:var(--font)}
     <!-- Pizza: situação das oportunidades -->
     <div class="card">
       <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Situação das oportunidades</div>
-      <canvas id="centralPizzaChart" height="200"></canvas>
+      <canvas id="centralPizzaChart" height="220" style="max-height:220px"></canvas>
     </div>
     <!-- Barras: resultado por canal -->
     <div class="card">
       <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Resultado por canal</div>
-      <canvas id="centralBarrasChart" height="200"></canvas>
+      <canvas id="centralBarrasChart" height="220" style="max-height:220px"></canvas>
     </div>
   </div>
 
   <!-- ── NÍVEL 6: EVOLUÇÃO DO MÊS ── -->
   <div class="card" style="margin-bottom:24px">
     <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução do mês — abordagens e reuniões por semana</div>
-    <canvas id="centralLinhaChart" height="120"></canvas>
+    <canvas id="centralLinhaChart" height="120" style="max-height:200px"></canvas>
   </div>
 
   <!-- ── BOTÃO: abrir análise completa ── -->
@@ -2227,7 +2227,7 @@ async function renderMensal(){
   // AGEND/NOSHOW: apenas CRM (crm_oportunidades tem data precisa)
   const abord    = (aggLeg.abord||0);                               // get_anual anti-dup
   const followup = (aggLeg.followup||0) + (aggLeg.pc_fu||0) + (aggLeg.reat_fu||0) + (aggLeg.isca_fu||0);
-  const agend    = (crmDados.agend||0);                             // crm_oportunidades
+  const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);    // legado + CRM (períodos diferentes)
   const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0); // legado histórico + CRM novo
   const noshow   = (crmDados.noshow||0);                            // crm_oportunidades
   const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);    // legado histórico + CRM ganhos
@@ -2644,7 +2644,7 @@ async function renderMetasTable(){
 
   // Valores reais combinados (igual ao renderMensal)
   const realAbord   = (agg.abord||0);
-  const realAgend   = (crmD.agend||0);
+  const realAgend   = (agg.agendadas||0) + (crmD.agend||0);
   const realRealiz  = (agg.reunioes||0)  + (crmD.realizadas||0);
   const realVendas  = (agg.vendas||0)    + (crmD.ganho||0);
   const realFat     = (agg.valor||0)     + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
@@ -3325,7 +3325,7 @@ async function renderCentral(){
   // Valores consolidados
   const vendas   = (agg.vendas||0)   + (crmD.ganho||0);
   const fat      = (agg.valor||0)    + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
-  const agend    = (crmD.agend||0);
+  const agend    = (agg.agendadas||0) + (crmD.agend||0);
   const reunioes = (agg.reunioes||0) + (crmD.realizadas||0);
   const noshow   = (crmD.noshow||0);
   const taxaFechamento = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
@@ -3530,7 +3530,7 @@ async function renderCentral(){
         }]
       },
       options:{
-        responsive:true, plugins:{
+        responsive:false, maintainAspectRatio:false, plugins:{
           legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:12}},
           tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} leads`}}
         }
@@ -3584,7 +3584,7 @@ async function renderCentral(){
         ]
       },
       options:{
-        responsive:true,
+        responsive:false,
         scales:{
           x:{ticks:{color:'#7a9b7e',font:{size:11}},grid:{color:'#253022'}},
           y:{ticks:{color:'#7a9b7e',font:{size:11},stepSize:1},grid:{color:'#253022'},beginAtZero:true}
@@ -3617,7 +3617,7 @@ async function renderCentral(){
         ]
       },
       options:{
-        responsive:true,
+        responsive:false,
         scales:{
           x:{ticks:{color:'#7a9b7e',font:{size:11}},grid:{color:'#253022'}},
           y:{ticks:{color:'#7a9b7e',font:{size:11},stepSize:1},grid:{color:'#253022'},beginAtZero:true}
