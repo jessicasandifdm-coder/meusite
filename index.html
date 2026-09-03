@@ -2219,35 +2219,29 @@ async function renderMensal(){
   try{ crmDados = await crmBuscarDadosMes(currentYear, currentMonth); }
   catch(e){ console.error('CRM mensal:', e); }
 
-  // ── REGRA DE FONTE POR PERÍODO ──
-  // CRM (crm_oportunidades) é fonte oficial para reuniões/noshow/realizadas/ganhos
-  // quando existe dado no CRM para aquele mês.
-  // Registro Diário é fonte para meses anteriores ao CRM (jan-jul/2026).
-  // ABORDAGENS: registro_diario + crm_abordagens complementar (anti-dup por dia via get_anual)
-  // NUNCA somar legado + CRM para as MESMAS métricas de reunião.
-
-  const temCRM    = (crmDados.agend||0) > 0 || (crmDados.realizadas||0) > 0
-                    || (crmDados.noshow||0) > 0 || (crmDados.ganho||0) > 0;
+  // ── CONSOLIDAÇÃO: legado + CRM são PERÍODOS DIFERENTES do mesmo mês ──
+  // registro_diario: dados de 1-14/ago (manual, antes do CRM)
+  // CRM: dados de 15/ago em diante (automático)
+  // SOMA é correta — não há duplicidade entre as duas fontes
+  // Abordagens: get_anual já faz anti-dup por dia nos 2 dias de sobreposição (17 e 18/ago)
   const temLegado = (aggLeg.abord||0) > 0;
 
-  // Abordagens: get_anual já faz anti-dup por dia (crm_abordagens prioridade em dias sobrepostos)
+  // Abordagens = SOMENTE primeiros contatos (anti-dup por dia via get_anual)
   const abord   = temLegado ? (aggLeg.abord||0) : (crmDados.abord||0);
-  const abordPc = temLegado ? (aggLeg.pc?.abord||0)  : (crmDados.abord_pc||0);
-  const abordIs = temLegado ? (aggLeg.is?.leads||0)  : (crmDados.abord_isca||0);
-  const abordRe = temLegado ? (aggLeg.re?.abord||0)  : (crmDados.abord_reat||0);
+  const abordPc = temLegado ? (aggLeg.pc?.abord||0) : (crmDados.abord_pc||0);
+  const abordIs = temLegado ? (aggLeg.is?.leads||0) : (crmDados.abord_isca||0);
+  const abordRe = temLegado ? (aggLeg.re?.abord||0) : (crmDados.abord_reat||0);
   const abordFu = temLegado
     ? ((aggLeg.pc_fu||0)+(aggLeg.reat_fu||0)+(aggLeg.isca_fu||0)+(aggLeg.followup||0))
-    : (crmDados.abord_fu||0);
+    : (crmDados.followup||0);
   const followup = abordFu;
 
-  // Reuniões/noshow/realizadas/ganhos:
-  // Se o CRM tem dados → usar APENAS o CRM (fonte precisa, sem duplicidade)
-  // Se não tem CRM → usar registro_diario (meses históricos jan-jul)
-  const agend    = temCRM ? (crmDados.agend||0)      : (aggLeg.agendadas||0);
-  const reunioes = temCRM ? (crmDados.realizadas||0) : (aggLeg.reunioes||0);
-  const noshow   = temCRM ? (crmDados.noshow||0)     : 0;
-  const vendas   = (aggLeg.vendas||0) + (crmDados.ganho||0);  // legado histórico + ganhos CRM (produtos diferentes)
-  const fat      = (aggLeg.valor||0)  + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
+  // Reuniões: SOMA legado + CRM (períodos diferentes, sem duplicidade)
+  const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);
+  const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0);
+  const noshow   = (crmDados.noshow||0); // noshow: só CRM tem data precisa
+  const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);
+  const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
 
   // ── KPIs TOPO ──
   const setEl = (id,v)=>{ const e=document.getElementById(id); if(e)e.textContent=v; };
@@ -3336,15 +3330,14 @@ async function renderCentral(){
     metasData = mr.dados||{};
   }catch(e){}
 
-  // Valores consolidados — mesma regra do Dashboard Mensal
-  const temCRMc   = (crmD.agend||0)>0 || (crmD.realizadas||0)>0 || (crmD.noshow||0)>0 || (crmD.ganho||0)>0;
+  // Valores consolidados — legado + CRM são períodos diferentes, soma é correta
   const temLegC   = (agg.abord||0) > 0;
   const abordC    = temLegC ? (agg.abord||0) : (crmD.abord||0);
   const vendas    = (agg.vendas||0)   + (crmD.ganho||0);
   const fat       = (agg.valor||0)    + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
-  const agend     = temCRMc ? (crmD.agend||0)      : (agg.agendadas||0);
-  const reunioes  = temCRMc ? (crmD.realizadas||0) : (agg.reunioes||0);
-  const noshow    = temCRMc ? (crmD.noshow||0)     : 0;
+  const agend     = (agg.agendadas||0) + (crmD.agend||0);
+  const reunioes  = (agg.reunioes||0)  + (crmD.realizadas||0);
+  const noshow    = (crmD.noshow||0);
   const taxaFechamento = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
   const taxaFech = taxaFechamento;
   const taxaNS   = agend>0   ? Math.round(noshow/agend*100)    : 0;
