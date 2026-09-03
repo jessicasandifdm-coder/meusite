@@ -1836,6 +1836,7 @@ function showTab(id){
   if(id==='anual'){renderAnual();}
   if(id==='trafego'){renderTrafego();}
   if(id==='materiais'){renderMateriais();}
+  if(id==='scripts'){loadScripts();}
 }
 
 function showTabByName(id){
@@ -1849,6 +1850,7 @@ function showTabByName(id){
   if(id==='anual'){renderAnual();}
   if(id==='trafego'){renderTrafego();}
   if(id==='materiais'){renderMateriais();}
+  if(id==='scripts'){loadScripts();}
 }
 
 function toggleFunil(card){card.classList.toggle('open')}
@@ -5378,20 +5380,23 @@ async function ensureScriptRows(){
   }
 }
 
-ensureScriptRows().then(() => loadScripts());
+// scripts carregados quando a aba é aberta (ver showTab)
 
 // ══════════════════════════════════════════
 // VENDAS AVULSAS
 // ══════════════════════════════════════════
 function abrirModalVenda(){
   const modal = document.getElementById('modalVendaOverlay');
-  document.getElementById('vd_data').value = today();
-  document.getElementById('vd_cliente').value = '';
-  document.getElementById('vd_produto').value = '';
-  document.getElementById('vd_valor').value = '';
-  document.getElementById('vd_canal').value = 'pc';
-  document.getElementById('vd_obs').value = '';
-  document.getElementById('vd_status').style.display = 'none';
+  if(!modal) return;
+  const setV = (id, v) => { const e = document.getElementById(id); if(e) e.value = v; };
+  setV('vd_data', today());
+  setV('vd_cliente', '');
+  setV('vd_produto', '');
+  setV('vd_valor', '');
+  setV('vd_canal', 'pc');
+  setV('vd_obs', '');
+  const vdStatus = document.getElementById('vd_status');
+  if(vdStatus) vdStatus.style.display = 'none';
   modal.style.display = 'flex';
 }
 
@@ -5472,9 +5477,12 @@ async function carregarPipelineValor(){
 }
 
 // ── Init principal — roda após todas as definições ──
-document.getElementById('regDate').value=today();
-loadDay();
-loadDailyMetas();
+// Registro Diário removido da interface — as funções abaixo só rodam se o elemento existir
+if(document.getElementById('regDate')){
+  document.getElementById('regDate').value=today();
+  loadDay();
+  loadDailyMetas();
+}
 
 // ── Qualificação visual ──
 function crmUpdateQualifStyle(){
