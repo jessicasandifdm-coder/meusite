@@ -3477,11 +3477,11 @@ async function renderCentral(){
   // ── DIAGNÓSTICO: MELHOR CANAL ──
   // Combinar legado (agg) + CRM (canalGanhoCRM) para cada canal
   const canais = [
-    {nome:'PC / Outbound', vend:(agg.pc?.vend||0)+canalGanhoCRM.pc,         reun:agg.pc?.reun||0},
-    {nome:'BV',            vend:(agg.bv?.vend||0)+canalGanhoCRM.bv,         reun:agg.bv?.reun||0},
-    {nome:'Reativação',    vend:(agg.re?.vend||0)+canalGanhoCRM.reativacao,  reun:agg.re?.reun||0},
-    {nome:'Isca',          vend:(agg.is?.vend||0)+canalGanhoCRM.isca,        reun:agg.is?.reun||0},
-    {nome:'Aplicação',     vend:canalGanhoCRM.aplicacao,                     reun:0},
+    {nome:'PC / Outbound', vend:(agg.pc?.vend||0)+canalGanhoCRM.pc,        reun:(agg.pc?.reun||0)+canalReunCRM.pc},
+    {nome:'BV',            vend:(agg.bv?.vend||0)+canalGanhoCRM.bv,        reun:(agg.bv?.reun||0)+canalReunCRM.bv},
+    {nome:'Reativação',    vend:(agg.re?.vend||0)+canalGanhoCRM.reativacao, reun:(agg.re?.reun||0)+canalReunCRM.reativacao},
+    {nome:'Isca',          vend:(agg.is?.vend||0)+canalGanhoCRM.isca,       reun:(agg.is?.reun||0)+canalReunCRM.isca},
+    {nome:'Aplicação',     vend:canalGanhoCRM.aplicacao,                    reun:canalReunCRM.aplicacao},
   ].filter(c=>c.reun>0||c.vend>0);
 
   const melhorCanal = canais.length ? canais.reduce((best,c)=>{
@@ -3560,7 +3560,9 @@ async function renderCentral(){
   // Para legado: pc_vendas, bv_vendas etc (antes de setembro)
   // Para CRM: ganhos por funil da tabela crm_oportunidades
   let canalGanhoCRM = {pc:0, bv:0, reativacao:0, isca:0, aplicacao:0};
+  let canalReunCRM  = {pc:0, bv:0, reativacao:0, isca:0, aplicacao:0};
   try{
+    // Ganhos por canal no CRM
     const rGanhoCRM = await fetch(
       SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+inicio+'T00:00:00Z&data_ganho=lte.'+fim+'T23:59:59Z&select=funil,pipeline,valor_venda',
       {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
@@ -3576,6 +3578,22 @@ async function renderCentral(){
         else canalGanhoCRM.pc++;
       });
     }
+    // Realizadas por canal no CRM (passaram para negociação/ganho/perda no mês)
+    const rReunCRM = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+inicio+'T00:00:00Z&data_realizada=lte.'+fim+'T23:59:59Z&select=funil,pipeline',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    if(rReunCRM.ok){
+      const rs = await rReunCRM.json();
+      rs.forEach(r=>{
+        const f = r.funil || r.pipeline || 'pc';
+        if(f==='bv') canalReunCRM.bv++;
+        else if(f==='reativacao') canalReunCRM.reativacao++;
+        else if(f==='isca') canalReunCRM.isca++;
+        else if(f==='aplicacao') canalReunCRM.aplicacao++;
+        else canalReunCRM.pc++;
+      });
+    }
   }catch(e){}
 
   const canalNomes = ['PC','BV','Reativação','Isca','Aplicação'];
@@ -3586,7 +3604,14 @@ async function renderCentral(){
     (agg.is?.vend||0)  + canalGanhoCRM.isca,
     canalGanhoCRM.aplicacao
   ];
-  const canalReun = [agg.pc?.reun||0, agg.bv?.reun||0, agg.re?.reun||0, agg.is?.reun||0, 0];
+  // Reuniões: legado + CRM (períodos diferentes)
+  const canalReun = [
+    (agg.pc?.reun||0) + canalReunCRM.pc,
+    (agg.bv?.reun||0) + canalReunCRM.bv,
+    (agg.re?.reun||0) + canalReunCRM.reativacao,
+    (agg.is?.reun||0) + canalReunCRM.isca,
+    canalReunCRM.aplicacao
+  ];
   const canalAbord= [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.is?.sdr||0, 0];
   if(barrasCtx){
     if(_chartBarras){ _chartBarras.destroy(); _chartBarras=null; }
