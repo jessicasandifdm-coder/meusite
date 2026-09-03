@@ -2310,79 +2310,52 @@ let currentYear=new Date().getFullYear();
 // CRM → DASHBOARDS: buscar dados reais do CRM
 // ══════════════════════════════════════════
 async function crmBuscarDadosMes(ano, mes){
-  // Primeiro e último dia do mês
   const inicio = `${ano}-${String(mes+1).padStart(2,'0')}-01`;
   const fimDate = new Date(ano, mes+1, 0);
   const fim = fimDate.toISOString().split('T')[0];
+  const iISO = inicio+'T00:00:00Z', fISO = fim+'T23:59:59Z';
+  const H = {'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
 
   try{
-    // Abordagens do mês
-    const rAbord = await fetch(
-      SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim,
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
-    const abordRows = rAbord.ok ? await rAbord.json() : [];
-
-    // Oportunidades criadas no mês
-    const rOps = await fetch(
-      SUPA_URL+'/rest/v1/crm_oportunidades?data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim,
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
-    const opsRows = rOps.ok ? await rOps.json() : [];
-
-    // Reuniões agendadas no mês (pelo data_agendamento)
-    const rAgend = await fetch(
-      SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+inicio+'T00:00:00Z&data_agendamento=lte.'+fim+'T23:59:59Z',
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
-    const agendRows = rAgend.ok ? await rAgend.json() : [];
-
-    // No-shows (pelo data_no_show)
-    const rNoShow = await fetch(
-      SUPA_URL+'/rest/v1/crm_oportunidades?data_no_show=gte.'+inicio+'T00:00:00Z&data_no_show=lte.'+fim+'T23:59:59Z',
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
+    const [rAbord, rAgend, rNoShow, rRealiz, rGanho, rBv, rVendas] = await Promise.all([
+      fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim, {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&select=id,reagendamento_count', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_no_show=gte.'+iISO+'&data_no_show=lte.'+fISO+'&select=id', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+iISO+'&data_realizada=lte.'+fISO+'&select=id', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+iISO+'&data_ganho=lte.'+fISO+'&select=id,valor_venda', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim+'&select=id,bv_qualificacao', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/vendas?data_venda=gte.'+inicio+'&data_venda=lte.'+fim+'&status=neq.cancelada&select=id,valor', {headers:H}),
+    ]);
+    const abordRows  = rAbord.ok  ? await rAbord.json()  : [];
+    const agendRows  = rAgend.ok  ? await rAgend.json()  : [];
     const noshowRows = rNoShow.ok ? await rNoShow.json() : [];
-
-    // Ganhos no mês (pelo data_ganho)
-    const rGanho = await fetch(
-      SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+inicio+'T00:00:00Z&data_ganho=lte.'+fim+'T23:59:59Z',
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
-    const ganhoRows = rGanho.ok ? await rGanho.json() : [];
-
-    // Agregar abordagens
-    const totAbord    = abordRows.reduce((s,r)=>s+(r.total||0),0);
-    const totAbordPc  = abordRows.reduce((s,r)=>s+(r.pc||0),0);
-    const totAbordIs  = abordRows.reduce((s,r)=>s+(r.isca||0),0);
-    const totAbordRe  = abordRows.reduce((s,r)=>s+(r.reativacao||0),0);
-    const totAbordFu  = abordRows.reduce((s,r)=>s+(r.outros||0),0);
-
-    // Leads BV do mês
-    const rBv = await fetch(
-      SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim,
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
-    const bvRows = rBv.ok ? await rBv.json() : [];
-
+    const realizRows = rRealiz.ok ? await rRealiz.json() : [];
+    const ganhoRows  = rGanho.ok  ? await rGanho.json()  : [];
+    const bvRows     = rBv.ok     ? await rBv.json()     : [];
+    const vendasRows = rVendas.ok ? await rVendas.json() : [];
+    const totalReagend = agendRows.reduce((s,r)=>s+(r.reagendamento_count||0),0);
     return {
-      abord:        totAbord,
-      abord_pc:     totAbordPc,
-      abord_isca:   totAbordIs,
-      abord_reat:   totAbordRe,
-      abord_fu:     totAbordFu,
-      ops:          opsRows.length,
-      agend:        agendRows.length,
-      noshow:       noshowRows.length,
-      ganho:        ganhoRows.length,
-      fat_ganho:    ganhoRows.reduce((s,r)=>s+(parseFloat(r.valor_venda)||0),0),
-      bv_total:     bvRows.length,
-      bv_qualif:    bvRows.filter(r=>r.bv_qualificacao==='qualificado').length,
-      bv_desqualif: bvRows.filter(r=>r.bv_qualificacao==='desqualificado').length,
+      abord:          abordRows.reduce((s,r)=>s+(r.total||0),0),
+      abord_pc:       abordRows.reduce((s,r)=>s+(r.pc||0),0),
+      abord_isca:     abordRows.reduce((s,r)=>s+(r.isca||0),0),
+      abord_reat:     abordRows.reduce((s,r)=>s+(r.reativacao||0),0),
+      abord_fu:       abordRows.reduce((s,r)=>s+(r.outros||0),0),
+      agend:          agendRows.length,
+      agend_original: agendRows.length - totalReagend,
+      reagend:        totalReagend,
+      realizadas:     realizRows.length,
+      noshow:         noshowRows.length,
+      ganho:          ganhoRows.length,
+      fat_ganho:      ganhoRows.reduce((s,r)=>s+(parseFloat(r.valor_venda)||0),0),
+      vendas_avulsas: vendasRows.length,
+      fat_avulsas:    vendasRows.reduce((s,r)=>s+(parseFloat(r.valor)||0),0),
+      bv_total:       bvRows.length,
+      bv_qualif:      bvRows.filter(r=>r.bv_qualificacao==='qualificado').length,
+      bv_desqualif:   bvRows.filter(r=>r.bv_qualificacao==='desqualificado').length,
     };
   }catch(e){
     console.error('Erro buscar dados CRM mês:', e);
-    return {abord:0,abord_pc:0,abord_isca:0,abord_reat:0,abord_fu:0,ops:0,agend:0,noshow:0,ganho:0,fat_ganho:0};
+    return {abord:0,abord_pc:0,abord_isca:0,abord_reat:0,abord_fu:0,agend:0,realizadas:0,noshow:0,ganho:0,fat_ganho:0,vendas_avulsas:0,fat_avulsas:0};
   }
 }
 
@@ -2414,10 +2387,10 @@ async function renderMensal(){
   // ── SOMA: unificar as duas fontes ──
   const abord    = (aggLeg.abord||0)     + (crmDados.abord||0);
   const agend    = (aggLeg.agendadas||0) + (crmDados.agend||0);
-  const reunioes = (aggLeg.reunioes||0)  + (crmDados.agend||0); // CRM usa agend como realizadas
+  const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0); // reuniões que aconteceram (data_realizada)
   const noshow   = Math.max(0,(aggLeg.agendadas||0)-(aggLeg.reunioes||0)) + (crmDados.noshow||0);
   const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);
-  const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0);
+  const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
   const abordPc  = (aggLeg.pc?.abord||0) + (crmDados.abord_pc||0);
   const abordIs  = (aggLeg.is?.leads||0) + (crmDados.abord_isca||0);
   const abordRe  = (aggLeg.re?.abord||0) + (crmDados.abord_reat||0);
@@ -2814,46 +2787,57 @@ async function renderMetasTable(){
   try{
     const mr=await apiGet({action:'get_metas',ano:currentYear,mes:m});
     metasData=mr.dados||{};
-    // Populate input fields with saved values
     ['abord','resp','convites','agend','reun','vendas','fat','vcurso','fcurso'].forEach(k=>{
       const el=document.getElementById('meta_'+k);
       if(el&&metasData[k])el.value=metasData[k];
     });
   }catch(e){console.error('Erro ao carregar metas:',e);}
+
+  // Buscar dados combinados: legado + CRM
   const allDays=await getAllDaysAsync(currentYear);
   const monthDays=allDays.filter(d=>{const[y,mo]=d._date.split('-').map(Number);return y===currentYear&&mo-1===currentMonth;});
   const agg=aggregateDays(monthDays);
-  const metaAbord=parseFloat(metasData.abord)||0;
-  const metaAgendP=parseFloat(metasData.agend)||0;
-  const metaReun=parseFloat(metasData.reun)||0;
-  const metaVend=parseFloat(metasData.vendas)||0;
-  const metaFat=parseFloat(metasData.fat)||0;
-  const metaVC=parseFloat(metasData.vcurso)||0;
-  const metaFC=parseFloat(metasData.fcurso)||0;
-  // Lock fields if metas already saved
-  const hasSavedMetas=metaAbord||metaReun||metaVend||metaFat;
+  let crmD={abord:0,agend:0,realizadas:0,noshow:0,ganho:0,fat_ganho:0,fat_avulsas:0};
+  try{crmD=await crmBuscarDadosMes(currentYear,m);}catch(e){}
+
+  // Valores reais combinados (igual ao renderMensal)
+  const realAbord   = (agg.abord||0)     + (crmD.abord||0);
+  const realAgend   = (agg.agendadas||0) + (crmD.agend||0);
+  const realRealiz  = (agg.reunioes||0)  + (crmD.realizadas||0);
+  const realVendas  = (agg.vendas||0)    + (crmD.ganho||0);
+  const realFat     = (agg.valor||0)     + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
+  const realResp    = agg.resp||0;
+  const realConv    = agg.convites||0;
+
+  const metaAbord   = parseFloat(metasData.abord)||0;
+  const metaAgend   = parseFloat(metasData.agend)||0;
+  const metaReun    = parseFloat(metasData.reun)||0;
+  const metaVend    = parseFloat(metasData.vendas)||0;
+  const metaFat     = parseFloat(metasData.fat)||0;
+  const metaResp    = parseFloat(metasData.resp)||0;
+  const metaConv    = parseFloat(metasData.convites)||0;
+  const metaVC      = parseFloat(metasData.vcurso)||0;
+
+  const hasSavedMetas = metaAbord||metaReun||metaVend||metaFat;
   if(hasSavedMetas) lockMetasFields(true);
   else lockMetasFields(false);
+
   function metaRow(label,meta,real,isMoney){
-    if(!meta)return`<tr><td>${label}</td><td style="color:var(--text3)">—</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>`;
-    const pct_val=meta?Math.round(real/meta*100):0;
+    const fmt=v=>isMoney?'R$ '+v.toLocaleString('pt-BR'):v;
+    if(!meta) return`<tr><td>${label}</td><td style="color:var(--text3)">—</td><td>${fmt(real)}</td><td style="color:var(--text3)">—</td><td style="color:var(--text3)">—</td></tr>`;
+    const pct=meta?Math.round(real/meta*100):0;
     const falta=meta-real;
-    const color=pct_val>=100?'var(--g4)':pct_val>=50?'var(--amber)':'var(--coral)';
-    return`<tr><td>${label}</td><td>${isMoney?'R$ '+meta.toLocaleString('pt-BR'):meta}</td><td>${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</td><td style="font-weight:600;color:${color}">${pct_val}%</td><td style="color:${falta<=0?'var(--g4)':'var(--text2)'}">${falta<=0?'✓ atingido':(isMoney?'R$ '+falta.toLocaleString('pt-BR'):falta)}</td></tr>`;
+    const color=pct>=100?'var(--g4)':pct>=50?'var(--amber)':'var(--coral)';
+    return`<tr><td>${label}</td><td>${fmt(meta)}</td><td>${fmt(real)}</td><td style="font-weight:600;color:${color}">${pct}%</td><td style="color:${falta<=0?'var(--g4)':'var(--text2)'}">${falta<=0?'✓ atingido':fmt(Math.abs(falta))}</td></tr>`;
   }
-  const metaResp=parseFloat(metasData.resp)||0;
-  const metaConvites=parseFloat(metasData.convites)||0;
-  const metaAgend=parseFloat(metasData.agend)||0;
+
   const tbody=document.getElementById('metasTableBody');
-  if(tbody)tbody.innerHTML=
-    metaRow('Abordagens',metaAbord,agg.abord,false)+
-    metaRow('Respostas',metaResp,agg.resp,false)+
-    metaRow('Convites p/ reunião',metaConvites,agg.convites,false)+
-    metaRow('Reuniões agendadas',metaAgendP||metaAgend,agg.agendadas||0,false)+
-    metaRow('Reuniões realizadas',metaReun,agg.reunioes||0,false)+
-    metaRow('Vendas mentoria (qtd)',metaVend,agg.vendas,false)+
-    metaRow('Faturamento mentoria (R$)',metaFat,agg.valor||0,true)+
-    metaRow('Vendas curso (qtd)',metaVC,agg.vcurso||0,false);
+  if(tbody) tbody.innerHTML=
+    metaRow('Abordagens',metaAbord,realAbord,false)+
+    metaRow('Reuniões agendadas',metaAgend,realAgend,false)+
+    metaRow('Reuniões realizadas',metaReun,realRealiz,false)+
+    metaRow('Ganhos / Vendas',metaVend,realVendas,false)+
+    metaRow('Faturamento (R$)',metaFat,realFat,true);
 }
 
 // ══════════════════════════════════════════
