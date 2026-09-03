@@ -682,12 +682,12 @@ button{font-family:var(--font)}
     <!-- Pizza: situação das oportunidades -->
     <div class="card">
       <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Situação das oportunidades</div>
-      <canvas id="centralPizzaChart" height="220" style="max-height:220px"></canvas>
+      <canvas id="centralPizzaChart" height="220" style="max-height:220px;width:100%;min-width:200px"></canvas>
     </div>
     <!-- Barras: resultado por canal -->
     <div class="card">
       <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Resultado por canal</div>
-      <canvas id="centralBarrasChart" height="220" style="max-height:220px"></canvas>
+      <canvas id="centralBarrasChart" height="220" style="width:100%;min-width:200px" style="max-height:220px"></canvas>
     </div>
   </div>
 
@@ -1824,7 +1824,13 @@ function showTab(id){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   event.target.classList.add('active');
-  if(id==='central'){renderCentral();}
+  if(id==='central'){
+    // Destruir charts antes de renderizar (garantia de limpeza para redimensionamento)
+    if(window._chartPizza){ window._chartPizza.destroy(); window._chartPizza=null; }
+    if(window._chartBarras){ window._chartBarras.destroy(); window._chartBarras=null; }
+    if(window._chartLinha){ window._chartLinha.destroy(); window._chartLinha=null; }
+    renderCentral();
+  }
   if(id==='crm'){renderCRM();}
   if(id==='mensal'){renderMensal();}
   if(id==='anual'){renderAnual();}
@@ -3518,7 +3524,9 @@ async function renderCentral(){
 
   const pizzaCtx = document.getElementById('centralPizzaChart');
   if(pizzaCtx){
-    if(_chartPizza) _chartPizza.destroy();
+    if(_chartPizza){ _chartPizza.destroy(); _chartPizza=null; }
+    // requestAnimationFrame garante que o DOM está pintado antes de criar o chart
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
     _chartPizza = new Chart(pizzaCtx, {
       type:'doughnut',
       data:{
@@ -3539,6 +3547,8 @@ async function renderCentral(){
   }
 
   // ── GRÁFICO BARRAS: resultado por canal ──
+  // Garantir que o canvas está visível e com dimensões antes de criar charts
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   const barrasCtx = document.getElementById('centralBarrasChart');
   // Canais: combinar legado (registro_diario) + CRM (crm_oportunidades por funil)
   // Para legado: pc_vendas, bv_vendas etc (antes de setembro)
@@ -3573,7 +3583,7 @@ async function renderCentral(){
   const canalReun = [agg.pc?.reun||0, agg.bv?.reun||0, agg.re?.reun||0, agg.is?.reun||0, 0];
   const canalAbord= [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.is?.sdr||0, 0];
   if(barrasCtx){
-    if(_chartBarras) _chartBarras.destroy();
+    if(_chartBarras){ _chartBarras.destroy(); _chartBarras=null; }
     _chartBarras = new Chart(barrasCtx, {
       type:'bar',
       data:{
@@ -3595,6 +3605,7 @@ async function renderCentral(){
   }
 
   // ── GRÁFICO LINHA: evolução por semana ──
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
   const linhaCtx = document.getElementById('centralLinhaChart');
   const semanas = {1:[],2:[],3:[],4:[],5:[]};
   monthDays.forEach(d=>{
@@ -3606,7 +3617,7 @@ async function renderCentral(){
   const semAbord  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).abord||0);
   const semReun   = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).reunioes||0);
   if(linhaCtx){
-    if(_chartLinha) _chartLinha.destroy();
+    if(_chartLinha){ _chartLinha.destroy(); _chartLinha=null; }
     _chartLinha = new Chart(linhaCtx, {
       type:'line',
       data:{
@@ -3648,7 +3659,7 @@ function checkSession(){
   if(s === 'true'){
     document.getElementById('loginOverlay').style.display = 'none';
     // Renderizar Central ao voltar ao sistema (já logado)
-    setTimeout(()=>{ renderCentral(); setTimeout(()=>crmVerificarLeadsNovos(), 1500); }, 100);
+    setTimeout(()=>{ renderCentral(); setTimeout(()=>crmVerificarLeadsNovos(), 1500); }, 400);
   }
 }
 
