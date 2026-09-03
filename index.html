@@ -2002,37 +2002,42 @@ async function apiGet(params){
     const ano=params.ano||new Date().getFullYear();
     const H={'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY};
 
-    // Buscar registro_diario (histórico)
-    const rLeg=await fetch(SUPA_URL+'/rest/v1/registro_diario?data_reg=gte.'+ano+'-01-01&data_reg=lte.'+ano+'-12-31&order=data_reg.asc',{headers:H});
-    const rowsLeg=rLeg.ok?await rLeg.json():[];
+    // Buscar as duas fontes em paralelo
+    const [rLeg,rCrm] = await Promise.all([
+      fetch(SUPA_URL+'/rest/v1/registro_diario?data_reg=gte.'+ano+'-01-01&data_reg=lte.'+ano+'-12-31&order=data_reg.asc',{headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+ano+'-01-01&data_reg=lte.'+ano+'-12-31&order=data_reg.asc',{headers:H}),
+    ]);
+    const rowsLeg = rLeg.ok ? await rLeg.json() : [];
+    const rowsCrm = rCrm.ok ? await rCrm.json() : [];
 
-    // Buscar crm_abordagens (novo RD dentro do CRM)
-    const rCrm=await fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+ano+'-01-01&data_reg=lte.'+ano+'-12-31&order=data_reg.asc',{headers:H});
-    const rowsCrm=rCrm.ok?await rCrm.json():[];
+    // Indexar crm_abordagens por data
+    const crmMap = {};
+    rowsCrm.forEach(r=>{ crmMap[r.data_reg]=r; });
 
-    // Criar set de datas que existem no crm_abordagens
-    const crmDates=new Set(rowsCrm.map(r=>r.data_reg));
+    // Construir dias mesclando as duas fontes:
+    // - Campos de ATIVIDADE (abordagens/FU): crm_abordagens tem prioridade (anti-dup)
+    // - Campos de RESULTADO (vendas, reuniões, valor): registro_diario sempre (só ele tem)
+    const datesAll = new Set([...rowsLeg.map(r=>r.data_reg), ...rowsCrm.map(r=>r.data_reg)]);
+    const legMap = {};
+    rowsLeg.forEach(r=>{ legMap[r.data_reg]={...r.dados}; });
 
-    // Mesclar: para datas no CRM, usar CRM; para datas só no legado, usar legado
-    const days=[];
-    rowsLeg.forEach(row=>{
-      if(!crmDates.has(row.data_reg)){
-        // Dia só existe no legado — usar registro_diario
-        const d={...row.dados};d._date=row.data_reg;days.push(d);
+    const days = [];
+    datesAll.forEach(date=>{
+      const leg = legMap[date] || {};
+      const crm = crmMap[date]  || null;
+      const d = {...leg, _date:date};
+      if(crm){
+        // crm_abordagens ganha nos campos de ATIVIDADE (evita dupla contagem)
+        d.pc_abord = crm.pc       || 0;
+        d.re_abord = crm.reativacao || 0;
+        d.is_sdr   = crm.isca     || 0;
+        d.fu_retom = crm.outros   || 0;
+        d.pc_fu    = crm.pc_fu    || 0;
+        d.reat_fu  = crm.reat_fu  || 0;
+        d.isca_fu  = crm.isca_fu  || 0;
+        // registro_diario MANTÉM vendas, reuniões, valor (crm_abordagens não tem esses)
+        // d.pc_vendas, d.bv_vendas, d.pc_valor etc já vieram do {…leg}
       }
-    });
-    rowsCrm.forEach(row=>{
-      // Dia existe no CRM — usar crm_abordagens (converte campos para formato legado)
-      const d={
-        _date:row.data_reg,
-        pc_abord:row.pc||0,
-        re_abord:row.reativacao||0,
-        is_sdr:row.isca||0,
-        fu_retom:row.outros||0,
-        pc_fu:row.pc_fu||0,
-        reat_fu:row.reat_fu||0,
-        isca_fu:row.isca_fu||0,
-      };
       days.push(d);
     });
     days.sort((a,b)=>a._date.localeCompare(b._date));
@@ -3336,10 +3341,11 @@ async function renderCentral(){
   function setKpi(id, val, prev, isMoney, isBad){
     const el  = document.getElementById('ck-'+id+'-val');
     const del = document.getElementById('ck-'+id+'-delta');
-    if(el) el.textContent = isMoney ? (val>0?'R$ '+val.toLocaleString('pt-BR'):'—') : (val||'0');
+    const isPct = id==='conv'||id==='noshow';
+    if(el) el.textContent = isMoney ? (val>0?'R$ '+val.toLocaleString('pt-BR'):'—') : isPct ? (val||'0')+'%' : (val||'0');
     if(del && prev!==null){
-      const diff = val - prev;
-      const pct  = prev>0 ? Math.round(diff/prev*100) : 0;
+      const diff = isNaN(val-prev) ? 0 : val - prev;
+      const pct  = (!isNaN(prev) && prev>0) ? Math.round(diff/prev*100) : 0;
       const up   = isBad ? diff<0 : diff>0;
       const cls  = diff===0?'neutral':up?'up':'down';
       const sign = diff>0?'+':'';
@@ -3351,8 +3357,8 @@ async function renderCentral(){
   setKpi('vendas',  vendas,     prevVendas,    false, false);
   setKpi('fat',     fat,        prevFat,       true,  false);
   setKpi('reun',    reunioes,   prevReun,      false, false);
-  setKpi('conv',    taxaFech+'%', prevTaxaFech+'%', false, false);
-  setKpi('noshow',  taxaNS+'%', null,          false, true);
+  setKpi('conv',    taxaFech,     prevTaxaFech,     false, false);
+  setKpi('noshow',  taxaNS,     null,          false, true);
 
   // Cores dos cards KPI
   const kpiColors = [
