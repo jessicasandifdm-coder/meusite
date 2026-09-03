@@ -2216,15 +2216,16 @@ async function renderMensal(){
   try{ crmDados = await crmBuscarDadosMes(currentYear, currentMonth); }
   catch(e){ console.error('CRM mensal:', e); }
 
-  // ── SOMA: fontes consolidadas ──
-  // get_anual já integra registro_diario E crm_abordagens (sem duplicar)
-  // crmDados traz apenas dados do crm_oportunidades (reuniões, ganhos, etc.)
-  const abord    = (aggLeg.abord||0);                               // fonte: get_anual (anti-dup)
-  const followup = (aggLeg.followup||0) + (aggLeg.pc_fu||0) + (aggLeg.reat_fu||0) + (aggLeg.isca_fu||0); // FU por canal
-  const agend    = (crmDados.agend||0);                             // fonte: crm_oportunidades
-  const reunioes = (crmDados.realizadas||0);                        // fonte: data_realizada
-  const noshow   = (crmDados.noshow||0);                            // fonte: data_no_show
-  const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);    // legado + CRM ganhos
+  // ── SOMA: fontes consolidadas (regra definitiva) ──
+  // ABORDAGENS: get_anual anti-dup (integra registro_diario + crm_abordagens sem duplicar)
+  // REUNIÕES/VENDAS/FAT: legado + CRM (períodos diferentes, sem duplicidade)
+  // AGEND/NOSHOW: apenas CRM (crm_oportunidades tem data precisa)
+  const abord    = (aggLeg.abord||0);                               // get_anual anti-dup
+  const followup = (aggLeg.followup||0) + (aggLeg.pc_fu||0) + (aggLeg.reat_fu||0) + (aggLeg.isca_fu||0);
+  const agend    = (crmDados.agend||0);                             // crm_oportunidades
+  const reunioes = (aggLeg.reunioes||0)  + (crmDados.realizadas||0); // legado histórico + CRM novo
+  const noshow   = (crmDados.noshow||0);                            // crm_oportunidades
+  const vendas   = (aggLeg.vendas||0)    + (crmDados.ganho||0);    // legado histórico + CRM ganhos
   const fat      = (aggLeg.valor||0)     + (crmDados.fat_ganho||0) + (crmDados.fat_avulsas||0);
   const abordPc  = (aggLeg.pc?.abord||0) + (crmDados.abord_pc||0);
   const abordIs  = (aggLeg.is?.leads||0) + (crmDados.abord_isca||0);
@@ -2383,7 +2384,7 @@ async function renderMensal(){
     // get_anual já integra abordagens sem duplicar — usar apenas sa.abord
     const sAbord  = (sa.abord||0);
     const sFuSem  = (sa.followup||0) + (sa.pc_fu||0) + (sa.reat_fu||0) + (sa.isca_fu||0);
-    const sRealiz = crmRealiz.length; // reuniões realizadas (data_realizada)
+    const sRealiz = (sa.reunioes||0) + crmRealiz.length; // legado + CRM
     const sAgend  = (sa.agendadas||0) + crmAgend.length;
     const sNoshow = Math.max(0,(sa.agendadas||0)-(sa.reunioes||0)) + crmNoshow.length;
     const sGanho  = (sa.vendas||0) + crmGanho.length;
@@ -2637,12 +2638,11 @@ async function renderMetasTable(){
   try{crmD=await crmBuscarDadosMes(currentYear,m);}catch(e){}
 
   // Valores reais combinados (igual ao renderMensal)
-  // get_anual já integra sem duplicar abordagens
   const realAbord   = (agg.abord||0);
   const realAgend   = (crmD.agend||0);
-  const realRealiz  = (crmD.realizadas||0);
-  const realVendas  = (agg.vendas||0) + (crmD.ganho||0);
-  const realFat     = (agg.valor||0)  + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
+  const realRealiz  = (agg.reunioes||0)  + (crmD.realizadas||0);
+  const realVendas  = (agg.vendas||0)    + (crmD.ganho||0);
+  const realFat     = (agg.valor||0)     + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
   const realResp    = agg.resp||0;
   const realConv    = agg.convites||0;
 
@@ -2693,12 +2693,11 @@ async function renderAnual(){
     let crmD = {abord:0,agend:0,realizadas:0,noshow:0,ganho:0,fat_ganho:0,fat_avulsas:0};
     try{ crmD = await crmBuscarDadosMes(currentYear, i); }catch(e){}
 
-    // Mesma lógica do mensal: get_anual já integra sem duplicar
-    const sAbord  = (agg.abord||0);                         // get_anual anti-dup
+    const sAbord  = (agg.abord||0);
     const sFu     = (agg.followup||0) + (agg.pc_fu||0) + (agg.reat_fu||0) + (agg.isca_fu||0);
-    const sAgend  = (crmD.agend||0);                        // crm_oportunidades
-    const sRealiz = (crmD.realizadas||0);                   // data_realizada
-    const sNoshow = (crmD.noshow||0);                       // data_no_show
+    const sAgend  = (crmD.agend||0);
+    const sRealiz = (agg.reunioes||0)  + (crmD.realizadas||0); // legado + CRM
+    const sNoshow = (crmD.noshow||0);
     const sGanho  = (agg.vendas||0)    + (crmD.ganho||0);
     const sFat    = (agg.valor||0)     + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
     const sConv   = sRealiz>0 ? Math.round(sGanho/sRealiz*100) : 0;
@@ -3319,11 +3318,11 @@ async function renderCentral(){
   }catch(e){}
 
   // Valores consolidados
-  const vendas   = (agg.vendas||0) + (crmD.ganho||0);
-  const fat      = (agg.valor||0)  + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
-  const agend    = (crmD.agend||0);                         // crm_oportunidades
-  const reunioes = (crmD.realizadas||0);                    // data_realizada
-  const noshow   = (crmD.noshow||0);                        // data_no_show
+  const vendas   = (agg.vendas||0)   + (crmD.ganho||0);
+  const fat      = (agg.valor||0)    + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
+  const agend    = (crmD.agend||0);
+  const reunioes = (agg.reunioes||0) + (crmD.realizadas||0);
+  const noshow   = (crmD.noshow||0);
   const taxaFechamento = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
   const taxaFech = taxaFechamento;
   const taxaNS   = agend>0   ? Math.round(noshow/agend*100)    : 0;
@@ -3460,14 +3459,14 @@ async function renderCentral(){
     </div>`;
 
   // ── DIAGNÓSTICO: MELHOR CANAL ──
+  // Combinar legado (agg) + CRM (canalGanhoCRM) para cada canal
   const canais = [
-    {nome:'PC / Outbound',  vend:agg.pc?.vend||0, reun:agg.pc?.reun||0},
-    {nome:'BV',             vend:agg.bv?.vend||0, reun:agg.bv?.reun||0},
-    {nome:'Stories',        vend:agg.st?.vend||0, reun:agg.st?.reun||0},
-    {nome:'Follow-up',      vend:agg.fu?.vend||0, reun:agg.fu?.reun||0},
-    {nome:'Reativação',     vend:agg.re?.vend||0, reun:agg.re?.reun||0},
-    {nome:'Isca',           vend:agg.is?.vend||0, reun:agg.is?.reun||0},
-  ].filter(c=>c.reun>0);
+    {nome:'PC / Outbound', vend:(agg.pc?.vend||0)+canalGanhoCRM.pc,         reun:agg.pc?.reun||0},
+    {nome:'BV',            vend:(agg.bv?.vend||0)+canalGanhoCRM.bv,         reun:agg.bv?.reun||0},
+    {nome:'Reativação',    vend:(agg.re?.vend||0)+canalGanhoCRM.reativacao,  reun:agg.re?.reun||0},
+    {nome:'Isca',          vend:(agg.is?.vend||0)+canalGanhoCRM.isca,        reun:agg.is?.reun||0},
+    {nome:'Aplicação',     vend:canalGanhoCRM.aplicacao,                     reun:0},
+  ].filter(c=>c.reun>0||c.vend>0);
 
   const melhorCanal = canais.length ? canais.reduce((best,c)=>{
     const t = c.reun>0?c.vend/c.reun:0;
@@ -3535,10 +3534,38 @@ async function renderCentral(){
 
   // ── GRÁFICO BARRAS: resultado por canal ──
   const barrasCtx = document.getElementById('centralBarrasChart');
-  const canalNomes = ['PC','BV','Reativação','Follow-up','Isca','Stories'];
-  const canalVendas = [agg.pc?.vend||0, agg.bv?.vend||0, agg.re?.vend||0, agg.fu?.vend||0, agg.is?.vend||0, agg.st?.vend||0];
-  const canalReun   = [agg.pc?.reun||0, agg.bv?.reun||0, agg.re?.reun||0, agg.fu?.reun||0, agg.is?.reun||0, agg.st?.reun||0];
-  const canalAbord  = [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.fu?.ret||0, agg.is?.sdr||0, agg.st?.inter||0];
+  // Canais: combinar legado (registro_diario) + CRM (crm_oportunidades por funil)
+  // Para legado: pc_vendas, bv_vendas etc (antes de setembro)
+  // Para CRM: ganhos por funil da tabela crm_oportunidades
+  let canalGanhoCRM = {pc:0, bv:0, reativacao:0, isca:0, aplicacao:0};
+  try{
+    const rGanhoCRM = await fetch(
+      SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+inicio+'T00:00:00Z&data_ganho=lte.'+fim+'T23:59:59Z&select=funil,pipeline,valor_venda',
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
+    );
+    if(rGanhoCRM.ok){
+      const gs = await rGanhoCRM.json();
+      gs.forEach(g=>{
+        const f = g.funil || g.pipeline || 'pc';
+        if(f==='bv') canalGanhoCRM.bv++;
+        else if(f==='reativacao') canalGanhoCRM.reativacao++;
+        else if(f==='isca') canalGanhoCRM.isca++;
+        else if(f==='aplicacao') canalGanhoCRM.aplicacao++;
+        else canalGanhoCRM.pc++;
+      });
+    }
+  }catch(e){}
+
+  const canalNomes = ['PC','BV','Reativação','Isca','Aplicação'];
+  const canalVendas = [
+    (agg.pc?.vend||0)  + canalGanhoCRM.pc,
+    (agg.bv?.vend||0)  + canalGanhoCRM.bv,
+    (agg.re?.vend||0)  + canalGanhoCRM.reativacao,
+    (agg.is?.vend||0)  + canalGanhoCRM.isca,
+    canalGanhoCRM.aplicacao
+  ];
+  const canalReun = [agg.pc?.reun||0, agg.bv?.reun||0, agg.re?.reun||0, agg.is?.reun||0, 0];
+  const canalAbord= [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.is?.sdr||0, 0];
   if(barrasCtx){
     if(_chartBarras) _chartBarras.destroy();
     _chartBarras = new Chart(barrasCtx, {
