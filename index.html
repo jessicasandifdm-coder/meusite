@@ -998,8 +998,7 @@ button{font-family:var(--font)}
   <div class="canal-section">
     <div class="canal-header"><div><div class="canal-title">PC — Outbound</div><div class="canal-goal">Funil 2 · Meta: 20 abordagens/dia</div></div><span class="badge badge-t">Funil 2</span></div>
     <div class="canal-fields">
-      <div class="field-group"><div class="field-label">Abordagens <span style="font-size:10px;color:var(--text3)">(novos contatos)</span></div><input class="field-input" type="number" id="pc_abord" min="0" oninput="updateSummary()"></div>
-      <div class="field-group"><div class="field-label">Follow-ups <span style="font-size:10px;color:var(--text3)">(retomadas)</span></div><input class="field-input" type="number" id="pc_followup" min="0" oninput="updateSummary()" style="border-color:rgba(77,184,200,.25)"></div>
+      <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="pc_abord" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="pc_resp" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Conv. iniciadas</div><input class="field-input" type="number" id="pc_conv" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="pc_convites" min="0" oninput="updateSummary()"></div>
@@ -1047,8 +1046,7 @@ button{font-family:var(--font)}
   <div class="canal-section">
     <div class="canal-header"><div><div class="canal-title">Reativação</div><div class="canal-goal">Funil 5 · Meta: 10 abordagens/dia</div></div><span class="badge badge-a">Funil 5</span></div>
     <div class="canal-fields">
-      <div class="field-group"><div class="field-label">Abordagens <span style="font-size:10px;color:var(--text3)">(novos contatos)</span></div><input class="field-input" type="number" id="re_abord" min="0" oninput="updateSummary()"></div>
-      <div class="field-group"><div class="field-label">Follow-ups <span style="font-size:10px;color:var(--text3)">(retomadas)</span></div><input class="field-input" type="number" id="re_followup" min="0" oninput="updateSummary()" style="border-color:rgba(77,184,200,.25)"></div>
+      <div class="field-group"><div class="field-label">Abordados</div><input class="field-input" type="number" id="re_abord" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Responderam</div><input class="field-input" type="number" id="re_resp" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Conversas iniciadas</div><input class="field-input" type="number" id="re_conv" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="re_convites" min="0" oninput="updateSummary()"></div>
@@ -1065,8 +1063,7 @@ button{font-family:var(--font)}
     <div class="canal-fields">
       <div class="field-group"><div class="field-label">Leads capturados</div><input class="field-input" type="number" id="is_leads" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Iscas entregues</div><input class="field-input" type="number" id="is_entregues" min="0" oninput="updateSummary()"></div>
-      <div class="field-group"><div class="field-label">SDR contactou <span style="font-size:10px;color:var(--text3)">(abordagens)</span></div><input class="field-input" type="number" id="is_sdr" min="0" oninput="updateSummary()"></div>
-      <div class="field-group"><div class="field-label">Follow-ups <span style="font-size:10px;color:var(--text3)">(retomadas)</span></div><input class="field-input" type="number" id="is_followup" min="0" oninput="updateSummary()" style="border-color:rgba(77,184,200,.25)"></div>
+      <div class="field-group"><div class="field-label">SDR contactou</div><input class="field-input" type="number" id="is_sdr" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Convites p/ reunião</div><input class="field-input" type="number" id="is_convites" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões agendadas</div><input class="field-input" type="number" id="is_agend" min="0" oninput="updateSummary()"></div>
       <div class="field-group"><div class="field-label">Reuniões realizadas</div><input class="field-input" type="number" id="is_reunioes" min="0" oninput="updateSummary()"></div>
@@ -2029,11 +2026,11 @@ const MONTHS_PT=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','No
 // REGISTRO DIÁRIO
 // ══════════════════════════════════════════
 const FIELDS=['seg_total','seg_novos','seg_perdidos','bv_auto','bv_video','bv_form','bv_sdr','bv_convites','bv_agend','bv_reunioes','bv_vendas','bv_valor','bv_vcurso','bv_vcurso_val',
-  'pc_abord','pc_followup','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val','pc_seguidores',
+  'pc_abord','pc_resp','pc_conv','pc_convites','pc_agend','pc_reunioes','pc_vendas','pc_vcurso','pc_valor','pc_vcurso_val','pc_seguidores',
   'st_inter','st_sdr','st_conv','st_convites','st_agend','st_reunioes','st_vendas',
   'fu_retom','fu_resp','fu_convites','fu_agend','fu_reunioes','fu_vendas','fu_valor','fu_vcurso','fu_vcurso_val',
-  're_abord','re_followup','re_resp','re_conv','re_convites','re_agend','re_reunioes','re_vendas','re_valor',
-  'is_leads','is_entregues','is_sdr','is_followup','is_convites','is_agend','is_reunioes','is_vendas',
+  're_abord','re_resp','re_conv','re_convites','re_agend','re_reunioes','re_vendas','re_valor',
+  'is_leads','is_entregues','is_sdr','is_convites','is_agend','is_reunioes','is_vendas',
   'obs_dia'];
 
 async function saveDay(){
@@ -2277,7 +2274,7 @@ function getN(data,f){return parseInt(data[f])||0;}
 function aggregateDays(days){
   return{
     abord: days.reduce((s,d)=>s+getN(d,'pc_abord')+getN(d,'re_abord')+getN(d,'bv_sdr')+getN(d,'st_inter'),0), // SEM fu_retom — follow-up não é abordagem nova
-    followup: days.reduce((s,d)=>s+getN(d,'fu_retom')+getN(d,'pc_followup')+getN(d,'re_followup')+getN(d,'is_followup'),0), // follow-ups por canal + geral
+    followup: days.reduce((s,d)=>s+getN(d,'fu_retom'),0), // follow-ups do registro legado
     resp: days.reduce((s,d)=>s+getN(d,'pc_resp')+getN(d,'re_resp')+getN(d,'fu_resp')+getN(d,'st_sdr'),0),
     conv: days.reduce((s,d)=>s+getN(d,'pc_conv')+getN(d,'st_conv')+getN(d,'bv_form'),0),
     convites: days.reduce((s,d)=>s+getN(d,'pc_convites')+getN(d,'st_convites')+getN(d,'bv_convites')+getN(d,'fu_convites')+getN(d,'re_convites')+getN(d,'is_convites'),0),
@@ -2292,11 +2289,11 @@ function aggregateDays(days){
     pc_seguidores: days.reduce((s,d)=>s+getN(d,'pc_seguidores'),0),
     // por canal
     bv:{auto:days.reduce((s,d)=>s+getN(d,'bv_auto'),0),sdr:days.reduce((s,d)=>s+getN(d,'bv_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'bv_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'bv_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'bv_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'bv_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'bv_vcurso'),0)},
-    pc:{abord:days.reduce((s,d)=>s+getN(d,'pc_abord'),0),fu:days.reduce((s,d)=>s+getN(d,'pc_followup'),0),resp:days.reduce((s,d)=>s+getN(d,'pc_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'pc_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'pc_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'pc_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'pc_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'pc_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'pc_vcurso'),0)},
+    pc:{abord:days.reduce((s,d)=>s+getN(d,'pc_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'pc_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'pc_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'pc_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'pc_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'pc_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'pc_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'pc_vcurso'),0)},
     st:{inter:days.reduce((s,d)=>s+getN(d,'st_inter'),0),sdr:days.reduce((s,d)=>s+getN(d,'st_sdr'),0),conv:days.reduce((s,d)=>s+getN(d,'st_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'st_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'st_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'st_vendas'),0)},
     fu:{ret:days.reduce((s,d)=>s+getN(d,'fu_retom'),0),resp:days.reduce((s,d)=>s+getN(d,'fu_resp'),0),convites:days.reduce((s,d)=>s+getN(d,'fu_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'fu_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'fu_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'fu_valor'),0),vcurso:days.reduce((s,d)=>s+getN(d,'fu_vcurso'),0)},
-    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),fu:days.reduce((s,d)=>s+getN(d,'re_followup'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'re_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),agend:days.reduce((s,d)=>s+getN(d,'re_agend'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'re_valor'),0)},
-    is:{leads:days.reduce((s,d)=>s+getN(d,'is_leads'),0),sdr:days.reduce((s,d)=>s+getN(d,'is_sdr'),0),fu:days.reduce((s,d)=>s+getN(d,'is_followup'),0),convites:days.reduce((s,d)=>s+getN(d,'is_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'is_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'is_vendas'),0)},
+    re:{abord:days.reduce((s,d)=>s+getN(d,'re_abord'),0),resp:days.reduce((s,d)=>s+getN(d,'re_resp'),0),conv:days.reduce((s,d)=>s+getN(d,'re_conv'),0),convites:days.reduce((s,d)=>s+getN(d,'re_convites'),0),agend:days.reduce((s,d)=>s+getN(d,'re_agend'),0),reun:days.reduce((s,d)=>s+getN(d,'re_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'re_vendas'),0),valor:days.reduce((s,d)=>s+getN(d,'re_valor'),0)},
+    is:{leads:days.reduce((s,d)=>s+getN(d,'is_leads'),0),sdr:days.reduce((s,d)=>s+getN(d,'is_sdr'),0),convites:days.reduce((s,d)=>s+getN(d,'is_convites'),0),reun:days.reduce((s,d)=>s+getN(d,'is_reunioes'),0),vend:days.reduce((s,d)=>s+getN(d,'is_vendas'),0)},
   };
 }
 
@@ -4195,7 +4192,7 @@ async function crmDrop(e, novoStatus){
 
   // Registrar pipeline de origem ao ir para nutrição
   const pipelineOrigemUpdate = {};
-  if(novoStatus==='nutricao'||novoStatus==='perdido'){
+  if(pipelineMudou && !op.pipeline_origem){
     pipelineOrigemUpdate.pipeline_origem = op.pipeline;
   }
 
@@ -4305,6 +4302,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
     <div class="crm-grid3">
       <div class="crm-field"><div class="crm-lbl">Pipeline</div>
         <select class="crm-sel" id="crm_pipeline" onchange="crmAtualizarStatusOpts()">${pipelineOpts}</select></div>
+      ${op.pipeline_origem ? `<div class="crm-field"><div class="crm-lbl">Veio de</div><div style="font-size:13px;color:var(--text3);padding:8px 0"><strong>${CRM_PIPELINES[op.pipeline_origem]?.label||op.pipeline_origem}</strong></div></div>` : ''}
       <div class="crm-field"><div class="crm-lbl">Funil de origem</div>
         <select class="crm-sel" id="crm_funil">${funilOpts}</select></div>
       <div class="crm-field"><div class="crm-lbl">Origem</div>
@@ -4339,7 +4337,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
         <input class="crm-inp" id="crm_qualif_obs" value="${crmEsc(op.qualificacao_obs||'')}" placeholder="Motivo da desqualificação ou observação..." style="font-size:12px;margin-top:4px;${(op.qualificacao_lead||'')==='desqualificado'?'':'display:none'}">
       </div>
     </div>
-    ${(pipeAtual==='aplicacao' && op.lap_faturamento) ? `
+    ${((pipeAtual==='aplicacao' || op.pipeline_origem==='aplicacao') && op.lap_faturamento) ? `
     <div style="margin-top:14px;background:rgba(196,154,60,.06);border:1px solid rgba(196,154,60,.2);border-radius:8px;padding:14px 16px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin-bottom:10px">Aplicação Lapidar — Respostas do Formulário</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
@@ -4357,7 +4355,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       ${op.lap_resultado?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Resultado desejado:</span> '+crmEsc(op.lap_resultado)+'</div>':''}
       ${op.lap_info_extra?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Info extra:</span> '+crmEsc(op.lap_info_extra)+'</div>':''}
     </div>` : ''}
-    ${(pipeAtual==='reativacao' && op.reat_faturamento) ? `
+    ${((pipeAtual==='reativacao' || op.pipeline_origem==='reativacao') && op.reat_faturamento) ? `
     <div style="margin-top:14px;background:rgba(155,114,207,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:10px">Diagnóstico Estratégico — Respostas do Formulário</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
@@ -4377,7 +4375,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       ${op.reat_objetivos ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Objetivos:</span> '+crmEsc(op.reat_objetivos)+'</div>' : ''}
       ${op.reat_mudanca ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Mudança desejada:</span> '+crmEsc(op.reat_mudanca)+'</div>' : ''}
     </div>` : ''}
-    ${(pipeAtual==='bv' && op.bv_faturamento) ? `
+    ${((pipeAtual==='bv' || op.pipeline_origem==='bv') && op.bv_faturamento) ? `
     <div style="margin-top:14px;background:rgba(45,106,79,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:10px">Respostas do Formulário BV</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
