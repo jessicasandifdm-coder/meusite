@@ -3509,12 +3509,15 @@ async function renderCentral(){
     <div style="font-size:12px;color:var(--text3);margin-top:8px">Sem dados suficientes ainda neste mês.</div>`;
 
   // ── GRÁFICO PIZZA: situação das oportunidades ──
-  // Buscar ops do mês via CRM
+  // inicio/fim definidos FORA do try para ficarem disponíveis nos blocos seguintes
+  const inicio = `${centralYear}-${String(centralMonth+1).padStart(2,'0')}-01`;
+  const fimDate = new Date(centralYear, centralMonth+1, 0);
+  const fim = fimDate.toISOString().split('T')[0];
+  const iISO = inicio+'T00:00:00Z';
+  const fISO = fim+'T23:59:59Z';
+
   let opsStatus = {agendado:0, nao_compareceu:0, negociacao:0, ganho:0, perdido:0, outros:0};
   try{
-    const inicio = `${centralYear}-${String(centralMonth+1).padStart(2,'0')}-01`;
-    const fimDate = new Date(centralYear, centralMonth+1, 0);
-    const fim = fimDate.toISOString().split('T')[0];
     // Buscar TODAS as oportunidades ativas (não só do mês) para mostrar situação atual
     const r = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?select=status,pipeline',
       {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
