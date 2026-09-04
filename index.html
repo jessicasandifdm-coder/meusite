@@ -3398,6 +3398,10 @@ async function renderCentral(){
     if(vendas>prevVendas && prevVendas>0) alertas.push({tipo:'positivo', titulo:'Crescimento nas vendas', txt:`+${vendas-prevVendas} venda(s) vs mês anterior.`});
     if(metasData.vendas && vendas>=parseFloat(metasData.vendas)) alertas.push({tipo:'positivo', titulo:'Meta de vendas atingida!', txt:`${vendas} de ${metasData.vendas} vendas — parabéns!`});
   }
+  const melhorSemReunVal = Math.max(...semReun);
+  const melhorSemVendVal = Math.max(...semVendas);
+  if(melhorSemReunVal>0) alertas.push({tipo:'positivo', titulo:'🏆 Melhor semana em realizações', txt:`Semana ${melhorSemReunIdx+1} com ${melhorSemReunVal} reunião(ões) realizada(s).`});
+  if(melhorSemVendVal>0) alertas.push({tipo:'positivo', titulo:'🏆 Melhor semana em vendas', txt:`Semana ${melhorSemVendIdx+1} com ${melhorSemVendVal} venda(s).`});
   if(!alertas.length) alertas.push({tipo:'atencao', titulo:'Sem dados suficientes', txt:'Preencha o Registro Diário e o CRM para ativar os alertas automáticos.'});
 
   alertasEl.innerHTML = alertas.slice(0,4).map(a=>`
@@ -3447,11 +3451,9 @@ async function renderCentral(){
   const conv = agg.convites||0;
   // Identificar qual etapa tem maior queda
   const taxas = [
-    {de:'Abord.',  ate:'Respostas', num:abordC, den:abordC, val:resp,  t:abordC>0?resp/abordC:0},
-    {de:'Respostas',ate:'Convites', num:resp,  den:resp,  val:conv,  t:resp>0?conv/resp:0},
-    {de:'Convites', ate:'Agend.',   num:conv,  den:conv,  val:agend, t:conv>0?agend/conv:0},
-    {de:'Agend.',   ate:'Reun.',    num:agend, den:agend, val:reunioes, t:agend>0?reunioes/agend:0},
-    {de:'Reun.',    ate:'Vendas',   num:reunioes, den:reunioes, val:vendas, t:reunioes>0?vendas/reunioes:0},
+    {de:'Abordagens', ate:'Agendadas',  num:abordC,   den:abordC,   val:agend,    t:abordC>0?agend/abordC:0},
+    {de:'Agendadas',  ate:'Realizadas', num:agend,    den:agend,    val:reunioes, t:agend>0?reunioes/agend:0},
+    {de:'Realizadas', ate:'Vendas',     num:reunioes, den:reunioes, val:vendas,   t:reunioes>0?vendas/reunioes:0},
   ];
   const gargalo = taxas.filter(t=>t.num>0).reduce((min,t)=>t.t<min.t?t:min, {t:1,de:'—',ate:'—',num:0,val:0});
   if(gargaloEl) gargaloEl.innerHTML = `
@@ -3612,7 +3614,16 @@ async function renderCentral(){
     (agg.is?.reun||0) + canalReunCRM.isca,
     canalReunCRM.aplicacao
   ];
-  const canalAbord= [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.is?.sdr||0, 0];
+  const canalAbord = [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.is?.sdr||0, 0];
+  const totalReunCRMsum = Object.values(canalReunCRM).reduce((s,v)=>s+v,0);
+  const prorrata = (canal) => totalReunCRMsum>0 ? Math.round((canalReunCRM[canal]||0)/totalReunCRMsum*(crmDados.agend||0)) : 0;
+  const canalAgend = [
+    (agg.pc?.agend||agg.pc?.reun||0)+prorrata('pc'),
+    (agg.bv?.agend||agg.bv?.reun||0)+prorrata('bv'),
+    (agg.re?.agend||agg.re?.reun||0)+prorrata('reativacao'),
+    (agg.is?.agend||agg.is?.reun||0)+prorrata('isca'),
+    prorrata('aplicacao')
+  ];
   if(barrasCtx){
     if(_chartBarras){ _chartBarras.destroy(); _chartBarras=null; }
     _chartBarras = new Chart(barrasCtx, {
@@ -3620,8 +3631,9 @@ async function renderCentral(){
       data:{
         labels:canalNomes,
         datasets:[
-          {label:'Reuniões',data:canalReun,backgroundColor:'rgba(77,184,200,.35)',borderColor:'#4db8c8',borderWidth:1,borderRadius:4},
-          {label:'Vendas',  data:canalVendas,backgroundColor:'rgba(116,198,157,.6)',borderColor:'#74c69d',borderWidth:1,borderRadius:4}
+          {label:'Agendadas', data:canalAgend,  backgroundColor:'rgba(233,168,76,.3)', borderColor:'#e9a84c',borderWidth:1,borderRadius:4},
+          {label:'Realizadas',data:canalReun,   backgroundColor:'rgba(77,184,200,.35)',borderColor:'#4db8c8',borderWidth:1,borderRadius:4},
+          {label:'Vendas',    data:canalVendas, backgroundColor:'rgba(116,198,157,.6)',borderColor:'#74c69d',borderWidth:1,borderRadius:4}
         ]
       },
       options:{
@@ -3646,7 +3658,11 @@ async function renderCentral(){
   });
   const semLabels = ['S1','S2','S3','S4','S5'];
   const semAbord  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).abord||0);
+  const semAgend  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).agendadas||0);
   const semReun   = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).reunioes||0);
+  const semVendas = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).vendas||0);
+  const melhorSemReunIdx = semReun.indexOf(Math.max(...semReun));
+  const melhorSemVendIdx = semVendas.indexOf(Math.max(...semVendas));
   if(linhaCtx){
     if(_chartLinha){ _chartLinha.destroy(); _chartLinha=null; }
     _chartLinha = new Chart(linhaCtx, {
@@ -3655,7 +3671,8 @@ async function renderCentral(){
         labels:semLabels,
         datasets:[
           {label:'Abordagens',data:semAbord,borderColor:'#4db8c8',backgroundColor:'rgba(77,184,200,.08)',fill:true,tension:.4,pointBackgroundColor:'#4db8c8',pointRadius:4},
-          {label:'Reuniões',  data:semReun, borderColor:'#74c69d',backgroundColor:'rgba(116,198,157,.08)',fill:true,tension:.4,pointBackgroundColor:'#74c69d',pointRadius:4}
+          {label:'Agendadas', data:semAgend,borderColor:'#e9a84c',backgroundColor:'rgba(233,168,76,.06)', fill:true,tension:.4,pointBackgroundColor:'#e9a84c',pointRadius:4},
+          {label:'Realizadas',data:semReun, borderColor:'#74c69d',backgroundColor:'rgba(116,198,157,.08)',fill:true,tension:.4,pointBackgroundColor:'#74c69d',pointRadius:4}
         ]
       },
       options:{
