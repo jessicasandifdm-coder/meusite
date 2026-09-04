@@ -4117,8 +4117,8 @@ async function crmDrop(e, novoStatus){
 
   // Registrar pipeline de origem ao ir para nutrição
   const pipelineOrigemUpdate = {};
-  if(pipelineMudou && !op.pipeline_origem){
-    pipelineOrigemUpdate.pipeline_origem = op.pipeline;
+  if(pipelineMudou){
+    pipelineOrigemUpdate.pipeline_origem = op.pipeline_origem || op.pipeline;
   }
 
   try{
@@ -4280,7 +4280,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       ${op.lap_resultado?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Resultado desejado:</span> '+crmEsc(op.lap_resultado)+'</div>':''}
       ${op.lap_info_extra?'<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Info extra:</span> '+crmEsc(op.lap_info_extra)+'</div>':''}
     </div>` : ''}
-    ${((pipeAtual==='reativacao' || op.pipeline_origem==='reativacao') && op.reat_faturamento) ? `
+    ${((pipeAtual==='reativacao' || op.funil==='reativacao') && op.reat_faturamento) ? `
     <div style="margin-top:14px;background:rgba(155,114,207,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:10px">Diagnóstico Estratégico — Respostas do Formulário</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
@@ -4300,7 +4300,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       ${op.reat_objetivos ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Objetivos:</span> '+crmEsc(op.reat_objetivos)+'</div>' : ''}
       ${op.reat_mudanca ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Mudança desejada:</span> '+crmEsc(op.reat_mudanca)+'</div>' : ''}
     </div>` : ''}
-    ${((pipeAtual==='bv' || op.pipeline_origem==='bv') && op.bv_faturamento) ? `
+    ${((pipeAtual==='bv' || op.funil==='bv') && op.bv_faturamento) ? `
     <div style="margin-top:14px;background:rgba(45,106,79,.06);border:1px solid var(--border);border-radius:8px;padding:14px 16px">
       <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--g4);margin-bottom:10px">Respostas do Formulário BV</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
