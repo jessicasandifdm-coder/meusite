@@ -509,6 +509,9 @@ button{font-family:var(--font)}
 .crm-hist-item:last-child{border-bottom:none}
 .crm-hist-dot{width:7px;height:7px;border-radius:50%;background:var(--g3);flex-shrink:0;margin-top:5px}
 .crm-hist-dot.red{background:var(--coral)}
+.crm-hist-dot.green{background:var(--g3)}
+.crm-hist-dot.blue{background:var(--teal)}
+.crm-hist-dot.purple{background:var(--purple)}
 .crm-hist-dot.amber{background:var(--amber)}
 .crm-hist-dot.purple{background:var(--purple)}
 .crm-hist-desc{font-size:12px;color:var(--text);line-height:1.5}
@@ -4363,7 +4366,7 @@ function crmFichaHtml(op, pessoa, eventos=[]){
     <div class="crm-hist" id="crmHist">
       ${eventos.length?eventos.map(ev=>`
         <div class="crm-hist-item">
-          <div class="crm-hist-dot ${ev.tipo==='no_show'?'red':ev.tipo==='status'?'purple':''}"></div>
+          <div class="crm-hist-dot ${ev.tipo==='no_show'?'red':ev.tipo==='ganho'?'green':ev.tipo==='status'?'purple':ev.tipo==='anotacao'?'blue':''}"></div>
           <div>
             <div class="crm-hist-desc">${crmEsc(ev.descricao)}</div>
             <div class="crm-hist-dt">${crmFmtDtHr(ev.criado_em)}${ev.responsavel?' · '+crmEsc(ev.responsavel):''}</div>
@@ -4537,14 +4540,25 @@ async function crmSalvar(){
       if(!r.ok) throw new Error('Erro ao criar op: '+r.status);
     }
 
-    // Evento histórico
+    // Evento histórico — detectar o que mudou
     const allLabels={};
     Object.values(CRM_PIPELINES).forEach(pp=>pp.cols.forEach(c=>allLabels[c.status]=c.label));
+    const opAnterior = _crmOps.find(o=>o.id===_crmEditId)||{};
+    const mudancas = [];
+    if(_crmEditId){
+      if(statusAnterior!==novoStatus) mudancas.push((allLabels[statusAnterior]||statusAnterior)+' → '+(allLabels[novoStatus]||novoStatus));
+      const dtAntes=(opAnterior.reuniao_data||'').slice(0,16), dtAgora=(dadosOp.reuniao_data||'').slice(0,16);
+      if(dtAgora&&dtAgora!==dtAntes){ const d=new Date(dtAgora); mudancas.push('Reunião: '+d.toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})); }
+      if(dadosOp.reuniao_valor_ofertado&&dadosOp.reuniao_valor_ofertado!=opAnterior.reuniao_valor_ofertado) mudancas.push('Oferta: R$ '+parseFloat(dadosOp.reuniao_valor_ofertado).toLocaleString('pt-BR'));
+      if(dadosOp.valor_venda&&dadosOp.valor_venda!=opAnterior.valor_venda) mudancas.push('Venda: R$ '+parseFloat(dadosOp.valor_venda).toLocaleString('pt-BR'));
+      if(dadosOp.proxima_acao&&dadosOp.proxima_acao!==opAnterior.proxima_acao){ const dt=dadosOp.data_proxima_acao?' ('+new Date(dadosOp.data_proxima_acao).toLocaleDateString('pt-BR')+')':''; mudancas.push('Próxima ação: '+dadosOp.proxima_acao+dt); }
+      if(dadosOp.reuniao_objecao&&dadosOp.reuniao_objecao!==opAnterior.reuniao_objecao) mudancas.push('Objeção: '+dadosOp.reuniao_objecao);
+      if(dadosOp.reuniao_motivo_perda&&dadosOp.reuniao_motivo_perda!==opAnterior.reuniao_motivo_perda) mudancas.push('Motivo perda: '+dadosOp.reuniao_motivo_perda);
+      if(dadosOp.responsavel&&dadosOp.responsavel!==opAnterior.responsavel) mudancas.push('Responsável: '+dadosOp.responsavel);
+    }
     const descEv = _crmEditId
-      ? (statusAnterior!==novoStatus
-          ? `${allLabels[statusAnterior]||statusAnterior} → ${allLabels[novoStatus]||novoStatus}`
-          : 'Ficha atualizada')
-      : `Oportunidade criada · ${CRM_FUNIL_LABELS[dadosOp.funil]||dadosOp.funil}`;
+      ? (mudancas.length>0 ? mudancas.join(' · ') : 'Ficha atualizada')
+      : 'Oportunidade criada · '+(CRM_FUNIL_LABELS[dadosOp.funil]||dadosOp.funil);
 
     await fetch(SUPA_URL+'/rest/v1/crm_eventos',{
       method:'POST',
@@ -4589,7 +4603,7 @@ async function crmAddNota(){
     const hist = document.getElementById('crmHist');
     if(hist) hist.innerHTML = evts.map(ev=>`
       <div class="crm-hist-item">
-        <div class="crm-hist-dot ${ev.tipo==='no_show'?'red':ev.tipo==='status'?'purple':''}"></div>
+        <div class="crm-hist-dot ${ev.tipo==='no_show'?'red':ev.tipo==='ganho'?'green':ev.tipo==='status'?'purple':ev.tipo==='anotacao'?'blue':''}"></div>
         <div>
           <div class="crm-hist-desc">${crmEsc(ev.descricao)}</div>
           <div class="crm-hist-dt">${crmFmtDtHr(ev.criado_em)}${ev.responsavel?' · '+crmEsc(ev.responsavel):''}</div>
