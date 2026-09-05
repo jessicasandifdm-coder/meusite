@@ -626,88 +626,70 @@ button{font-family:var(--font)}
 <div class="tab-content active" id="tab-central">
 
   <!-- Header -->
-  <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px">
     <div>
-      <p class="page-title" style="font-size:28px">Central de Decisão</p>
-      <p class="page-sub" id="centralSubtitle">Painel de comando comercial — visão executiva do mês</p>
+      <div class="page-title" style="margin-bottom:4px">Central de Decisão</div>
+      <div id="centralSubtitle" class="page-sub">Painel de comando</div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <div class="period-tabs" id="centralMonthTabs"></div>
-      <button class="btn-save" onclick="centralRefresh()" id="centralRefreshBtn">↻ Atualizar</button>
-    </div>
-  </div>
-
-  <!-- ── NÍVEL 1: ALERTAS ── -->
-  <div id="centralAlertas" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px"></div>
-
-  <!-- ── NÍVEL 2: RESUMO — 5 KPIs principais ── -->
-  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px" id="centralKpis">
-    <div class="central-kpi" id="ck-vendas">
-      <div class="ck-val" id="ck-vendas-val">—</div>
-      <div class="ck-lbl">Vendas</div>
-      <div class="ck-delta" id="ck-vendas-delta"></div>
-    </div>
-    <div class="central-kpi" id="ck-fat">
-      <div class="ck-val" id="ck-fat-val">—</div>
-      <div class="ck-lbl">Faturamento</div>
-      <div class="ck-delta" id="ck-fat-delta"></div>
-    </div>
-    <div class="central-kpi" id="ck-reun">
-      <div class="ck-val" id="ck-reun-val">—</div>
-      <div class="ck-lbl">Realizadas</div>
-      <div class="ck-delta" id="ck-reun-delta"></div>
-    </div>
-    <div class="central-kpi" id="ck-conv">
-      <div class="ck-val" id="ck-conv-val">—</div>
-      <div class="ck-lbl">Fechamento (reun→venda)</div>
-      <div class="ck-delta" id="ck-conv-delta"></div>
-    </div>
-    <div class="central-kpi" id="ck-noshow">
-      <div class="ck-val" id="ck-noshow-val">—</div>
-      <div class="ck-lbl">No-show</div>
-      <div class="ck-delta" id="ck-noshow-delta"></div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <div id="centralMonthTabs" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+      <button id="centralRefreshBtn" onclick="centralRefresh()" class="btn-sec" style="font-size:12px;padding:6px 12px">↻ Atualizar</button>
     </div>
   </div>
 
-  <!-- ── NÍVEL 3: METAS COM PROGRESSO VISUAL ── -->
-  <div class="sh"><span class="sh-label">Metas do mês</span><div class="sh-line"></div></div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px" id="centralMetas"></div>
+  <!-- KPIs topo -->
+  <div id="centralKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+    <div class="central-kpi" id="ck-vendas"><div class="ck-val" id="ck-vendas-val">—</div><div class="ck-lbl">Vendas</div><div class="ck-delta" id="ck-vendas-delta"></div></div>
+    <div class="central-kpi" id="ck-fat"><div class="ck-val" id="ck-fat-val">—</div><div class="ck-lbl">Faturamento</div><div class="ck-delta" id="ck-fat-delta"></div></div>
+    <div class="central-kpi" id="ck-reun"><div class="ck-val" id="ck-reun-val">—</div><div class="ck-lbl">Realizadas</div><div class="ck-delta" id="ck-reun-delta"></div></div>
+    <div class="central-kpi" id="ck-conv"><div class="ck-val" id="ck-conv-val">—</div><div class="ck-lbl">Fechamento (reun→venda)</div><div class="ck-delta" id="ck-conv-delta"></div></div>
+    <div class="central-kpi" id="ck-noshow" style="border-color:var(--coral-dim)"><div class="ck-val" id="ck-noshow-val" style="color:var(--coral)">—</div><div class="ck-lbl">No-show</div><div class="ck-delta" id="ck-noshow-delta"></div></div>
+  </div>
 
-  <!-- ── NÍVEL 4: DIAGNÓSTICO ── -->
-  <div class="sh"><span class="sh-label">Diagnóstico</span><div class="sh-line"></div></div>
+  <!-- Metas -->
+  <div class="sh" style="margin-bottom:12px"><span class="sh-label">Metas do mês</span><div class="sh-line"></div></div>
+  <div id="centralMetas" style="margin-bottom:24px;min-height:32px;color:var(--text3);font-size:13px">—</div>
+
+  <!-- Diagnóstico -->
+  <div class="sh" style="margin-bottom:12px"><span class="sh-label">Diagnóstico</span><div class="sh-line"></div></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
-    <div id="centralGargalo" class="card"></div>
-    <div id="centralMelhorCanal" class="card"></div>
+    <div class="card" id="centralGargalo" style="min-height:60px"></div>
+    <div class="card" id="centralMelhorCanal" style="min-height:60px"></div>
   </div>
 
-  <!-- ── NÍVEL 5: VISÃO DO FUNIL + GRÁFICOS ── -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px">
-    <!-- Pizza: situação das oportunidades -->
+  <!-- Alertas -->
+  <div id="centralAlertas" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px"></div>
+
+  <!-- Gráficos -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
     <div class="card">
-      <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Situação das oportunidades</div>
-      <div style="position:relative;height:220px;width:100%"><canvas id="centralPizzaChart"></canvas></div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px">Situação das oportunidades</div>
+      <div id="centralPizzaWrap" style="position:relative;height:220px;width:100%">
+        <canvas id="centralPizzaChart"></canvas>
+      </div>
     </div>
-    <!-- Barras: resultado por canal -->
     <div class="card">
-      <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Resultado por canal</div>
-      <div style="position:relative;height:220px;width:100%"><canvas id="centralBarrasChart"></canvas></div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px">Resultado por canal</div>
+      <div id="centralBarrasWrap" style="position:relative;height:220px;width:100%">
+        <canvas id="centralBarrasChart"></canvas>
+      </div>
     </div>
   </div>
 
-  <!-- ── NÍVEL 6: EVOLUÇÃO DO MÊS ── -->
+  <!-- Evolução semanal -->
   <div class="card" style="margin-bottom:24px">
-    <div style="font-family:var(--display);font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Evolução do mês — abordagens e reuniões por semana</div>
-    <div style="position:relative;height:180px;width:100%"><canvas id="centralLinhaChart"></canvas></div>
+    <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px">Evolução do mês por semana</div>
+    <div id="centralLinhaWrap" style="position:relative;height:180px;width:100%">
+      <canvas id="centralLinhaChart"></canvas>
+    </div>
   </div>
 
-  <!-- ── BOTÃO: abrir análise completa ── -->
   <div style="text-align:center;padding:8px 0 24px">
-    <button onclick="showTabByName('mensal')" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text2);font-family:var(--font);font-size:13px;font-weight:500;padding:12px 28px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--g3)';this.style.color='var(--g4)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">
-      Ver análise completa → Dashboard Mensal
-    </button>
+    <button onclick="showTabByName('mensal')" class="btn-sec" style="font-size:12px">Ver Dashboard Mensal completo →</button>
   </div>
 
 </div>
+
 
 <div class="tab-content" id="tab-visao">
 
@@ -3283,13 +3265,7 @@ let _chartBarras = null;
 let _chartLinha  = null;
 
 async function renderCentral(){
-  // Mostrar loading enquanto carrega
-  const container = document.getElementById('tab-central');
-  if(container && !container.querySelector('#centralKpis').children.length){
-    document.getElementById('centralAlertas').innerHTML = '<div class="central-alert atencao" style="width:100%"><div class="central-alert-icon">⏳</div><div class="central-alert-txt"><div class="central-alert-title">Carregando</div><div>Buscando dados do mês...</div></div></div>';
-  }
-
-  // Month tabs
+  // ── Tabs de mês ──
   const tabs = document.getElementById('centralMonthTabs');
   if(tabs){
     tabs.innerHTML = '';
@@ -3302,386 +3278,359 @@ async function renderCentral(){
     });
   }
   const sub = document.getElementById('centralSubtitle');
-  if(sub) sub.textContent = `Painel de comando — ${MONTHS_PT[centralMonth]}/${centralYear}`;
+  if(sub) sub.textContent = 'Painel de comando — '+MONTHS_PT[centralMonth]+'/'+centralYear;
 
-  // Carregar dados — com proteção contra erro
+  // ── Carregar dados ──
   let allDays = [];
-  try{ allDays = await getAllDaysAsync(centralYear); }catch(e){ allDays = []; }
+  try{ allDays = await getAllDaysAsync(centralYear); }catch(e){ allDays=[]; }
+
   const monthDays = allDays.filter(d=>{
     const [y,m] = d._date.split('-').map(Number);
     return y===centralYear && m-1===centralMonth;
   });
   const agg = aggregateDays(monthDays);
 
-  // Dados do mês anterior para comparação
-  const prevMonth = centralMonth===0 ? 11 : centralMonth-1;
-  const prevYear  = centralMonth===0 ? centralYear-1 : centralYear;
+  const prevMonth = centralMonth===0?11:centralMonth-1;
+  const prevYear  = centralMonth===0?centralYear-1:centralYear;
   const prevDays  = allDays.filter(d=>{
     const [y,m] = d._date.split('-').map(Number);
     return y===prevYear && m-1===prevMonth;
   });
   const prevAgg = aggregateDays(prevDays);
 
-  // Dados CRM — com proteção
-  let crmD = {abord:0,agend:0,noshow:0,ganho:0,fat_ganho:0,ops:0,bv_total:0,bv_qualif:0};
-  try{ crmD = await crmBuscarDadosMes(centralYear, centralMonth); }catch(e){ console.warn('CRM central:', e); }
+  let crmD = {abord:0,agend:0,noshow:0,realizadas:0,ganho:0,fat_ganho:0,fat_avulsas:0,ops:0,followup:0};
+  try{ crmD = await crmBuscarDadosMes(centralYear, centralMonth); }catch(e){ console.warn('CRM:',e); }
 
-  // Metas
+  let prevCrmD = {agend:0,realizadas:0,ganho:0,fat_ganho:0};
+  try{ prevCrmD = await crmBuscarDadosMes(prevYear, prevMonth); }catch(e){}
+
   let metasData = {};
   try{
     const mr = await apiGet({action:'get_metas',ano:centralYear,mes:centralMonth});
     metasData = mr.dados||{};
   }catch(e){}
 
-  // Valores consolidados — legado + CRM são períodos diferentes, soma é correta
-  const temLegC   = (agg.abord||0) > 0;
-  const abordC    = temLegC ? (agg.abord||0) : (crmD.abord||0);
-  const vendas    = (agg.vendas||0)   + (crmD.ganho||0);
-  const fat       = (agg.valor||0)    + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
-  const agend     = (agg.agendadas||0) + (crmD.agend||0);
-  const reunioes  = (agg.reunioes||0)  + (crmD.realizadas||0);
-  const noshow    = (crmD.noshow||0);
-  const taxaFechamento = reunioes>0 ? Math.round(vendas/reunioes*100) : 0;
-  const taxaFech = taxaFechamento;
-  const taxaNS   = agend>0   ? Math.round(noshow/agend*100)    : 0;
+  // ── Consolidar valores ──
+  const temLeg = (agg.abord||0) > 0;
+  const abord   = temLeg ? (agg.abord||0) : (crmD.abord||0);
+  const agend   = (agg.agendadas||0) + (crmD.agend||0);
+  const reun    = (agg.reunioes||0)  + (crmD.realizadas||0);
+  const noshow  = (crmD.noshow||0);
+  const vendas  = (agg.vendas||0)    + (crmD.ganho||0);
+  const fat     = (agg.valor||0)     + (crmD.fat_ganho||0) + (crmD.fat_avulsas||0);
 
-  const prevVendas   = (prevAgg.vendas||0);
-  const prevFat      = (prevAgg.valor||0);
-  const prevReun     = (prevAgg.reunioes||0);
-  const prevTaxaFech = prevReun>0 ? Math.round(prevVendas/prevReun*100) : 0;
+  const prevAgend = (prevAgg.agendadas||0) + (prevCrmD.agend||0);
+  const prevReun  = (prevAgg.reunioes||0)  + (prevCrmD.realizadas||0);
+  const prevVend  = (prevAgg.vendas||0)    + (prevCrmD.ganho||0);
+  const prevFat   = (prevAgg.valor||0)     + (prevCrmD.fat_ganho||0);
+
+  const taxaFech = reun>0 ? Math.round(vendas/reun*100) : 0;
+  const taxaNS   = agend>0 ? Math.round(noshow/agend*100) : 0;
+  const prevTaxa = (prevAgg.reunioes||0)>0 ? Math.round((prevAgg.vendas||0)/(prevAgg.reunioes||0)*100) : 0;
 
   // ── KPIs ──
-  function setKpi(id, val, prev, isMoney, isBad){
+  function setKpi(id, val, prev, isMoney){
     const el  = document.getElementById('ck-'+id+'-val');
     const del = document.getElementById('ck-'+id+'-delta');
-    const isPct = id==='conv'||id==='noshow';
-    if(el) el.textContent = isMoney ? (val>0?'R$ '+val.toLocaleString('pt-BR'):'—') : isPct ? (val||'0')+'%' : (val||'0');
-    if(del && prev!==null){
-      const diff = isNaN(val-prev) ? 0 : val - prev;
-      const pct  = (!isNaN(prev) && prev>0) ? Math.round(diff/prev*100) : 0;
-      const up   = isBad ? diff<0 : diff>0;
-      const cls  = diff===0?'neutral':up?'up':'down';
-      const sign = diff>0?'+':'';
-      del.className = 'ck-delta '+cls;
-      del.textContent = diff!==0 ? `${sign}${isMoney?'R$ '+Math.abs(diff).toLocaleString('pt-BR'):diff} (${sign}${pct}% vs mês ant.)` : '= mês anterior';
+    if(!el) return;
+    el.textContent = isMoney ? 'R$ '+val.toLocaleString('pt-BR') : val;
+    if(del && prev!==null && prev!==undefined){
+      const diff = val - prev;
+      const sign = diff>=0?'+':'';
+      const pct  = prev>0 ? Math.round(Math.abs(diff)/prev*100) : (diff>0?100:0);
+      del.textContent = sign+diff+(isMoney?' ('+sign+pct+'% vs mês ant.)':' ('+sign+pct+'% vs mês ant.)');
+      del.className = 'ck-delta '+(diff>=0?'pos':'neg');
     }
   }
+  setKpi('vendas', vendas, prevVend,  false);
+  setKpi('fat',    fat,    prevFat,   true);
+  setKpi('reun',   reun,   prevReun,  false);
+  setKpi('conv',   taxaFech+'%', null, false);
+  const noShowEl = document.getElementById('ck-noshow-val');
+  if(noShowEl) noShowEl.textContent = taxaNS+'%';
 
-  setKpi('vendas',  vendas,     prevVendas,    false, false);
-  setKpi('fat',     fat,        prevFat,       true,  false);
-  setKpi('reun',    reunioes,   prevReun,      false, false);
-  setKpi('conv',    taxaFech,     prevTaxaFech,     false, false);
-  setKpi('noshow',  taxaNS,     null,          false, true);
-
-  // Cores dos cards KPI
-  const kpiColors = [
-    {id:'ck-vendas', borderColor:'var(--g2)', bg:'rgba(27,67,50,.08)', valColor:'var(--g4)'},
-    {id:'ck-fat',    borderColor:'var(--g2)', bg:'rgba(27,67,50,.08)', valColor:'var(--g4)'},
-    {id:'ck-reun',   borderColor:'', bg:'', valColor:''},
-    {id:'ck-conv',   borderColor:'var(--purple-dim)', bg:'rgba(155,114,207,.06)', valColor:'var(--purple)'},
-    {id:'ck-noshow', borderColor:'var(--coral-dim)', bg:'rgba(224,112,112,.06)', valColor:'var(--coral)'},
-  ];
-  kpiColors.forEach(k=>{
-    const el = document.getElementById(k.id);
-    if(el&&k.borderColor){ el.style.borderColor=k.borderColor; el.style.background=k.bg; }
-    const val = document.getElementById(k.id+'-val');
-    if(val&&k.valColor) val.style.color=k.valColor;
+  // ── Estilo dos KPI cards ──
+  [
+    {id:'ck-vendas', bc:'var(--g2)', bg:'rgba(27,67,50,.08)', vc:'var(--g4)'},
+    {id:'ck-fat',    bc:'var(--g2)', bg:'rgba(27,67,50,.08)', vc:'var(--g4)'},
+    {id:'ck-reun',   bc:'',         bg:'',                    vc:''},
+    {id:'ck-conv',   bc:'var(--purple-dim)', bg:'rgba(155,114,207,.06)', vc:'var(--purple)'},
+    {id:'ck-noshow', bc:'var(--coral-dim)',  bg:'rgba(224,112,112,.06)', vc:'var(--coral)'},
+  ].forEach(({id,bc,bg,vc})=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(bc) el.style.borderColor = bc;
+    if(bg) el.style.background  = bg;
+    const valEl = el.querySelector('.ck-val');
+    if(valEl && vc) valEl.style.color = vc;
   });
 
-  // ── ALERTAS ──
-  const alertasEl = document.getElementById('centralAlertas');
-  const alertas = [];
-  if(abordC>0){
-    const taxaAgend = abordC>0 ? agend/abordC : 0;
-    if(taxaAgend<0.03 && abordC>20) alertas.push({tipo:'critico', titulo:'Gargalo crítico', txt:`Só ${pct(agend,abordC)} das abordagens chegam a reunião. Volume adequado mas conversão muito baixa.`});
-    else if(taxaAgend<0.06 && abordC>10) alertas.push({tipo:'atencao', titulo:'Atenção: poucas reuniões', txt:`Taxa abordagem→reunião em ${pct(agend,abordC)}. Revisar qualificação e abordagem.`});
-    if(taxaNS>=30) alertas.push({tipo:'critico', titulo:`No-show elevado: ${taxaNS}%`, txt:'Mais de 30% das reuniões agendadas não acontecem. Reforçar pré-aquecimento.'});
-    else if(taxaNS>=15) alertas.push({tipo:'atencao', titulo:`No-show: ${taxaNS}%`, txt:'Acompanhar comparecimento. Enviar lembrete no dia anterior e no dia.'});
-    if(taxaFech>=25) alertas.push({tipo:'positivo', titulo:'Fechamento saudável', txt:`${taxaFech}% das reuniões viram venda. Funil funcionando bem.`});
-    if(vendas>prevVendas && prevVendas>0) alertas.push({tipo:'positivo', titulo:'Crescimento nas vendas', txt:`+${vendas-prevVendas} venda(s) vs mês anterior.`});
-    if(metasData.vendas && vendas>=parseFloat(metasData.vendas)) alertas.push({tipo:'positivo', titulo:'Meta de vendas atingida!', txt:`${vendas} de ${metasData.vendas} vendas — parabéns!`});
-  }
-  const melhorSemReunVal = Math.max(...semReun);
-  const melhorSemVendVal = Math.max(...semVendas);
-  if(melhorSemReunVal>0) alertas.push({tipo:'positivo', titulo:'🏆 Melhor semana em realizações', txt:`Semana ${melhorSemReunIdx+1} com ${melhorSemReunVal} reunião(ões) realizada(s).`});
-  if(melhorSemVendVal>0) alertas.push({tipo:'positivo', titulo:'🏆 Melhor semana em vendas', txt:`Semana ${melhorSemVendIdx+1} com ${melhorSemVendVal} venda(s).`});
-  if(!alertas.length) alertas.push({tipo:'atencao', titulo:'Sem dados suficientes', txt:'Preencha o Registro Diário e o CRM para ativar os alertas automáticos.'});
-
-  alertasEl.innerHTML = alertas.slice(0,4).map(a=>`
-    <div class="central-alert ${a.tipo}">
-      <div class="central-alert-icon">${a.tipo==='critico'?'🔴':a.tipo==='atencao'?'🟡':'🟢'}</div>
-      <div class="central-alert-txt">
-        <div class="central-alert-title">${a.titulo}</div>
-        <div>${a.txt}</div>
+  // ── Metas ──
+  function metaRow(label, meta, real, isMoney){
+    if(!meta) return '';
+    const pct  = meta>0 ? Math.round(real/meta*100) : 0;
+    const falta = Math.max(0, meta-real);
+    const cor   = pct>=100?'var(--g4)':pct>=70?'var(--amber)':'var(--coral)';
+    const fmt   = v => isMoney ? 'R$ '+v.toLocaleString('pt-BR') : v;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;font-size:13px;color:var(--text2)">${label}</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);min-width:60px;text-align:right">${fmt(real)}</div>
+      <div style="font-size:12px;color:var(--text3);min-width:60px;text-align:right">meta ${fmt(meta)}</div>
+      <div style="width:80px;background:var(--border);border-radius:4px;height:6px;overflow:hidden">
+        <div style="width:${Math.min(100,pct)}%;height:100%;background:${cor};border-radius:4px"></div>
       </div>
-    </div>`).join('');
-
-  // ── METAS COM BARRA DE PROGRESSO ──
+      <div style="font-size:12px;font-weight:600;color:${cor};min-width:36px;text-align:right">${pct}%</div>
+      <div style="font-size:11px;color:var(--text3);min-width:80px">${falta>0?'faltam '+fmt(falta):''}</div>
+    </div>`;
+  }
   const metasEl = document.getElementById('centralMetas');
-  function metaCard(label, meta, real, isMoney){
-    if(!meta) return `<div class="meta-progress-card">
-      <div class="meta-progress-label">${label}</div>
-      <div style="font-size:12px;color:var(--text3);margin-top:8px">Meta não definida</div>
-      <button onclick="showTabByName('mensal')" style="font-size:11px;color:var(--g4);background:none;border:none;cursor:pointer;margin-top:8px;padding:0;font-family:var(--font)">→ Definir meta</button>
-    </div>`;
-    const pctVal = Math.min(Math.round(real/meta*100),100);
-    const falta  = Math.max(0, meta-real);
-    const color  = pctVal>=100?'var(--g4)':pctVal>=60?'var(--amber)':'var(--coral)';
-    return `<div class="meta-progress-card">
-      <div class="meta-progress-label">${label}</div>
-      <div class="meta-progress-nums">
-        <span class="meta-progress-real" style="color:${color}">${isMoney?'R$ '+real.toLocaleString('pt-BR'):real}</span>
-        <span class="meta-progress-meta">/ ${isMoney?'R$ '+parseFloat(meta).toLocaleString('pt-BR'):meta}</span>
-      </div>
-      <div class="meta-progress-bar-track">
-        <div class="meta-progress-bar-fill" style="width:${pctVal}%;background:${color}"></div>
-      </div>
-      <div class="meta-progress-footer">
-        <span class="meta-progress-pct" style="color:${color}">${pctVal}%</span>
-        <span class="meta-progress-falta">${falta>0?(isMoney?'Falta R$ '+falta.toLocaleString('pt-BR'):'Faltam '+falta):'✓ Atingido'}</span>
-      </div>
-    </div>`;
+  if(metasEl){
+    const rows = [
+      metaRow('Abordagens (1º contato)', parseFloat(metasData.abord)||0, abord, false),
+      metaRow('Reuniões agendadas',      parseFloat(metasData.agend)||0, agend, false),
+      metaRow('Reuniões realizadas',     parseFloat(metasData.reun)||0,  reun,  false),
+      metaRow('Vendas',                  parseFloat(metasData.vendas)||0, vendas, false),
+      metaRow('Faturamento',             parseFloat(metasData.fat)||0,   fat,   true),
+    ].filter(Boolean).join('');
+    metasEl.innerHTML = rows || '<span style="color:var(--text3);font-size:13px">Sem metas cadastradas para este mês</span>';
   }
-  metasEl.innerHTML =
-    metaCard('Abordagens',  metasData.abord,  abordC,   false) +
-    metaCard('Reuniões',    metasData.reun,   reunioes, false) +
-    metaCard('Vendas',      metasData.vendas, vendas,   false) +
-    metaCard('Faturamento', metasData.fat,    fat,      true);
 
-  // ── DIAGNÓSTICO: GARGALO ──
+  // ── Gargalo ──
   const gargaloEl = document.getElementById('centralGargalo');
-  const resp = agg.resp||0;
-  const conv = agg.convites||0;
-  // Identificar qual etapa tem maior queda
-  const taxas = [
-    {de:'Abordagens', ate:'Agendadas',  num:abordC,   den:abordC,   val:agend,    t:abordC>0?agend/abordC:0},
-    {de:'Agendadas',  ate:'Realizadas', num:agend,    den:agend,    val:reunioes, t:agend>0?reunioes/agend:0},
-    {de:'Realizadas', ate:'Vendas',     num:reunioes, den:reunioes, val:vendas,   t:reunioes>0?vendas/reunioes:0},
-  ];
-  const gargalo = taxas.filter(t=>t.num>0).reduce((min,t)=>t.t<min.t?t:min, {t:1,de:'—',ate:'—',num:0,val:0});
-  if(gargaloEl) gargaloEl.innerHTML = `
-    <div class="central-diagnostico-title" style="color:var(--coral)">🔴 Principal gargalo</div>
-    <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px">${gargalo.de} → ${gargalo.ate}</div>
-    <div class="central-gargalo-steps">
-      ${taxas.filter(t=>t.num>0).map((t,i)=>`
-        ${i>0?'<div class="central-gargalo-arrow">→</div>':''}
-        <div class="central-gargalo-step">
-          <div class="central-gargalo-num" style="color:${t===gargalo?'var(--coral)':'var(--text)'}">${t.val}</div>
-          <div class="central-gargalo-lbl">${t.ate}</div>
-          <div class="central-gargalo-pct" style="color:${t===gargalo?'var(--coral)':t.t>=0.3?'var(--g4)':'var(--amber)'}">${Math.round(t.t*100)}%</div>
-        </div>`).join('')}
-    </div>
-    <div style="font-size:12px;color:var(--text3);line-height:1.5;margin-top:8px;border-top:1px solid var(--border);padding-top:8px">
-      ${gargalo.de==='Abord.'?'Volume de respostas baixo — revisar script e critério de seleção dos perfis.':
-        gargalo.de==='Respostas'?'Poucas respostas viram convite — treinar condução da conversa.':
-        gargalo.de==='Convites'?'Convites não viram agendamentos — verificar fit do lead.':
-        gargalo.de==='Agend.'?'Muitas reuniões não acontecem — reforçar pré-aquecimento.':
-        'Reuniões sem fechamento — revisar oferta e diagnóstico.'}
-    </div>`;
+  if(gargaloEl){
+    const etapas = [
+      {nome:'Abordagens', val:abord},
+      {nome:'Agendadas',  val:agend},
+      {nome:'Realizadas', val:reun},
+      {nome:'Vendas',     val:vendas},
+    ];
+    let html = '<div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Principal gargalo</div>';
+    html += '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">';
+    etapas.forEach((e,i)=>{
+      if(i>0){
+        const prev = etapas[i-1].val;
+        const pct = prev>0 ? Math.round(e.val/prev*100) : (e.val>0?100:0);
+        const cor = pct>=60?'var(--g4)':pct>=30?'var(--amber)':'var(--coral)';
+        html += `<span style="font-size:10px;color:${cor}">→ ${pct}%</span>`;
+      }
+      html += `<span style="font-size:13px;font-weight:600;color:var(--text)">${e.val}<span style="font-size:10px;font-weight:400;color:var(--text3);margin-left:2px">${e.nome}</span></span>`;
+    });
+    html += '</div>';
+    // Identificar maior queda
+    let maiorQueda = null, maiorPct = 101;
+    for(let i=1;i<etapas.length;i++){
+      const prev = etapas[i-1].val;
+      const pct = prev>0 ? Math.round(etapas[i].val/prev*100) : (etapas[i].val>0?100:0);
+      if(pct < maiorPct){ maiorPct=pct; maiorQueda=i; }
+    }
+    if(maiorQueda && etapas[maiorQueda-1].val>0){
+      html += `<div style="margin-top:8px;font-size:12px;color:var(--coral)">⚠ Maior queda: ${etapas[maiorQueda-1].nome} → ${etapas[maiorQueda].nome} (${maiorPct}%)</div>`;
+    } else {
+      html += '<div style="margin-top:8px;font-size:12px;color:var(--text3)">Sem dados suficientes ainda</div>';
+    }
+    gargaloEl.innerHTML = html;
+  }
 
-  // ── DIAGNÓSTICO: MELHOR CANAL ──
-  // Combinar legado (agg) + CRM (canalGanhoCRM) para cada canal
-  const canais = [
-    {nome:'PC / Outbound', vend:(agg.pc?.vend||0)+canalGanhoCRM.pc,        reun:(agg.pc?.reun||0)+canalReunCRM.pc},
-    {nome:'BV',            vend:(agg.bv?.vend||0)+canalGanhoCRM.bv,        reun:(agg.bv?.reun||0)+canalReunCRM.bv},
-    {nome:'Reativação',    vend:(agg.re?.vend||0)+canalGanhoCRM.reativacao, reun:(agg.re?.reun||0)+canalReunCRM.reativacao},
-    {nome:'Isca',          vend:(agg.is?.vend||0)+canalGanhoCRM.isca,       reun:(agg.is?.reun||0)+canalReunCRM.isca},
-    {nome:'Aplicação',     vend:canalGanhoCRM.aplicacao,                    reun:canalReunCRM.aplicacao},
-  ].filter(c=>c.reun>0||c.vend>0);
-
-  const melhorCanal = canais.length ? canais.reduce((best,c)=>{
-    const t = c.reun>0?c.vend/c.reun:0;
-    const bt = best.reun>0?best.vend/best.reun:0;
-    return t>bt?c:best;
-  }, canais[0]) : null;
-
-  const melhorEl = document.getElementById('centralMelhorCanal');
-  if(melhorEl) melhorEl.innerHTML = melhorCanal ? `
-    <div class="central-diagnostico-title" style="color:var(--g4)">🏆 Melhor canal do mês</div>
-    <div style="font-family:var(--display);font-size:22px;font-weight:700;color:var(--g4);margin-bottom:12px">${melhorCanal.nome}</div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text3)">Reuniões realizadas</span><span style="font-weight:600;color:var(--text)">${melhorCanal.reun}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text3)">Vendas geradas</span><span style="font-weight:600;color:var(--g4)">${melhorCanal.vend}</span></div>
-      <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text3)">Taxa de fechamento</span><span style="font-weight:600;color:var(--g4)">${Math.round(melhorCanal.vend/melhorCanal.reun*100)}%</span></div>
-    </div>
-    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--text3)">Considere aumentar o volume neste funil para escalar o resultado.</div>
-  ` : `<div class="central-diagnostico-title" style="color:var(--g4)">🏆 Melhor canal</div>
-    <div style="font-size:12px;color:var(--text3);margin-top:8px">Sem dados suficientes ainda neste mês.</div>`;
-
-  // ── GRÁFICO PIZZA: situação das oportunidades ──
-  // inicio/fim definidos FORA do try para ficarem disponíveis nos blocos seguintes
-  const inicio = `${centralYear}-${String(centralMonth+1).padStart(2,'0')}-01`;
+  // ── Buscar dados por canal (CRM) ──
+  const inicio = centralYear+'-'+String(centralMonth+1).padStart(2,'0')+'-01';
   const fimDate = new Date(centralYear, centralMonth+1, 0);
   const fim = fimDate.toISOString().split('T')[0];
   const iISO = inicio+'T00:00:00Z';
   const fISO = fim+'T23:59:59Z';
 
-  let opsStatus = {agendado:0, nao_compareceu:0, negociacao:0, ganho:0, perdido:0, outros:0};
+  const canalG = {pc:0,bv:0,reativacao:0,isca:0};
+  const canalR = {pc:0,bv:0,reativacao:0,isca:0};
+
   try{
-    // Buscar TODAS as oportunidades ativas (não só do mês) para mostrar situação atual
-    const r = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?select=status,pipeline',
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
-    if(r.ok){
-      const ops = await r.json();
-      ops.forEach(o=>{
-        if(o.status==='agendado') opsStatus.agendado++;
-        else if(o.status==='nao_compareceu') opsStatus.nao_compareceu++;
-        else if(o.status==='negociacao') opsStatus.negociacao++;
-        else if(o.status==='ganho') opsStatus.ganho++;
-        else if(o.status==='perdido') opsStatus.perdido++;
-        else opsStatus.outros++;
-      });
-    }
-  }catch(e){ console.warn("Central opsStatus:", e); }
+    const [rG, rR] = await Promise.all([
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+iISO+'&data_ganho=lte.'+fISO+'&select=funil',
+        {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+iISO+'&data_realizada=lte.'+fISO+'&select=funil',
+        {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}})
+    ]);
+    if(rG.ok){ (await rG.json()).forEach(o=>{ const f=o.funil||'pc'; canalG[f]=(canalG[f]||0)+1; }); }
+    if(rR.ok){ (await rR.json()).forEach(o=>{ const f=o.funil||'pc'; canalR[f]=(canalR[f]||0)+1; }); }
+  }catch(e){ console.warn('canal fetch:',e); }
 
-  try {
-    const pizzaCtx2 = document.getElementById('centralPizzaChart');
-    const totalOps = opsStatus.agendado+opsStatus.nao_compareceu+opsStatus.negociacao+opsStatus.ganho+opsStatus.perdido+opsStatus.outros;
-    if(pizzaCtx2){
-      if(_chartPizza){ _chartPizza.destroy(); _chartPizza=null; }
-      if(totalOps > 0){
-        _chartPizza = new Chart(pizzaCtx2, {
-          type:'doughnut',
-          data:{labels:['Agendado','No-show','Negociação','Ganho','Perdido','Outros'],
-            datasets:[{data:[opsStatus.agendado,opsStatus.nao_compareceu,opsStatus.negociacao,opsStatus.ganho,opsStatus.perdido,opsStatus.outros],
-              backgroundColor:['#9b72cf','#e07070','#e9a84c','#74c69d','#435744','#4db8c8'],borderColor:'#111510',borderWidth:2}]},
-          options:{responsive:true,maintainAspectRatio:false,
-            plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:10}},
-              tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}`}}}}});
-      } else {
-        pizzaCtx2.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Sem leads registrados</div>';
-      }
-    }
-  } catch(ePizza){ console.error('Pizza:', ePizza); }
+  const sumR = Object.values(canalR).reduce((s,v)=>s+v,0);
+  const pr = c => sumR>0 ? Math.round((canalR[c]||0)/sumR*(crmD.agend||0)) : 0;
 
-  // ── GRÁFICO BARRAS: resultado por canal ──
-  // Garantir que o canvas está visível e com dimensões antes de criar charts
-  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-  // Canais: combinar legado (registro_diario) + CRM (crm_oportunidades por funil)
-  // Para legado: pc_vendas, bv_vendas etc (antes de setembro)
-  // Para CRM: ganhos por funil da tabela crm_oportunidades
-  let canalGanhoCRM = {pc:0, bv:0, reativacao:0, isca:0, aplicacao:0};
-  let canalReunCRM  = {pc:0, bv:0, reativacao:0, isca:0, aplicacao:0};
-  try{
-    // Ganhos por canal no CRM
-    const rGanhoCRM = await fetch(
-      SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+inicio+'T00:00:00Z&data_ganho=lte.'+fim+'T23:59:59Z&select=funil,pipeline,valor_venda',
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
-    if(rGanhoCRM.ok){
-      const gs = await rGanhoCRM.json();
-      gs.forEach(g=>{
-        const f = g.funil || g.pipeline || 'pc';
-        if(f==='bv') canalGanhoCRM.bv++;
-        else if(f==='reativacao') canalGanhoCRM.reativacao++;
-        else if(f==='isca') canalGanhoCRM.isca++;
-        else if(f==='aplicacao') canalGanhoCRM.aplicacao++;
-        else canalGanhoCRM.pc++;
-      });
-    }
-    // Realizadas por canal no CRM (passaram para negociação/ganho/perda no mês)
-    const rReunCRM = await fetch(
-      SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+inicio+'T00:00:00Z&data_realizada=lte.'+fim+'T23:59:59Z&select=funil,pipeline',
-      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}}
-    );
-    if(rReunCRM.ok){
-      const rs = await rReunCRM.json();
-      rs.forEach(r=>{
-        const f = r.funil || r.pipeline || 'pc';
-        if(f==='bv') canalReunCRM.bv++;
-        else if(f==='reativacao') canalReunCRM.reativacao++;
-        else if(f==='isca') canalReunCRM.isca++;
-        else if(f==='aplicacao') canalReunCRM.aplicacao++;
-        else canalReunCRM.pc++;
-      });
-    }
-  }catch(e){ console.warn("Central canal:", e); }
-
-  const canalNomes = ['PC','BV','Reativação','Isca','Aplicação'];
+  const canalNomes  = ['PC','BV','Reativação','Isca'];
+  const canalAgend  = [
+    (agg.pc?.agend||0)+pr('pc'),
+    (agg.bv?.agend||0)+pr('bv'),
+    (agg.re?.agend||0)+pr('reativacao'),
+    (agg.is?.agend||0)+pr('isca')
+  ];
+  const canalReun   = [
+    (agg.pc?.reun||0)+(canalR.pc||0),
+    (agg.bv?.reun||0)+(canalR.bv||0),
+    (agg.re?.reun||0)+(canalR.reativacao||0),
+    (agg.is?.reun||0)+(canalR.isca||0)
+  ];
   const canalVendas = [
-    (agg.pc?.vend||0)  + canalGanhoCRM.pc,
-    (agg.bv?.vend||0)  + canalGanhoCRM.bv,
-    (agg.re?.vend||0)  + canalGanhoCRM.reativacao,
-    (agg.is?.vend||0)  + canalGanhoCRM.isca,
-    canalGanhoCRM.aplicacao
+    (agg.pc?.vend||0)+(canalG.pc||0),
+    (agg.bv?.vend||0)+(canalG.bv||0),
+    (agg.re?.vend||0)+(canalG.reativacao||0),
+    (agg.is?.vend||0)+(canalG.isca||0)
   ];
-  // Reuniões: legado + CRM (períodos diferentes)
-  const canalReun = [
-    (agg.pc?.reun||0) + canalReunCRM.pc,
-    (agg.bv?.reun||0) + canalReunCRM.bv,
-    (agg.re?.reun||0) + canalReunCRM.reativacao,
-    (agg.is?.reun||0) + canalReunCRM.isca,
-    canalReunCRM.aplicacao
+  const canalAbord  = [
+    agg.pc?.abord||0,
+    agg.bv?.auto||0,
+    agg.re?.abord||0,
+    agg.is?.sdr||0
   ];
-  const canalAbord = [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.is?.sdr||0, 0];
-  const totalReunCRMsum = Object.values(canalReunCRM).reduce((s,v)=>s+v,0);
-  const prorrata = (canal) => totalReunCRMsum>0 ? Math.round((canalReunCRM[canal]||0)/totalReunCRMsum*(crmD.agend||0)) : 0;
-  const canalAgend = [
-    (agg.pc?.agend||agg.pc?.reun||0)+prorrata('pc'),
-    (agg.bv?.agend||agg.bv?.reun||0)+prorrata('bv'),
-    (agg.re?.agend||agg.re?.reun||0)+prorrata('reativacao'),
-    (agg.is?.agend||agg.is?.reun||0)+prorrata('isca'),
-    prorrata('aplicacao')
-  ];
-    try {
-    const barrasCtx2 = document.getElementById('centralBarrasChart');
-    if(barrasCtx2){
-      if(_chartBarras){ _chartBarras.destroy(); _chartBarras=null; }
-      const temBarras = canalAgend.some(v=>v>0)||canalReun.some(v=>v>0)||canalVendas.some(v=>v>0);
-      if(temBarras){
-        _chartBarras = new Chart(barrasCtx2, {
-          type:'bar',
-          data:{labels:canalNomes,datasets:[
-            {label:'Agendadas',data:canalAgend,backgroundColor:'rgba(233,168,76,.35)',borderColor:'#e9a84c',borderWidth:1,borderRadius:3},
-            {label:'Realizadas',data:canalReun,backgroundColor:'rgba(77,184,200,.4)',borderColor:'#4db8c8',borderWidth:1,borderRadius:3},
-            {label:'Vendas',data:canalVendas,backgroundColor:'rgba(116,198,157,.7)',borderColor:'#74c69d',borderWidth:1,borderRadius:3}]},
-          options:{responsive:true,maintainAspectRatio:false,
-            scales:{x:{ticks:{color:'#7a9b7e',font:{size:10}},grid:{color:'rgba(37,48,34,.8)'}},
-              y:{ticks:{color:'#7a9b7e',font:{size:10},stepSize:1},grid:{color:'rgba(37,48,34,.8)'},beginAtZero:true}},
-            plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:10},padding:10}}}}});
-      } else {
-        barrasCtx2.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Sem dados de canal neste mês</div>';
-      }
-    }
-  } catch(eBarras){ console.error('Barras:', eBarras); }
 
-  // ── GRÁFICO LINHA: evolução por semana ──
-  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  // ── Melhor canal ──
+  const melhorEl = document.getElementById('centralMelhorCanal');
+  if(melhorEl){
+    const canais = canalNomes.map((n,i)=>({nome:n, agend:canalAgend[i], reun:canalReun[i], vend:canalVendas[i]}))
+      .filter(c=>c.reun>0||c.agend>0);
+    const melhor = canais.sort((a,b)=>{
+      const ta = a.reun>0?a.vend/a.reun:0;
+      const tb = b.reun>0?b.vend/b.reun:0;
+      return tb-ta;
+    })[0];
+    if(melhor){
+      melhorEl.innerHTML = `<div style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:8px">🏆 Melhor canal</div>
+        <div style="font-size:20px;font-weight:700;color:var(--g4);margin-bottom:8px">${melhor.nome}</div>
+        <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--text2)">
+          <div>Agendadas: <b>${melhor.agend}</b></div>
+          <div>Realizadas: <b>${melhor.reun}</b></div>
+          <div>Vendas: <b>${melhor.vend}</b></div>
+          <div>Conversão: <b>${melhor.reun>0?Math.round(melhor.vend/melhor.reun*100):0}%</b></div>
+        </div>`;
+    } else {
+      melhorEl.innerHTML = '<div style="color:var(--text3);font-size:13px">Sem dados de canal ainda</div>';
+    }
+  }
+
+  // ── Alertas ──
+  const alertas = [];
+  if(abord>0 && agend>0){
+    const ta = Math.round(agend/abord*100);
+    if(ta<5) alertas.push({tipo:'critico', t:'Conversão abordagem→reunião baixa', txt:`Apenas ${ta}% das abordagens viram reunião.`});
+  }
+  if(agend>0 && noshow>0){
+    const tns = Math.round(noshow/agend*100);
+    if(tns>30) alertas.push({tipo:'critico', t:'No-show elevado', txt:`${tns}% das reuniões não foram realizadas.`});
+    else if(tns>15) alertas.push({tipo:'atencao', t:'No-show acima do ideal', txt:`${tns}% de no-show.`});
+  }
+  if(reun>0 && vendas>0){
+    const tc = Math.round(vendas/reun*100);
+    if(tc>=30) alertas.push({tipo:'positivo', t:'Boa conversão em vendas', txt:`${tc}% das reuniões geraram venda.`});
+  }
+  // Melhor semana
   const semanas = {1:[],2:[],3:[],4:[],5:[]};
-  monthDays.forEach(d=>{
-    const dayNum = parseInt(d._date.split('-')[2]);
-    const wk = Math.min(Math.ceil(dayNum/7),5);
-    semanas[wk].push(d);
-  });
-  const semLabels = ['S1','S2','S3','S4','S5'];
-  const semAbord  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).abord||0);
-  const semAgend  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).agendadas||0);
+  monthDays.forEach(d=>{ const wk=Math.min(Math.ceil(parseInt(d._date.split('-')[2])/7),5); semanas[wk].push(d); });
   const semReun   = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).reunioes||0);
   const semVendas = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).vendas||0);
-  const melhorSemReunIdx = semReun.indexOf(Math.max(...semReun));
-  const melhorSemVendIdx = semVendas.indexOf(Math.max(...semVendas));
-    try {
-    const linhaCtx2 = document.getElementById('centralLinhaChart');
-    if(linhaCtx2){
-      if(_chartLinha){ _chartLinha.destroy(); _chartLinha=null; }
-      const temLinha = semAbord.some(v=>v>0)||semReun.some(v=>v>0)||semAgend.some(v=>v>0);
-      if(temLinha){
-        _chartLinha = new Chart(linhaCtx2, {
-          type:'line',
-          data:{labels:semLabels,datasets:[
-            {label:'Abordagens',data:semAbord,borderColor:'#4db8c8',backgroundColor:'rgba(77,184,200,.08)',fill:true,tension:.4,pointRadius:4},
-            {label:'Agendadas',data:semAgend,borderColor:'#e9a84c',backgroundColor:'rgba(233,168,76,.06)',fill:true,tension:.4,pointRadius:4},
-            {label:'Realizadas',data:semReun,borderColor:'#74c69d',backgroundColor:'rgba(116,198,157,.08)',fill:true,tension:.4,pointRadius:4}]},
-          options:{responsive:true,maintainAspectRatio:false,
-            scales:{x:{ticks:{color:'#7a9b7e',font:{size:10}},grid:{color:'rgba(37,48,34,.8)'}},
-              y:{ticks:{color:'#7a9b7e',font:{size:10},stepSize:1},grid:{color:'rgba(37,48,34,.8)'},beginAtZero:true}},
-            plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:10},padding:10}}}}});
-      } else {
-        linhaCtx2.parentElement.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3);font-size:13px">Sem dados semanais</div>';
+  const semAbord  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).abord||0);
+  const semAgend  = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).agendadas||0);
+  const mrv = Math.max(...semReun), mrvi = semReun.indexOf(mrv);
+  const mvv = Math.max(...semVendas), mvvi = semVendas.indexOf(mvv);
+  if(mrv>0) alertas.push({tipo:'positivo', t:'🏆 Melhor semana em reuniões', txt:`Semana ${mrvi+1} com ${mrv} realizadas.`});
+  if(mvv>0) alertas.push({tipo:'positivo', t:'🏆 Melhor semana em vendas', txt:`Semana ${mvvi+1} com ${mvv} venda(s).`});
+  if(!alertas.length) alertas.push({tipo:'atencao', t:'Sem alertas', txt:'Adicione dados para ativar os alertas automáticos.'});
+
+  const alertasEl = document.getElementById('centralAlertas');
+  if(alertasEl) alertasEl.innerHTML = alertas.slice(0,4).map(a=>`
+    <div class="central-alert ${a.tipo}" style="flex:1;min-width:200px">
+      <div class="central-alert-icon">${a.tipo==='positivo'?'✓':a.tipo==='critico'?'⚠':'ℹ'}</div>
+      <div class="central-alert-txt">
+        <div class="central-alert-title">${a.t}</div>
+        <div>${a.txt}</div>
+      </div>
+    </div>`).join('');
+
+  // ── GRÁFICO PIZZA ──
+  const pWrap = document.getElementById('centralPizzaWrap');
+  const pCtx  = document.getElementById('centralPizzaChart');
+  if(pWrap && pCtx){
+    if(_chartPizza){ _chartPizza.destroy(); _chartPizza=null; }
+    let opsStatus = {agendado:0,nao_compareceu:0,negociacao:0,ganho:0,perdido:0,outros:0};
+    try{
+      const rOps = await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?select=status',
+        {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+      if(rOps.ok){
+        (await rOps.json()).forEach(o=>{
+          if(o.status==='agendado') opsStatus.agendado++;
+          else if(o.status==='nao_compareceu') opsStatus.nao_compareceu++;
+          else if(o.status==='negociacao') opsStatus.negociacao++;
+          else if(o.status==='ganho') opsStatus.ganho++;
+          else if(o.status==='perdido') opsStatus.perdido++;
+          else opsStatus.outros++;
+        });
       }
+    }catch(e){ console.warn('pizza:',e); }
+    const total = Object.values(opsStatus).reduce((s,v)=>s+v,0);
+    if(total>0){
+      _chartPizza = new Chart(pCtx,{
+        type:'doughnut',
+        data:{
+          labels:['Agendado','No-show','Negociação','Ganho','Perdido','Outros'],
+          datasets:[{data:[opsStatus.agendado,opsStatus.nao_compareceu,opsStatus.negociacao,opsStatus.ganho,opsStatus.perdido,opsStatus.outros],
+            backgroundColor:['#9b72cf','#e07070','#e9a84c','#74c69d','#435744','#4db8c8'],
+            borderColor:'#111510',borderWidth:2}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,
+          plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:10}},
+            tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}`}}}}
+      });
+    } else {
+      pWrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px">Sem leads registrados</div>';
     }
-  } catch(eLinha){ console.error('Linha:', eLinha); }
+  }
+
+  // ── GRÁFICO BARRAS ──
+  const bWrap = document.getElementById('centralBarrasWrap');
+  const bCtx  = document.getElementById('centralBarrasChart');
+  if(bWrap && bCtx){
+    if(_chartBarras){ _chartBarras.destroy(); _chartBarras=null; }
+    const temDados = canalAgend.some(v=>v>0)||canalReun.some(v=>v>0)||canalVendas.some(v=>v>0);
+    if(temDados){
+      _chartBarras = new Chart(bCtx,{
+        type:'bar',
+        data:{labels:canalNomes,datasets:[
+          {label:'Agendadas',data:canalAgend,backgroundColor:'rgba(233,168,76,.4)',borderColor:'#e9a84c',borderWidth:1,borderRadius:3},
+          {label:'Realizadas',data:canalReun,backgroundColor:'rgba(77,184,200,.4)',borderColor:'#4db8c8',borderWidth:1,borderRadius:3},
+          {label:'Vendas',data:canalVendas,backgroundColor:'rgba(116,198,157,.7)',borderColor:'#74c69d',borderWidth:1,borderRadius:3}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,
+          scales:{x:{ticks:{color:'#7a9b7e',font:{size:10}},grid:{color:'rgba(37,48,34,.6)'}},
+            y:{ticks:{color:'#7a9b7e',font:{size:10},stepSize:1},grid:{color:'rgba(37,48,34,.6)'},beginAtZero:true}},
+          plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:10},padding:8}}}}
+      });
+    } else {
+      bWrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px">Sem dados de canal neste mês</div>';
+    }
+  }
+
+  // ── GRÁFICO LINHA ──
+  const lWrap = document.getElementById('centralLinhaWrap');
+  const lCtx  = document.getElementById('centralLinhaChart');
+  if(lWrap && lCtx){
+    if(_chartLinha){ _chartLinha.destroy(); _chartLinha=null; }
+    const temLinha = semAbord.some(v=>v>0)||semReun.some(v=>v>0)||semAgend.some(v=>v>0);
+    if(temLinha){
+      _chartLinha = new Chart(lCtx,{
+        type:'line',
+        data:{labels:['S1','S2','S3','S4','S5'],datasets:[
+          {label:'Abordagens',data:semAbord,borderColor:'#4db8c8',backgroundColor:'rgba(77,184,200,.08)',fill:true,tension:.4,pointRadius:4},
+          {label:'Agendadas', data:semAgend,borderColor:'#e9a84c',backgroundColor:'rgba(233,168,76,.06)',fill:true,tension:.4,pointRadius:4},
+          {label:'Realizadas',data:semReun, borderColor:'#74c69d',backgroundColor:'rgba(116,198,157,.08)',fill:true,tension:.4,pointRadius:4}
+        ]},
+        options:{responsive:true,maintainAspectRatio:false,
+          scales:{x:{ticks:{color:'#7a9b7e',font:{size:10}},grid:{color:'rgba(37,48,34,.6)'}},
+            y:{ticks:{color:'#7a9b7e',font:{size:10},stepSize:1},grid:{color:'rgba(37,48,34,.6)'},beginAtZero:true}},
+          plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:10},padding:8}}}}
+      });
+    } else {
+      lWrap.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text3);font-size:13px">Sem dados semanais</div>';
+    }
+  }
 }
+
 
 async function centralRefresh(){
   const btn = document.getElementById('centralRefreshBtn');
