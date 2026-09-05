@@ -3557,7 +3557,6 @@ async function renderCentral(){
   // ── GRÁFICO BARRAS: resultado por canal ──
   // Garantir que o canvas está visível e com dimensões antes de criar charts
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-  const barrasCtx = document.getElementById('centralBarrasChart');
   // Canais: combinar legado (registro_diario) + CRM (crm_oportunidades por funil)
   // Para legado: pc_vendas, bv_vendas etc (antes de setembro)
   // Para CRM: ganhos por funil da tabela crm_oportunidades
@@ -3616,7 +3615,7 @@ async function renderCentral(){
   ];
   const canalAbord = [agg.pc?.abord||0, agg.bv?.auto||0, agg.re?.abord||0, agg.is?.sdr||0, 0];
   const totalReunCRMsum = Object.values(canalReunCRM).reduce((s,v)=>s+v,0);
-  const prorrata = (canal) => totalReunCRMsum>0 ? Math.round((canalReunCRM[canal]||0)/totalReunCRMsum*(crmDados.agend||0)) : 0;
+  const prorrata = (canal) => totalReunCRMsum>0 ? Math.round((canalReunCRM[canal]||0)/totalReunCRMsum*(crmD.agend||0)) : 0;
   const canalAgend = [
     (agg.pc?.agend||agg.pc?.reun||0)+prorrata('pc'),
     (agg.bv?.agend||agg.bv?.reun||0)+prorrata('bv'),
@@ -3648,7 +3647,6 @@ async function renderCentral(){
 
   // ── GRÁFICO LINHA: evolução por semana ──
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-  const linhaCtx = document.getElementById('centralLinhaChart');
   const semanas = {1:[],2:[],3:[],4:[],5:[]};
   monthDays.forEach(d=>{
     const dayNum = parseInt(d._date.split('-')[2]);
