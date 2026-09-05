@@ -607,7 +607,7 @@ button{font-family:var(--font)}
     <button class="nav-btn" onclick="showTab('scripts')">Scripts</button>
     <button class="nav-btn" onclick="showTab('materiais')">Materiais</button>
     <button class="nav-btn" onclick="showTab('guia')">Guia de Uso</button>
-    <button class="nav-btn" onclick="showTab('central')">Visão Geral</button>
+    <button class="nav-btn" onclick="showTab('visao')">Visão Geral</button>
   </nav>
   <div class="topbar-right">
     <span class="save-indicator" id="saveIndicator">✓ salvo</span>
@@ -3534,31 +3534,25 @@ async function renderCentral(){
     }
   }catch(e){ console.warn("Central opsStatus:", e); }
 
-  const pizzaCtx = document.getElementById('centralPizzaChart');
-  if(pizzaCtx){
-    if(_chartPizza){ _chartPizza.destroy(); _chartPizza=null; }
-    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+  try {
+    const pizzaCtx2 = document.getElementById('centralPizzaChart');
     const totalOps = opsStatus.agendado+opsStatus.nao_compareceu+opsStatus.negociacao+opsStatus.ganho+opsStatus.perdido+opsStatus.outros;
-    if(totalOps > 0){
-    _chartPizza = new Chart(pizzaCtx, {
-      type:'doughnut',
-      data:{
-        labels:['Agendado','No-show','Negociação','Ganho','Perdido','Outros'],
-        datasets:[{
-          data:[opsStatus.agendado, opsStatus.nao_compareceu, opsStatus.negociacao, opsStatus.ganho, opsStatus.perdido, opsStatus.outros],
-          backgroundColor:['#9b72cf','#e07070','#e9a84c','#74c69d','#435744','#253022'],
-          borderColor:'#111510', borderWidth:2
-        }]
-      },
-      options:{
-        responsive:true, maintainAspectRatio:false, plugins:{
-          legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:12}},
-          tooltip:{callbacks:{label:ctx=>`${ctx.label}: ${ctx.raw} leads`}}
-        }
+    if(pizzaCtx2){
+      if(_chartPizza){ _chartPizza.destroy(); _chartPizza=null; }
+      if(totalOps > 0){
+        _chartPizza = new Chart(pizzaCtx2, {
+          type:'doughnut',
+          data:{labels:['Agendado','No-show','Negociação','Ganho','Perdido','Outros'],
+            datasets:[{data:[opsStatus.agendado,opsStatus.nao_compareceu,opsStatus.negociacao,opsStatus.ganho,opsStatus.perdido,opsStatus.outros],
+              backgroundColor:['#9b72cf','#e07070','#e9a84c','#74c69d','#435744','#4db8c8'],borderColor:'#111510',borderWidth:2}]},
+          options:{responsive:true,maintainAspectRatio:false,
+            plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:10}},
+              tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}`}}}}});
+      } else {
+        pizzaCtx2.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Sem leads registrados</div>';
       }
-    });
-    } else { pizzaCtx.parentElement.innerHTML='<div style="text-align:center;padding:60px 0;font-size:13px;color:var(--text3)">Sem oportunidades neste mês</div>'; }
-  }
+    }
+  } catch(ePizza){ console.error('Pizza:', ePizza); }
 
   // ── GRÁFICO BARRAS: resultado por canal ──
   // Garantir que o canvas está visível e com dimensões antes de criar charts
@@ -3630,29 +3624,27 @@ async function renderCentral(){
     (agg.is?.agend||agg.is?.reun||0)+prorrata('isca'),
     prorrata('aplicacao')
   ];
-  if(barrasCtx){
-    if(_chartBarras){ _chartBarras.destroy(); _chartBarras=null; }
-    _chartBarras = new Chart(barrasCtx, {
-      type:'bar',
-      data:{
-        labels:canalNomes,
-        datasets:[
-          {label:'Agendadas', data:canalAgend,  backgroundColor:'rgba(233,168,76,.3)', borderColor:'#e9a84c',borderWidth:1,borderRadius:4},
-          {label:'Realizadas',data:canalReun,   backgroundColor:'rgba(77,184,200,.35)',borderColor:'#4db8c8',borderWidth:1,borderRadius:4},
-          {label:'Vendas',    data:canalVendas, backgroundColor:'rgba(116,198,157,.6)',borderColor:'#74c69d',borderWidth:1,borderRadius:4}
-        ]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        scales:{
-          x:{ticks:{color:'#7a9b7e',font:{size:11}},grid:{color:'#253022'}},
-          y:{ticks:{color:'#7a9b7e',font:{size:11},stepSize:1},grid:{color:'#253022'},beginAtZero:true}
-        },
-        plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:12}}}
+    try {
+    const barrasCtx2 = document.getElementById('centralBarrasChart');
+    if(barrasCtx2){
+      if(_chartBarras){ _chartBarras.destroy(); _chartBarras=null; }
+      const temBarras = canalAgend.some(v=>v>0)||canalReun.some(v=>v>0)||canalVendas.some(v=>v>0);
+      if(temBarras){
+        _chartBarras = new Chart(barrasCtx2, {
+          type:'bar',
+          data:{labels:canalNomes,datasets:[
+            {label:'Agendadas',data:canalAgend,backgroundColor:'rgba(233,168,76,.35)',borderColor:'#e9a84c',borderWidth:1,borderRadius:3},
+            {label:'Realizadas',data:canalReun,backgroundColor:'rgba(77,184,200,.4)',borderColor:'#4db8c8',borderWidth:1,borderRadius:3},
+            {label:'Vendas',data:canalVendas,backgroundColor:'rgba(116,198,157,.7)',borderColor:'#74c69d',borderWidth:1,borderRadius:3}]},
+          options:{responsive:true,maintainAspectRatio:false,
+            scales:{x:{ticks:{color:'#7a9b7e',font:{size:10}},grid:{color:'rgba(37,48,34,.8)'}},
+              y:{ticks:{color:'#7a9b7e',font:{size:10},stepSize:1},grid:{color:'rgba(37,48,34,.8)'},beginAtZero:true}},
+            plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:10},padding:10}}}}});
+      } else {
+        barrasCtx2.parentElement.innerHTML='<div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Sem dados de canal neste mês</div>';
       }
-    });
-  }
+    }
+  } catch(eBarras){ console.error('Barras:', eBarras); }
 
   // ── GRÁFICO LINHA: evolução por semana ──
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
@@ -3670,29 +3662,27 @@ async function renderCentral(){
   const semVendas = [1,2,3,4,5].map(i=>aggregateDays(semanas[i]).vendas||0);
   const melhorSemReunIdx = semReun.indexOf(Math.max(...semReun));
   const melhorSemVendIdx = semVendas.indexOf(Math.max(...semVendas));
-  if(linhaCtx){
-    if(_chartLinha){ _chartLinha.destroy(); _chartLinha=null; }
-    _chartLinha = new Chart(linhaCtx, {
-      type:'line',
-      data:{
-        labels:semLabels,
-        datasets:[
-          {label:'Abordagens',data:semAbord,borderColor:'#4db8c8',backgroundColor:'rgba(77,184,200,.08)',fill:true,tension:.4,pointBackgroundColor:'#4db8c8',pointRadius:4},
-          {label:'Agendadas', data:semAgend,borderColor:'#e9a84c',backgroundColor:'rgba(233,168,76,.06)', fill:true,tension:.4,pointBackgroundColor:'#e9a84c',pointRadius:4},
-          {label:'Realizadas',data:semReun, borderColor:'#74c69d',backgroundColor:'rgba(116,198,157,.08)',fill:true,tension:.4,pointBackgroundColor:'#74c69d',pointRadius:4}
-        ]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        scales:{
-          x:{ticks:{color:'#7a9b7e',font:{size:11}},grid:{color:'#253022'}},
-          y:{ticks:{color:'#7a9b7e',font:{size:11},stepSize:1},grid:{color:'#253022'},beginAtZero:true}
-        },
-        plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:11},padding:12}}}
+    try {
+    const linhaCtx2 = document.getElementById('centralLinhaChart');
+    if(linhaCtx2){
+      if(_chartLinha){ _chartLinha.destroy(); _chartLinha=null; }
+      const temLinha = semAbord.some(v=>v>0)||semReun.some(v=>v>0)||semAgend.some(v=>v>0);
+      if(temLinha){
+        _chartLinha = new Chart(linhaCtx2, {
+          type:'line',
+          data:{labels:semLabels,datasets:[
+            {label:'Abordagens',data:semAbord,borderColor:'#4db8c8',backgroundColor:'rgba(77,184,200,.08)',fill:true,tension:.4,pointRadius:4},
+            {label:'Agendadas',data:semAgend,borderColor:'#e9a84c',backgroundColor:'rgba(233,168,76,.06)',fill:true,tension:.4,pointRadius:4},
+            {label:'Realizadas',data:semReun,borderColor:'#74c69d',backgroundColor:'rgba(116,198,157,.08)',fill:true,tension:.4,pointRadius:4}]},
+          options:{responsive:true,maintainAspectRatio:false,
+            scales:{x:{ticks:{color:'#7a9b7e',font:{size:10}},grid:{color:'rgba(37,48,34,.8)'}},
+              y:{ticks:{color:'#7a9b7e',font:{size:10},stepSize:1},grid:{color:'rgba(37,48,34,.8)'},beginAtZero:true}},
+            plugins:{legend:{position:'bottom',labels:{color:'#7a9b7e',font:{size:10},padding:10}}}}});
+      } else {
+        linhaCtx2.parentElement.innerHTML='<div style="text-align:center;padding:30px;color:var(--text3);font-size:13px">Sem dados semanais</div>';
       }
-    });
-  }
+    }
+  } catch(eLinha){ console.error('Linha:', eLinha); }
 }
 
 async function centralRefresh(){
