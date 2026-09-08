@@ -572,6 +572,40 @@ button{font-family:var(--font)}
 .toast-title{font-size:13px;font-weight:600;color:var(--g4);margin-bottom:2px}
 .toast-desc{font-size:12px;color:var(--text3)}
 .toast-close{margin-left:auto;font-size:16px;color:var(--text3);cursor:pointer;flex-shrink:0;padding-left:8px}
+
+/* ── CÉREBRO COMERCIAL ── */
+.cerebro-modulo{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:border-color .15s,transform .1s}
+.cerebro-modulo:hover{border-color:var(--g3);transform:translateY(-1px)}
+.cerebro-mod-num{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:6px}
+.cerebro-mod-titulo{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.cerebro-mod-desc{font-size:13px;color:var(--text2);line-height:1.5;margin-bottom:12px}
+.cerebro-mod-tags{display:flex;flex-wrap:wrap;gap:6px}
+.cerebro-badge{font-size:10px;padding:2px 8px;border-radius:4px;background:var(--bg);border:1px solid var(--border);color:var(--text3)}
+.cerebro-badge.verde{background:rgba(116,198,157,.1);border-color:rgba(116,198,157,.3);color:var(--g4)}
+.cerebro-badge.vermelho{background:rgba(224,112,112,.1);border-color:rgba(224,112,112,.3);color:var(--coral)}
+.cerebro-tag{font-size:12px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text3);cursor:pointer;transition:all .15s}
+.cerebro-tag.active,.cerebro-tag:hover{background:var(--g3);border-color:var(--g3);color:#fff}
+.cerebro-etapa-pill{font-size:12px;padding:5px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap}
+.cerebro-etapa-pill.active,.cerebro-etapa-pill:hover{background:var(--g3);border-color:var(--g3);color:#fff}
+.cerebro-etapa-pill.verde{border-color:rgba(116,198,157,.3);color:var(--g4)}
+.cerebro-etapa-pill.verde:hover,.cerebro-etapa-pill.verde.active{background:var(--g3);color:#fff}
+.cerebro-seta{color:var(--text3);font-size:14px;align-self:center;flex-shrink:0}
+.cerebro-reun-step{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2)}
+.cerebro-reun-step:hover,.cerebro-reun-step.active{border-color:var(--g3);background:rgba(116,198,157,.06);color:var(--g4)}
+.cerebro-reun-step.verde{border-color:rgba(116,198,157,.3)}
+.cerebro-reun-step.verde:hover{border-color:var(--g3)}
+.cerebro-reun-step.vermelho{border-color:rgba(224,112,112,.2)}
+.cerebro-reun-step.vermelho:hover{border-color:var(--coral);background:rgba(224,112,112,.06);color:var(--coral)}
+.cerebro-reun-num{font-size:10px;font-weight:700;color:var(--text3);min-width:20px}
+.cerebro-obj-item{font-size:13px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:color .15s}
+.cerebro-obj-item:last-child{border-bottom:none}
+.cerebro-obj-item:hover{color:var(--text)}
+.cerebro-fu-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .15s}
+.cerebro-fu-card:hover{border-color:var(--g3)}
+.cerebro-fu-titulo{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.cerebro-fu-cadencia{font-size:11px;color:var(--g4);font-family:var(--mono,monospace);margin-bottom:6px}
+.cerebro-fu-desc{font-size:12px;color:var(--text3)}
+
 </style>
 </head>
 <body>
@@ -608,6 +642,7 @@ button{font-family:var(--font)}
     <button class="nav-btn" onclick="showTab('materiais')">Materiais</button>
     <button class="nav-btn" onclick="showTab('guia')">Guia de Uso</button>
     <button class="nav-btn" onclick="showTab('visao')">Visão Geral</button>
+  <button class="nav-btn" onclick="showTab('cerebro')">🧠 Cérebro Comercial</button>
   </nav>
   <div class="topbar-right">
     <span class="save-indicator" id="saveIndicator">✓ salvo</span>
@@ -1786,6 +1821,476 @@ button{font-family:var(--font)}
   </div>
   <div class="toast-close" onclick="event.stopPropagation();crmFecharToast()">✕</div>
 </div>
+
+<!-- ══ TAB: CÉREBRO COMERCIAL ══════════════════════════════════════ -->
+<div class="tab-content" id="tab-cerebro">
+
+  <!-- Header -->
+  <div style="margin-bottom:24px">
+    <div class="page-title">Cérebro Comercial</div>
+    <div class="page-sub">Playbook, scripts, objeções e inteligência de vendas</div>
+  </div>
+
+  <!-- Busca global -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:28px">
+    <div style="font-size:13px;color:var(--text3);margin-bottom:10px;font-weight:500">O que você precisa encontrar?</div>
+    <div style="display:flex;gap:10px">
+      <input id="cerebroSearch" type="text" placeholder="Ex: está caro, marido, não é o momento, follow-up..." 
+        style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none"
+        oninput="cerebroFiltrar()" onkeydown="if(event.key==='Enter')cerebroFiltrar()">
+      <button onclick="cerebroFiltrar()" class="btn-pri" style="padding:10px 20px;font-size:13px">Buscar</button>
+      <button onclick="cerebroLimpar()" class="btn-sec" style="padding:10px 16px;font-size:13px">✕</button>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div id="cerebroFiltros" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+    <div style="font-size:11px;color:var(--text3);align-self:center;margin-right:4px;text-transform:uppercase;letter-spacing:.06em">Filtrar:</div>
+    <button class="cerebro-tag active" onclick="cerebroSetCat('todas')">Todas</button>
+    <button class="cerebro-tag" onclick="cerebroSetCat('qualificacao')">Qualificação</button>
+    <button class="cerebro-tag" onclick="cerebroSetCat('reuniao')">Reunião</button>
+    <button class="cerebro-tag" onclick="cerebroSetCat('objecoes')">Objeções</button>
+    <button class="cerebro-tag" onclick="cerebroSetCat('followup')">Follow-up</button>
+    <button class="cerebro-tag" onclick="cerebroSetCat('reativacao')">Reativação</button>
+    <button class="cerebro-tag" onclick="cerebroSetCat('respostas')">Respostas rápidas</button>
+  </div>
+
+  <!-- Módulos (visão home) -->
+  <div id="cerebroHome">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:32px">
+
+      <!-- 01 Qualificação -->
+      <div class="cerebro-modulo" onclick="cerebroAbrirModulo('qualificacao')">
+        <div class="cerebro-mod-num">01</div>
+        <div class="cerebro-mod-titulo">Interesse & Qualificação</div>
+        <div class="cerebro-mod-desc">Atendimento inicial no Instagram e WhatsApp. Fluxo de qualificação até o convite para reunião.</div>
+        <div class="cerebro-mod-tags">
+          <span class="cerebro-badge">Pergunta</span>
+          <span class="cerebro-badge">Script</span>
+          <span class="cerebro-badge">Fluxo</span>
+        </div>
+      </div>
+
+      <!-- 02 Reunião -->
+      <div class="cerebro-modulo" onclick="cerebroAbrirModulo('reuniao')">
+        <div class="cerebro-mod-num">02</div>
+        <div class="cerebro-mod-titulo">Reunião Comercial</div>
+        <div class="cerebro-mod-desc">Roteiro completo da reunião com 16 etapas. Guia visual para usar durante a conversa.</div>
+        <div class="cerebro-mod-tags">
+          <span class="cerebro-badge verde">16 etapas</span>
+          <span class="cerebro-badge">Roteiro</span>
+        </div>
+      </div>
+
+      <!-- 03 Objeções -->
+      <div class="cerebro-modulo" onclick="cerebroAbrirModulo('objecoes')">
+        <div class="cerebro-mod-num">03</div>
+        <div class="cerebro-mod-titulo">Objeções</div>
+        <div class="cerebro-mod-desc">Biblioteca de objeções com caminhos de resposta. Preço, decisão, momento, segurança e mais.</div>
+        <div class="cerebro-mod-tags">
+          <span class="cerebro-badge vermelho">Preço</span>
+          <span class="cerebro-badge">Decisão</span>
+          <span class="cerebro-badge">Momento</span>
+        </div>
+      </div>
+
+      <!-- 04 Follow-up -->
+      <div class="cerebro-modulo" onclick="cerebroAbrirModulo('followup')">
+        <div class="cerebro-mod-num">04</div>
+        <div class="cerebro-mod-titulo">Follow-up</div>
+        <div class="cerebro-mod-desc">Cadências pós-reunião organizadas por situação. Silêncio, decisão conjunta, financeiro e mais.</div>
+        <div class="cerebro-mod-tags">
+          <span class="cerebro-badge">Cadência</span>
+          <span class="cerebro-badge">D0→D30</span>
+        </div>
+      </div>
+
+      <!-- 05 Reativação -->
+      <div class="cerebro-modulo" onclick="cerebroAbrirModulo('reativacao')">
+        <div class="cerebro-mod-num">05</div>
+        <div class="cerebro-mod-titulo">Reativação</div>
+        <div class="cerebro-mod-desc">Leads que disseram "agora não". Gatilhos, motivos e mensagens contextualizadas.</div>
+        <div class="cerebro-mod-tags">
+          <span class="cerebro-badge">Gatilho</span>
+          <span class="cerebro-badge">Timing</span>
+        </div>
+      </div>
+
+      <!-- 06 Respostas rápidas -->
+      <div class="cerebro-modulo" onclick="cerebroAbrirModulo('respostas')">
+        <div class="cerebro-mod-num">06</div>
+        <div class="cerebro-mod-titulo">Respostas Rápidas</div>
+        <div class="cerebro-mod-desc">Mensagens curtas para Instagram e WhatsApp. Atalhos para copiar com um clique.</div>
+        <div class="cerebro-mod-tags">
+          <span class="cerebro-badge">/convite</span>
+          <span class="cerebro-badge">/mentoria</span>
+          <span class="cerebro-badge">Copiar</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Alerta 3 meses -->
+    <div style="background:rgba(233,168,76,.08);border:1px solid rgba(233,168,76,.3);border-radius:10px;padding:16px 20px;margin-bottom:24px">
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <div style="font-size:18px">⚠</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:4px">REGRA — PLANO DE 3 MESES (R$ 1.900)</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6">Só oferecer quando: existe fit + desejo de entrar + a barreira é financeira + a cliente não consegue assumir 6 meses. <b style="color:var(--amber)">Não oferecer automaticamente</b> para: "vou pensar", "vou falar com meu marido", "vou analisar".</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTEÚDO DOS MÓDULOS ── -->
+  <div id="cerebroConteudo" style="display:none">
+
+    <!-- Breadcrumb -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;font-size:13px">
+      <span style="color:var(--text3);cursor:pointer" onclick="cerebroVoltar()">Cérebro Comercial</span>
+      <span style="color:var(--border2)">›</span>
+      <span id="cerebroBreadcrumb" style="color:var(--text)"></span>
+    </div>
+
+    <!-- MOD 01: Qualificação -->
+    <div id="mod-qualificacao" class="cerebro-mod-content" style="display:none">
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:20px">Interesse & Qualificação</div>
+
+      <!-- Fluxo visual -->
+      <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:28px;padding:16px;background:var(--card);border-radius:10px;border:1px solid var(--border)">
+        <div class="cerebro-etapa-pill active" onclick="cerebroAbrirEtapa('q1')">Interesse</div>
+        <div class="cerebro-seta">→</div>
+        <div class="cerebro-etapa-pill" onclick="cerebroAbrirEtapa('q2')">Contexto da loja</div>
+        <div class="cerebro-seta">→</div>
+        <div class="cerebro-etapa-pill" onclick="cerebroAbrirEtapa('q3')">Dor</div>
+        <div class="cerebro-seta">→</div>
+        <div class="cerebro-etapa-pill" onclick="cerebroAbrirEtapa('q4')">Aprofundamento</div>
+        <div class="cerebro-seta">→</div>
+        <div class="cerebro-etapa-pill" onclick="cerebroAbrirEtapa('q5')">Faturamento</div>
+        <div class="cerebro-seta">→</div>
+        <div class="cerebro-etapa-pill" onclick="cerebroAbrirEtapa('q6')">Fit</div>
+        <div class="cerebro-seta">→</div>
+        <div class="cerebro-etapa-pill verde" onclick="cerebroAbrirEtapa('q7')">Convite para reunião</div>
+      </div>
+
+      <!-- Cards das etapas -->
+      <div id="cerebro-etapa-detalhe"></div>
+
+      <!-- Template de etapas de qualificação -->
+      <div id="etapa-q1" class="cerebro-etapa-data" style="display:none"
+        data-titulo="Interesse"
+        data-objetivo="[a preencher — qual é o objetivo dessa etapa?]"
+        data-pergunta="[a preencher — qual é a pergunta principal?]"
+        data-apoio="[a preencher — perguntas de apoio]"
+        data-observar="[a preencher — o que observar na resposta?]"
+        data-proximo="[a preencher — para onde seguir?]"
+        data-evitar="[a preencher — o que evitar?]">
+      </div>
+      <div id="etapa-q2" class="cerebro-etapa-data" style="display:none"
+        data-titulo="Contexto da loja"
+        data-objetivo="[a preencher]"
+        data-pergunta="[a preencher]"
+        data-apoio="[a preencher]"
+        data-observar="[a preencher]"
+        data-proximo="[a preencher]"
+        data-evitar="[a preencher]">
+      </div>
+      <div id="etapa-q3" class="cerebro-etapa-data" style="display:none"
+        data-titulo="Dor"
+        data-objetivo="[a preencher]"
+        data-pergunta="[a preencher]"
+        data-apoio="[a preencher]"
+        data-observar="[a preencher]"
+        data-proximo="[a preencher]"
+        data-evitar="[a preencher]">
+      </div>
+      <div id="etapa-q4" class="cerebro-etapa-data" style="display:none"
+        data-titulo="Aprofundamento"
+        data-objetivo="[a preencher]"
+        data-pergunta="[a preencher]"
+        data-apoio="[a preencher]"
+        data-observar="[a preencher]"
+        data-proximo="[a preencher]"
+        data-evitar="[a preencher]">
+      </div>
+      <div id="etapa-q5" class="cerebro-etapa-data" style="display:none"
+        data-titulo="Faturamento"
+        data-objetivo="[a preencher]"
+        data-pergunta="[a preencher]"
+        data-apoio="[a preencher]"
+        data-observar="[a preencher]"
+        data-proximo="[a preencher]"
+        data-evitar="[a preencher]">
+      </div>
+      <div id="etapa-q6" class="cerebro-etapa-data" style="display:none"
+        data-titulo="Fit"
+        data-objetivo="[a preencher]"
+        data-pergunta="[a preencher]"
+        data-apoio="[a preencher]"
+        data-observar="[a preencher]"
+        data-proximo="[a preencher]"
+        data-evitar="[a preencher]">
+      </div>
+      <div id="etapa-q7" class="cerebro-etapa-data" style="display:none"
+        data-titulo="Convite para reunião"
+        data-objetivo="[a preencher]"
+        data-pergunta="[a preencher]"
+        data-apoio="[a preencher]"
+        data-observar="[a preencher]"
+        data-proximo="[a preencher]"
+        data-evitar="[a preencher]">
+      </div>
+    </div>
+
+    <!-- MOD 02: Reunião -->
+    <div id="mod-reuniao" class="cerebro-mod-content" style="display:none">
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:20px">Reunião Comercial</div>
+
+      <div id="cerebro-reuniao-etapa-detalhe"></div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:24px">
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r01')"><span class="cerebro-reun-num">01</span>Acolhimento</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r02')"><span class="cerebro-reun-num">02</span>Contexto da loja</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r03')"><span class="cerebro-reun-num">03</span>Faturamento</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r04')"><span class="cerebro-reun-num">04</span>Objetivo</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r05')"><span class="cerebro-reun-num">05</span>Problema</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r06')"><span class="cerebro-reun-num">06</span>Investigação</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r07')"><span class="cerebro-reun-num">07</span>O que já tentou</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r08')"><span class="cerebro-reun-num">08</span>Causa</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r09')"><span class="cerebro-reun-num">09</span>Consequência</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r10')"><span class="cerebro-reun-num">10</span>Custo de continuar igual</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r11')"><span class="cerebro-reun-num">11</span>Resumo do diagnóstico</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r12')"><span class="cerebro-reun-num">12</span>Direção</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r13')"><span class="cerebro-reun-num">13</span>Apresentação Lapidar</div>
+        <div class="cerebro-reun-step" onclick="cerebroAbrirReuniao('r14')"><span class="cerebro-reun-num">14</span>Investimento</div>
+        <div class="cerebro-reun-step verde" onclick="cerebroAbrirReuniao('r15')"><span class="cerebro-reun-num">15</span>Decisão</div>
+        <div class="cerebro-reun-step vermelho" onclick="cerebroAbrirReuniao('r16')"><span class="cerebro-reun-num">16</span>Objeção / Fechamento</div>
+      </div>
+
+      <!-- Dados das etapas da reunião -->
+      <div id="etapa-r01" class="cerebro-etapa-data" style="display:none" data-titulo="Acolhimento" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 02 — Contexto da loja" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r02" class="cerebro-etapa-data" style="display:none" data-titulo="Contexto da loja" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 03 — Faturamento" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r03" class="cerebro-etapa-data" style="display:none" data-titulo="Faturamento" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 04 — Objetivo" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r04" class="cerebro-etapa-data" style="display:none" data-titulo="Objetivo" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 05 — Problema" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r05" class="cerebro-etapa-data" style="display:none" data-titulo="Problema" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 06 — Investigação" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r06" class="cerebro-etapa-data" style="display:none" data-titulo="Investigação" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 07 — O que já tentou" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r07" class="cerebro-etapa-data" style="display:none" data-titulo="O que já tentou" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 08 — Causa" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r08" class="cerebro-etapa-data" style="display:none" data-titulo="Causa" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 09 — Consequência" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r09" class="cerebro-etapa-data" style="display:none" data-titulo="Consequência" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 10 — Custo de continuar igual" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r10" class="cerebro-etapa-data" style="display:none" data-titulo="Custo de continuar igual" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 11 — Resumo do diagnóstico" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r11" class="cerebro-etapa-data" style="display:none" data-titulo="Resumo do diagnóstico" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 12 — Direção" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r12" class="cerebro-etapa-data" style="display:none" data-titulo="Direção" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 13 — Apresentação Lapidar" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r13" class="cerebro-etapa-data" style="display:none" data-titulo="Apresentação Lapidar" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 14 — Investimento" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r14" class="cerebro-etapa-data" style="display:none" data-titulo="Investimento" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 15 — Decisão" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r15" class="cerebro-etapa-data" style="display:none" data-titulo="Decisão" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="Etapa 16 — Objeção / Fechamento" data-evitar="[a preencher]" data-exemplo=""></div>
+      <div id="etapa-r16" class="cerebro-etapa-data" style="display:none" data-titulo="Objeção / Fechamento" data-objetivo="[a preencher]" data-pergunta="[a preencher]" data-apoio="[a preencher]" data-observar="[a preencher]" data-proximo="—" data-evitar="[a preencher]" data-exemplo=""></div>
+    </div>
+
+    <!-- MOD 03: Objeções -->
+    <div id="mod-objecoes" class="cerebro-mod-content" style="display:none">
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:20px">Biblioteca de Objeções</div>
+
+      <div id="cerebro-obj-detalhe"></div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+
+        <!-- Grupo: Preço -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--coral);margin-bottom:12px">Preço</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-caro')">Está caro</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-agora')">Não consigo agora</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-analisar')">Preciso analisar</div>
+        </div>
+
+        <!-- Grupo: Decisão -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple);margin-bottom:12px">Decisão</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-marido')">Preciso falar com meu marido</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-socia')">Preciso falar com minha sócia</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-financeiro')">Preciso falar com o financeiro</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-pensar')">Quero pensar</div>
+        </div>
+
+        <!-- Grupo: Momento -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);margin-bottom:12px">Momento</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-momento')">Agora não é o momento</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-depois')">Talvez mais para frente</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-esperar')">Quero esperar</div>
+        </div>
+
+        <!-- Grupo: Outro investimento -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin-bottom:12px">Outro investimento</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-trafego')">Já investi em tráfego</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-agencia')">Já tenho agência</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-curso')">Já comprei outro curso</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-outro-invest')">Acabei de investir em outra coisa</div>
+        </div>
+
+        <!-- Grupo: Segurança -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--g3);margin-bottom:12px">Segurança</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-compromisso')">Medo de assumir compromisso</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-aplicar')">Não sei se vou conseguir aplicar</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-nao-implementou')">Já comprei e não implementei</div>
+        </div>
+
+        <!-- Grupo: Silêncio -->
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:12px">Silêncio</div>
+          <div class="cerebro-obj-item" onclick="cerebroAbrirObj('obj-silencio')">Recebeu proposta e não respondeu</div>
+        </div>
+
+      </div>
+
+      <!-- Dados das objeções (ocultos, preenchidos depois) -->
+      <div id="obj-caro" class="cerebro-obj-data" style="display:none" data-titulo="Está caro" data-frase="Está caro." data-por-tras="[a preencher — o que pode estar por trás?]" data-pergunta="[a preencher — pergunta de diagnóstico]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher — como responder]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-agora" class="cerebro-obj-data" style="display:none" data-titulo="Não consigo agora" data-frase="Não consigo agora." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-analisar" class="cerebro-obj-data" style="display:none" data-titulo="Preciso analisar" data-frase="Preciso analisar." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-marido" class="cerebro-obj-data" style="display:none" data-titulo="Preciso falar com meu marido" data-frase="Preciso falar com meu marido." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-socia" class="cerebro-obj-data" style="display:none" data-titulo="Preciso falar com minha sócia" data-frase="Preciso falar com minha sócia." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-financeiro" class="cerebro-obj-data" style="display:none" data-titulo="Preciso falar com o financeiro" data-frase="Preciso falar com o financeiro." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-pensar" class="cerebro-obj-data" style="display:none" data-titulo="Quero pensar" data-frase="Quero pensar." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-momento" class="cerebro-obj-data" style="display:none" data-titulo="Agora não é o momento" data-frase="Agora não é o momento." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-depois" class="cerebro-obj-data" style="display:none" data-titulo="Talvez mais para frente" data-frase="Talvez mais para frente." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-esperar" class="cerebro-obj-data" style="display:none" data-titulo="Quero esperar" data-frase="Quero esperar." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-trafego" class="cerebro-obj-data" style="display:none" data-titulo="Já investi em tráfego" data-frase="Já investi em tráfego." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-agencia" class="cerebro-obj-data" style="display:none" data-titulo="Já tenho agência" data-frase="Já tenho agência." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-curso" class="cerebro-obj-data" style="display:none" data-titulo="Já comprei outro curso" data-frase="Já comprei outro curso." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-outro-invest" class="cerebro-obj-data" style="display:none" data-titulo="Acabei de investir em outra coisa" data-frase="Acabei de investir em outra coisa." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-compromisso" class="cerebro-obj-data" style="display:none" data-titulo="Medo de assumir compromisso" data-frase="Tenho medo de assumir outro compromisso." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-aplicar" class="cerebro-obj-data" style="display:none" data-titulo="Não sei se vou conseguir aplicar" data-frase="Não sei se vou conseguir aplicar." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-nao-implementou" class="cerebro-obj-data" style="display:none" data-titulo="Já comprei e não implementei" data-frase="Já comprei cursos e não implementei." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+      <div id="obj-silencio" class="cerebro-obj-data" style="display:none" data-titulo="Silêncio após proposta" data-frase="Recebeu a proposta e não respondeu." data-por-tras="[a preencher]" data-pergunta="[a preencher]" data-resp-a="[a preencher]" data-resp-b="[a preencher]" data-responder="[a preencher]" data-nao-fazer="[a preencher]" data-proximo="[a preencher]"></div>
+    </div>
+
+    <!-- MOD 04: Follow-up -->
+    <div id="mod-followup" class="cerebro-mod-content" style="display:none">
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:20px">Follow-up</div>
+      <div id="cerebro-fu-detalhe"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+        <div class="cerebro-fu-card" onclick="cerebroAbrirFU('fu-silencio')">
+          <div class="cerebro-fu-titulo">Silêncio após proposta</div>
+          <div class="cerebro-fu-cadencia">D0 → D2 → D5 → D8 → D12</div>
+          <div class="cerebro-fu-desc">[a preencher — objetivo desta cadência]</div>
+        </div>
+        <div class="cerebro-fu-card" onclick="cerebroAbrirFU('fu-socia')">
+          <div class="cerebro-fu-titulo">Precisa falar com sócia/marido</div>
+          <div class="cerebro-fu-cadencia">Conversa → esclarecimento → decisão</div>
+          <div class="cerebro-fu-desc">[a preencher]</div>
+        </div>
+        <div class="cerebro-fu-card" onclick="cerebroAbrirFU('fu-financeiro')">
+          <div class="cerebro-fu-titulo">Barreira financeira</div>
+          <div class="cerebro-fu-cadencia">Diagnóstico → segurança → fechamento</div>
+          <div class="cerebro-fu-desc">[a preencher]</div>
+        </div>
+        <div class="cerebro-fu-card" onclick="cerebroAbrirFU('fu-outro-invest')">
+          <div class="cerebro-fu-titulo">Outro investimento</div>
+          <div class="cerebro-fu-cadencia">Identificar lacuna → valor</div>
+          <div class="cerebro-fu-desc">[a preencher]</div>
+        </div>
+        <div class="cerebro-fu-card" onclick="cerebroAbrirFU('fu-momento')">
+          <div class="cerebro-fu-titulo">Não é o momento</div>
+          <div class="cerebro-fu-cadencia">Registrar motivo → aguardar → reativar</div>
+          <div class="cerebro-fu-desc">[a preencher]</div>
+        </div>
+      </div>
+      <!-- Dados das cadências -->
+      <div id="fu-silencio" class="cerebro-fu-data" style="display:none" data-titulo="Silêncio após proposta"
+        data-situacao="[a preencher]" data-objetivo="[a preencher]" data-quando="[a preencher]"
+        data-d0="[a preencher]" data-d2="[a preencher]" data-d5="[a preencher]" data-d8="[a preencher]" data-d12="[a preencher]"
+        data-se-resp="[a preencher]" data-se-nao="[a preencher]" data-encerrar="[a preencher]"></div>
+      <div id="fu-socia" class="cerebro-fu-data" style="display:none" data-titulo="Precisa falar com sócia/marido"
+        data-situacao="[a preencher]" data-objetivo="[a preencher]" data-quando="[a preencher]"
+        data-d0="[a preencher]" data-d2="[a preencher]" data-d5="[a preencher]" data-d8="" data-d12=""
+        data-se-resp="[a preencher]" data-se-nao="[a preencher]" data-encerrar="[a preencher]"></div>
+      <div id="fu-financeiro" class="cerebro-fu-data" style="display:none" data-titulo="Barreira financeira"
+        data-situacao="[a preencher]" data-objetivo="[a preencher]" data-quando="[a preencher]"
+        data-d0="[a preencher]" data-d2="[a preencher]" data-d5="[a preencher]" data-d8="" data-d12=""
+        data-se-resp="[a preencher]" data-se-nao="[a preencher]" data-encerrar="[a preencher]"></div>
+      <div id="fu-outro-invest" class="cerebro-fu-data" style="display:none" data-titulo="Outro investimento"
+        data-situacao="[a preencher]" data-objetivo="[a preencher]" data-quando="[a preencher]"
+        data-d0="[a preencher]" data-d2="[a preencher]" data-d5="" data-d8="" data-d12=""
+        data-se-resp="[a preencher]" data-se-nao="[a preencher]" data-encerrar="[a preencher]"></div>
+      <div id="fu-momento" class="cerebro-fu-data" style="display:none" data-titulo="Não é o momento"
+        data-situacao="[a preencher]" data-objetivo="[a preencher]" data-quando="[a preencher]"
+        data-d0="[a preencher]" data-d2="[a preencher]" data-d5="" data-d8="" data-d12=""
+        data-se-resp="[a preencher]" data-se-nao="[a preencher]" data-encerrar="[a preencher]"></div>
+    </div>
+
+    <!-- MOD 05: Reativação -->
+    <div id="mod-reativacao" class="cerebro-mod-content" style="display:none">
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:12px">Reativação</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:20px;max-width:600px">Leads que disseram "agora não". A reativação acontece com base em um gatilho real — nunca com "Oi, ainda tem interesse?"</div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px">
+        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:16px">Para cada lead em reativação, registre:</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;color:var(--text2)">
+          <div><b style="color:var(--text)">Motivo</b><br>Por que não entrou</div>
+          <div><b style="color:var(--text)">Gatilho</b><br>O que precisa acontecer para ela estar pronta</div>
+          <div><b style="color:var(--text)">Data de revisão</b><br>Quando retomar</div>
+          <div><b style="color:var(--text)">Mensagem</b><br>Contextualizada ao que ela disse</div>
+        </div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Mensagem de reativação — estrutura</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.8">[a preencher — como estruturar uma mensagem de reativação contextualizada]</div>
+      </div>
+    </div>
+
+    <!-- MOD 06: Respostas Rápidas -->
+    <div id="mod-respostas" class="cerebro-mod-content" style="display:none">
+      <div style="font-size:20px;font-weight:700;color:var(--text);margin-bottom:20px">Respostas Rápidas</div>
+      <div id="cerebro-respostas-lista">
+        <!-- Grupo: Primeiro contato -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Primeiro contato</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+            <div class="cerebro-resp-card" data-atalho="/inicio" data-quando="[a preencher]" data-msg="[a preencher — mensagem de primeiro contato]"></div>
+            <div class="cerebro-resp-card" data-atalho="/tempo" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+            <div class="cerebro-resp-card" data-atalho="/dor" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+          </div>
+        </div>
+        <!-- Grupo: Qualificação -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Qualificação</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+            <div class="cerebro-resp-card" data-atalho="/aprofundar" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+            <div class="cerebro-resp-card" data-atalho="/faturamento" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+            <div class="cerebro-resp-card" data-atalho="/resolucao" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+          </div>
+        </div>
+        <!-- Grupo: Reunião -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Reunião</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+            <div class="cerebro-resp-card" data-atalho="/convite" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+            <div class="cerebro-resp-card" data-atalho="/horarios" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+          </div>
+        </div>
+        <!-- Grupo: Mentoria -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Mentoria</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+            <div class="cerebro-resp-card" data-atalho="/mentoria" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+            <div class="cerebro-resp-card" data-atalho="/preco" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+            <div class="cerebro-resp-card" data-atalho="/preco-direto" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+          </div>
+        </div>
+        <!-- Grupo: Desqualificação -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:10px">Desqualificação</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+            <div class="cerebro-resp-card" data-atalho="/nao-fit" data-quando="[a preencher]" data-msg="[a preencher]"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /cerebroConteudo -->
+
+</div><!-- /tab-cerebro -->
+
 </div><!-- /main -->
 
 <script>
@@ -1810,6 +2315,7 @@ function showTab(id){
   if(id==='trafego'){renderTrafego();}
   if(id==='materiais'){renderMateriais();}
   if(id==='scripts'){loadScripts();}
+  if(id==='cerebro'){/* Cérebro carrega ao renderizar */}
 }
 
 function showTabByName(id){
@@ -1824,6 +2330,7 @@ function showTabByName(id){
   if(id==='trafego'){renderTrafego();}
   if(id==='materiais'){renderMateriais();}
   if(id==='scripts'){loadScripts();}
+  if(id==='cerebro'){/* Cérebro carrega ao renderizar */}
 }
 
 function toggleFunil(card){card.classList.toggle('open')}
@@ -5501,6 +6008,270 @@ function crmUpdateQualifStyle(){
 // Roda ao abrir a ficha para aplicar o estilo salvo
 function crmInitQualifStyle(){
   setTimeout(crmUpdateQualifStyle, 50);
+}
+
+
+
+// ══ CÉREBRO COMERCIAL ══════════════════════════════════════════
+
+let _cerebroModuloAtual = null;
+
+// Renderizar respostas rápidas ao abrir
+function cerebroRenderRespostas(){
+  document.querySelectorAll('.cerebro-resp-card').forEach(el=>{
+    const atalho = el.dataset.atalho;
+    const quando = el.dataset.quando;
+    const msg    = el.dataset.msg;
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-family:var(--mono,monospace);font-size:12px;font-weight:700;color:var(--g4);background:rgba(116,198,157,.1);padding:2px 8px;border-radius:4px">${atalho}</span>
+        <button onclick="navigator.clipboard.writeText(${JSON.stringify(msg)});this.textContent='✓ Copiado';setTimeout(()=>this.textContent='Copiar',1500)"
+          style="font-size:11px;color:var(--text3);background:none;border:1px solid var(--border);border-radius:4px;padding:2px 8px;cursor:pointer">Copiar</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px">${quando}</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.5;white-space:pre-wrap">${msg}</div>`;
+  });
+}
+
+function cerebroAbrirModulo(mod){
+  _cerebroModuloAtual = mod;
+  document.getElementById('cerebroHome').style.display = 'none';
+  document.getElementById('cerebroConteudo').style.display = 'block';
+
+  // Ocultar todos os módulos
+  document.querySelectorAll('.cerebro-mod-content').forEach(el=>el.style.display='none');
+  const el = document.getElementById('mod-'+mod);
+  if(el) el.style.display='block';
+
+  // Breadcrumb
+  const nomes = {qualificacao:'Qualificação',reuniao:'Reunião',objecoes:'Objeções',
+    followup:'Follow-up',reativacao:'Reativação',respostas:'Respostas Rápidas'};
+  const bc = document.getElementById('cerebroBreadcrumb');
+  if(bc) bc.textContent = nomes[mod]||mod;
+
+  if(mod==='respostas') cerebroRenderRespostas();
+
+  // Limpar detalhes abertos
+  ['cerebro-etapa-detalhe','cerebro-reuniao-etapa-detalhe','cerebro-obj-detalhe','cerebro-fu-detalhe'].forEach(id=>{
+    const d = document.getElementById(id);
+    if(d) d.innerHTML='';
+  });
+}
+
+function cerebroVoltar(){
+  _cerebroModuloAtual = null;
+  document.getElementById('cerebroHome').style.display = 'block';
+  document.getElementById('cerebroConteudo').style.display = 'none';
+}
+
+function cerebroSetCat(cat){
+  document.querySelectorAll('.cerebro-tag').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  if(cat==='todas'){ cerebroVoltar(); return; }
+  cerebroAbrirModulo(cat);
+}
+
+function cerebroFiltrar(){
+  const q = (document.getElementById('cerebroSearch')?.value||'').toLowerCase().trim();
+  if(!q) return;
+  // Busca simples: procura em todos os data-attributes
+  const resultados = [];
+  // Objeções
+  document.querySelectorAll('.cerebro-obj-data').forEach(el=>{
+    const txt = Object.values(el.dataset).join(' ').toLowerCase();
+    if(txt.includes(q)) resultados.push({tipo:'objecao', id:el.id, titulo:el.dataset.titulo});
+  });
+  // Etapas qualificação
+  document.querySelectorAll('#mod-qualificacao .cerebro-etapa-data').forEach(el=>{
+    const txt = Object.values(el.dataset).join(' ').toLowerCase();
+    if(txt.includes(q)) resultados.push({tipo:'qualificacao', id:el.id.replace('etapa-',''), titulo:el.dataset.titulo});
+  });
+  // Etapas reunião
+  document.querySelectorAll('#mod-reuniao .cerebro-etapa-data').forEach(el=>{
+    const txt = Object.values(el.dataset).join(' ').toLowerCase();
+    if(txt.includes(q)) resultados.push({tipo:'reuniao', id:el.id.replace('etapa-',''), titulo:el.dataset.titulo});
+  });
+  // Follow-up
+  document.querySelectorAll('.cerebro-fu-data').forEach(el=>{
+    const txt = Object.values(el.dataset).join(' ').toLowerCase();
+    if(txt.includes(q)) resultados.push({tipo:'followup', id:el.id, titulo:el.dataset.titulo});
+  });
+  // Respostas rápidas
+  document.querySelectorAll('.cerebro-resp-card').forEach(el=>{
+    const txt = Object.values(el.dataset).join(' ').toLowerCase();
+    if(txt.includes(q)) resultados.push({tipo:'respostas', id:el.dataset.atalho, titulo:el.dataset.atalho});
+  });
+
+  // Mostrar resultados
+  document.getElementById('cerebroHome').style.display = 'none';
+  document.getElementById('cerebroConteudo').style.display = 'block';
+  document.querySelectorAll('.cerebro-mod-content').forEach(el=>el.style.display='none');
+  const bc = document.getElementById('cerebroBreadcrumb');
+  if(bc) bc.textContent = `Busca: "${q}" — ${resultados.length} resultado(s)`;
+
+  // Criar div de resultados
+  let div = document.getElementById('cerebro-busca-resultado');
+  if(!div){ div = document.createElement('div'); div.id='cerebro-busca-resultado'; document.getElementById('cerebroConteudo').appendChild(div); }
+  div.style.display='block';
+  if(!resultados.length){
+    div.innerHTML='<div style="color:var(--text3);font-size:13px;padding:20px 0">Nenhum resultado para "'+q+'".</div>';
+    return;
+  }
+  const tiposNome = {objecao:'Objeção',qualificacao:'Qualificação',reuniao:'Reunião',followup:'Follow-up',respostas:'Resposta rápida'};
+  div.innerHTML = resultados.map(r=>`
+    <div onclick="cerebroBuscarIr('${r.tipo}','${r.id}')" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:12px">
+      <span style="font-size:10px;color:var(--text3);background:var(--bg);border:1px solid var(--border);padding:2px 8px;border-radius:4px">${tiposNome[r.tipo]||r.tipo}</span>
+      <span style="font-size:13px;color:var(--text)">${r.titulo}</span>
+      <span style="margin-left:auto;font-size:12px;color:var(--text3)">→</span>
+    </div>`).join('');
+}
+
+function cerebroBuscarIr(tipo, id){
+  const buscaEl = document.getElementById('cerebro-busca-resultado');
+  if(buscaEl) buscaEl.style.display='none';
+  if(tipo==='objecao') { cerebroAbrirModulo('objecoes'); cerebroAbrirObj(id); }
+  else if(tipo==='qualificacao') { cerebroAbrirModulo('qualificacao'); cerebroAbrirEtapa(id); }
+  else if(tipo==='reuniao') { cerebroAbrirModulo('reuniao'); cerebroAbrirReuniao(id); }
+  else if(tipo==='followup') { cerebroAbrirModulo('followup'); cerebroAbrirFU(id); }
+  else if(tipo==='respostas') cerebroAbrirModulo('respostas');
+}
+
+function cerebroLimpar(){
+  const inp = document.getElementById('cerebroSearch');
+  if(inp) inp.value='';
+  const buscaEl = document.getElementById('cerebro-busca-resultado');
+  if(buscaEl) buscaEl.style.display='none';
+  cerebroVoltar();
+}
+
+// Abrir etapa de qualificação
+function cerebroAbrirEtapa(id){
+  const el = document.getElementById('etapa-'+id);
+  if(!el) return;
+  const d  = el.dataset;
+  const container = document.getElementById('cerebro-etapa-detalhe');
+  if(!container) return;
+  // Marcar pill ativo
+  document.querySelectorAll('#mod-qualificacao .cerebro-etapa-pill').forEach(p=>p.classList.remove('active'));
+  container.innerHTML = cerebroFichaEtapa(d, false);
+  container.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// Abrir etapa da reunião
+function cerebroAbrirReuniao(id){
+  const el = document.getElementById('etapa-'+id);
+  if(!el) return;
+  const d  = el.dataset;
+  const container = document.getElementById('cerebro-reuniao-etapa-detalhe');
+  if(!container) return;
+  document.querySelectorAll('#mod-reuniao .cerebro-reun-step').forEach(p=>p.classList.remove('active'));
+  const btn = document.querySelector(`[onclick="cerebroAbrirReuniao('${id}')"]`);
+  if(btn) btn.classList.add('active');
+  container.innerHTML = cerebroFichaEtapa(d, true);
+  container.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function cerebroFichaEtapa(d, isReuniao){
+  const blocos = [
+    {label:'OBJETIVO', val:d.objetivo},
+    {label:'PERGUNTA PRINCIPAL', val:d.pergunta, destaque:true},
+    {label:'PERGUNTAS DE APOIO', val:d.apoio},
+    {label:'O QUE OBSERVAR', val:d.observar},
+    {label:'PRÓXIMO PASSO', val:d.proximo},
+    {label:isReuniao?'NÃO FAZER':'EVITAR', val:d.evitar, alerta:true},
+  ];
+  if(isReuniao && d.exemplo) blocos.push({label:'EXEMPLO', val:d.exemplo, exemplo:true});
+  return `<div style="background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:20px;margin-bottom:20px">
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:16px">${d.titulo}</div>
+    ${blocos.filter(b=>b.val&&b.val!=='').map(b=>`
+      <div style="margin-bottom:14px;${b.destaque?'background:rgba(116,198,157,.07);border-radius:8px;padding:10px 14px;border-left:3px solid var(--g4)':''}${b.alerta?'background:rgba(224,112,112,.06);border-radius:8px;padding:10px 14px;border-left:3px solid var(--coral)':''}${b.exemplo?'background:rgba(77,184,200,.06);border-radius:8px;padding:10px 14px;border-left:3px solid var(--teal)':''}">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">${b.label}</div>
+        <div style="font-size:13px;color:${b.destaque?'var(--g4)':b.alerta?'var(--coral)':'var(--text2)'};line-height:1.6;white-space:pre-wrap">${b.val}</div>
+      </div>`).join('')}
+  </div>`;
+}
+
+// Abrir objeção
+function cerebroAbrirObj(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const d  = el.dataset;
+  const container = document.getElementById('cerebro-obj-detalhe');
+  if(!container) return;
+  container.innerHTML = `<div style="background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:20px;margin-bottom:20px">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">${d.titulo}</div>
+    <div style="font-size:13px;font-style:italic;color:var(--text3);margin-bottom:16px">"${d.frase}"</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">O QUE PODE ESTAR POR TRÁS</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">${d.porTras||d['por-tras']||'[a preencher]'}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">PRIMEIRA PERGUNTA</div>
+        <div style="font-size:13px;color:var(--g4);line-height:1.6;white-space:pre-wrap;background:rgba(116,198,157,.07);padding:8px 12px;border-radius:6px;border-left:3px solid var(--g4)">${d.pergunta||'[a preencher]'}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div style="background:rgba(77,184,200,.06);border-radius:8px;padding:10px 14px;border-left:3px solid var(--teal)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:4px">SE RESPONDER A</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">${d.respA||d['resp-a']||'[a preencher]'}</div>
+      </div>
+      <div style="background:rgba(233,168,76,.06);border-radius:8px;padding:10px 14px;border-left:3px solid var(--amber)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:4px">SE RESPONDER B</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">${d.respB||d['resp-b']||'[a preencher]'}</div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">COMO RESPONDER</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">${d.responder||'[a preencher]'}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">
+      <div style="background:rgba(224,112,112,.06);border-radius:8px;padding:10px 14px;border-left:3px solid var(--coral)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--coral);margin-bottom:4px">O QUE NÃO FAZER</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;white-space:pre-wrap">${d.naoFazer||d['nao-fazer']||'[a preencher]'}</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:4px">PRÓXIMO PASSO</div>
+        <div style="font-size:13px;color:var(--text);line-height:1.6;white-space:pre-wrap">${d.proximo||'[a preencher]'}</div>
+      </div>
+    </div>
+    <button onclick="document.getElementById('cerebro-obj-detalhe').innerHTML=''" style="margin-top:16px;font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer">✕ Fechar</button>
+  </div>`;
+  container.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// Abrir follow-up
+function cerebroAbrirFU(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  const d  = el.dataset;
+  const container = document.getElementById('cerebro-fu-detalhe');
+  if(!container) return;
+  const dias = ['d0','d2','d5','d8','d12'].filter(dk=>d[dk]);
+  container.innerHTML = `<div style="background:var(--card);border:1px solid var(--border2);border-radius:10px;padding:20px;margin-bottom:20px">
+    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px">${d.titulo}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+      <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">SITUAÇÃO</div><div style="font-size:13px;color:var(--text2)">${d.situacao}</div></div>
+      <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">OBJETIVO</div><div style="font-size:13px;color:var(--text2)">${d.objetivo}</div></div>
+      <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--text3);margin-bottom:3px">QUANDO USAR</div><div style="font-size:13px;color:var(--text2)">${d.quando}</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--text3);text-transform:uppercase;margin-bottom:10px">Cadência</div>
+    <div style="display:flex;align-items:flex-start;gap:6px;overflow-x:auto;padding-bottom:8px">
+      ${dias.map((dk,i)=>`
+        <div style="flex-shrink:0;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;min-width:140px">
+          <div style="font-size:12px;font-weight:700;color:var(--g4);margin-bottom:6px">${dk.toUpperCase()}</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.5;white-space:pre-wrap">${d[dk]}</div>
+        </div>
+        ${i<dias.length-1?'<div style="color:var(--text3);font-size:18px;margin-top:18px">→</div>':''}`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:16px">
+      <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--teal);margin-bottom:3px">SE RESPONDER</div><div style="font-size:13px;color:var(--text2)">${d.seResp||d['se-resp']}</div></div>
+      <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--amber);margin-bottom:3px">SE NÃO RESPONDER</div><div style="font-size:13px;color:var(--text2)">${d.seNao||d['se-nao']}</div></div>
+      <div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--coral);margin-bottom:3px">QUANDO ENCERRAR</div><div style="font-size:13px;color:var(--text2)">${d.encerrar}</div></div>
+    </div>
+    <button onclick="document.getElementById('cerebro-fu-detalhe').innerHTML=''" style="margin-top:16px;font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer">✕ Fechar</button>
+  </div>`;
+  container.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 </script>
