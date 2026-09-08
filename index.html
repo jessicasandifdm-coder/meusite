@@ -4526,8 +4526,10 @@ const CRM_PIPELINES = {
 
 // Status que, ao serem definidos, mudam o pipeline automaticamente
 const CRM_STATUS_PIPELINE_RULES = {
-  agendado:  'reunioes',  // qualquer pipeline → reunioes
-  perdido:   'nutricao',  // qualquer pipeline → nutricao (registra pipeline_origem antes)
+  agendado:  'reunioes',  // qualquer pipeline → reunioes ao agendar
+  // REGRA: perdido NÃO migra para nutricao imediatamente
+  // A migração acontece na virada do mês (crmMigrarPerdidosParaNutricao)
+  // Isso preserva o registro de perdidos do mês atual no pipeline correto
 };
 
 const CRM_FUNIL_LABELS = {
