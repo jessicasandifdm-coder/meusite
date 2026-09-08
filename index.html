@@ -4974,12 +4974,80 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       ${op.bv_impedimento ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Impedimento:</span> '+crmEsc(op.bv_impedimento)+'</div>' : ''}
       ${op.bv_visao_6m ? '<div style="margin-top:6px;font-size:12px;color:var(--text2)"><span style="color:var(--text3)">Visão 6 meses:</span> '+crmEsc(op.bv_visao_6m)+'</div>' : ''}
     </div>` : ''}
-    <div class="crm-grid2" style="margin-top:10px">
-      <div class="crm-field"><div class="crm-lbl">Próxima ação</div>
-        <input class="crm-inp" id="crm_prox" value="${crmEsc(op.proxima_acao||'')}" placeholder="ex: ligar, enviar proposta..."></div>
-      <div class="crm-field"><div class="crm-lbl">Data da próxima ação</div>
-        <input class="crm-inp" type="date" id="crm_prox_dt" value="${op.data_proxima_acao||''}"></div>
+    <!-- ── PRÓXIMA AÇÃO INTELIGENTE ── -->
+  <div style="margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Próxima ação</div>
+
+    <div class="crm-grid2" style="margin-bottom:10px">
+      <!-- Tipo de ação -->
+      <div class="crm-field">
+        <div class="crm-lbl">Tipo</div>
+        <select class="crm-inp" id="crm_prox_tipo" onchange="crmProxAcaoTipo(this.value)" style="cursor:pointer">
+          <option value="">— selecionar —</option>
+          <option value="primeiro_contato" ${op.tipo_proxima_acao==='primeiro_contato'?'selected':''}>Primeiro contato pós-proposta</option>
+          <option value="prova_social" ${op.tipo_proxima_acao==='prova_social'?'selected':''}>Prova social</option>
+          <option value="condicao_3m" ${op.tipo_proxima_acao==='condicao_3m'?'selected':''}>Condição 3 meses</option>
+          <option value="objecao" ${op.tipo_proxima_acao==='objecao'?'selected':''}>Responder / tratar objeção</option>
+          <option value="aguardar" ${op.tipo_proxima_acao==='aguardar'?'selected':''}>Aguardar retorno</option>
+          <option value="encerrar" ${op.tipo_proxima_acao==='encerrar'?'selected':''}>Encerrar negociação</option>
+          <option value="reativar" ${op.tipo_proxima_acao==='reativar'?'selected':''}>Reativar futuramente</option>
+        </select>
+      </div>
+      <!-- Data -->
+      <div class="crm-field">
+        <div class="crm-lbl">Data</div>
+        <input class="crm-inp" type="date" id="crm_prox_dt" value="${op.data_proxima_acao||''}">
+      </div>
     </div>
+
+    <!-- Mensagem sugerida (aparece conforme o tipo) -->
+    <div id="crm_prox_msg_wrap" style="${op.tipo_proxima_acao&&!['aguardar','encerrar','reativar','objecao'].includes(op.tipo_proxima_acao)?'':'display:none'}">
+      <div class="crm-lbl" style="margin-bottom:4px">Mensagem sugerida</div>
+      <textarea id="crm_prox_msg" rows="5" style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text2);font-size:12px;line-height:1.6;resize:vertical;font-family:inherit">${crmEsc(op.proxima_acao_msg||'')}</textarea>
+      <button onclick="navigator.clipboard.writeText(document.getElementById('crm_prox_msg').value);this.textContent='✓ Copiado!';setTimeout(()=>this.textContent='Copiar mensagem',1500)"
+        style="margin-top:6px;font-size:12px;padding:5px 14px;background:var(--g3);color:#fff;border:none;border-radius:5px;cursor:pointer">Copiar mensagem</button>
+    </div>
+
+    <!-- Objeção (só aparece se tipo = objecao) -->
+    <div id="crm_prox_obj_wrap" style="${op.tipo_proxima_acao==='objecao'?'':'display:none'};margin-bottom:8px">
+      <div class="crm-lbl" style="margin-bottom:4px">Qual foi a objeção?</div>
+      <select class="crm-inp" id="crm_prox_obj">
+        <option value="">— selecionar —</option>
+        <option value="caro" ${op.proxima_objecao==='caro'?'selected':''}>Está caro</option>
+        <option value="marido" ${op.proxima_objecao==='marido'?'selected':''}>Precisa falar com marido/sócia</option>
+        <option value="financeiro" ${op.proxima_objecao==='financeiro'?'selected':''}>Precisa analisar financeiro</option>
+        <option value="pensar" ${op.proxima_objecao==='pensar'?'selected':''}>Quer pensar</option>
+        <option value="momento" ${op.proxima_objecao==='momento'?'selected':''}>Não é o momento</option>
+        <option value="outro" ${op.proxima_objecao==='outro'?'selected':''}>Outra</option>
+      </select>
+    </div>
+
+    <!-- Encerrar: motivo -->
+    <div id="crm_prox_enc_wrap" style="${op.tipo_proxima_acao==='encerrar'?'':'display:none'};margin-bottom:8px">
+      <div class="crm-lbl" style="margin-bottom:4px">Motivo do encerramento</div>
+      <select class="crm-inp" id="crm_prox_enc">
+        <option value="">— selecionar —</option>
+        <option value="sem_interesse" ${op.proxima_encerramento==='sem_interesse'?'selected':''}>Sem interesse</option>
+        <option value="sem_retorno" ${op.proxima_encerramento==='sem_retorno'?'selected':''}>Sem retorno</option>
+        <option value="momento" ${op.proxima_encerramento==='momento'?'selected':''}>Não é o momento</option>
+        <option value="financeiro" ${op.proxima_encerramento==='financeiro'?'selected':''}>Sem condição financeira</option>
+        <option value="outra_solucao" ${op.proxima_encerramento==='outra_solucao'?'selected':''}>Escolheu outra solução</option>
+        <option value="outro" ${op.proxima_encerramento==='outro'?'selected':''}>Outro</option>
+      </select>
+    </div>
+
+    <!-- Reativar: gatilho -->
+    <div id="crm_prox_reat_wrap" style="${op.tipo_proxima_acao==='reativar'?'':'display:none'};margin-bottom:8px">
+      <div class="crm-lbl" style="margin-bottom:4px">Gatilho para reativação</div>
+      <input class="crm-inp" id="crm_prox_gatilho" value="${crmEsc(op.proxima_gatilho||'')}" placeholder="ex: após troca da agência, após formaturas...">
+    </div>
+
+    <!-- Observação manual (sempre visível) -->
+    <div class="crm-field" style="margin-top:8px">
+      <div class="crm-lbl">Observação / ação personalizada</div>
+      <input class="crm-inp" id="crm_prox" value="${crmEsc(op.proxima_acao||'')}" placeholder="ex: retomar dia 18 porque ela está aguardando definição da nova agência...">
+    </div>
+  </div>
   </div>
 
   <div class="crm-sec">
@@ -5159,8 +5227,13 @@ async function crmSalvar(){
       origem:document.getElementById('crm_origem')?.value||'instagram',
       status:novoStatus,
       responsavel:document.getElementById('crm_resp')?.value||'Amanda',
-      proxima_acao:document.getElementById('crm_prox')?.value||'',
-      data_proxima_acao:document.getElementById('crm_prox_dt')?.value||null,
+      proxima_acao:      document.getElementById('crm_prox')?.value||'',
+      data_proxima_acao: document.getElementById('crm_prox_dt')?.value||null,
+      tipo_proxima_acao: document.getElementById('crm_prox_tipo')?.value||'',
+      proxima_acao_msg:  document.getElementById('crm_prox_msg')?.value||'',
+      proxima_objecao:   document.getElementById('crm_prox_obj')?.value||'',
+      proxima_encerramento: document.getElementById('crm_prox_enc')?.value||'',
+      proxima_gatilho:   document.getElementById('crm_prox_gatilho')?.value||'',
       reuniao_data:document.getElementById('crm_reun_dt')?.value||null,
       isca_nome:document.getElementById('crm_isca')?.value||'',
       qualificacao_lead:(()=>{const q=document.querySelector('input[name="crm_qualificacao"]:checked');return q&&q.value?q.value:'';})(),
@@ -6480,6 +6553,39 @@ function cerebroAbrirFU(id){
     <button onclick="document.getElementById('cerebro-fu-detalhe').innerHTML=''" style="margin-top:16px;font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer">✕ Fechar</button>
   </div>`;
   container.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+
+// ── PRÓXIMA AÇÃO INTELIGENTE ──
+const CRM_PROX_MSGS = {
+  primeiro_contato: "Oi, [NOME]! Tudo bem?\n\nPassei aqui porque combinamos de retomar nossa conversa depois que você analisasse a proposta.\n\nConseguiu olhar com calma?\n\nQueria entender como você se sentiu em relação ao que conversamos e definir contigo os próximos passos.",
+  prova_social: "Oi, [NOME]!\n\nLembrei de você porque vi esse resultado da [ALUNA/LOJA] e não poderia deixar de compartilhar contigo, principalmente por aquilo que conversamos na nossa reunião sobre [DOR].\n\nImagino que você esteja na correria e por isso talvez não tenha conseguido me responder ainda.\n\nQueria retomar contigo para a gente definir os próximos passos.",
+  condicao_3m: "Oi, [NOME]!\n\nLembrei de você porque consegui uma condição diferente para quem quer começar agora com um acompanhamento mais enxuto.\n\nPensei em você porque acredito que pode fazer sentido para o momento da [LOJA].\n\nSe tiver interesse, te explico como funciona."
+};
+
+function crmProxAcaoTipo(tipo){
+  const msgWrap  = document.getElementById('crm_prox_msg_wrap');
+  const objWrap  = document.getElementById('crm_prox_obj_wrap');
+  const encWrap  = document.getElementById('crm_prox_enc_wrap');
+  const reatWrap = document.getElementById('crm_prox_reat_wrap');
+  const msgEl    = document.getElementById('crm_prox_msg');
+
+  // Ocultar tudo
+  [msgWrap, objWrap, encWrap, reatWrap].forEach(el=>{ if(el) el.style.display='none'; });
+
+  if(tipo === 'objecao')   { if(objWrap)  objWrap.style.display='block'; return; }
+  if(tipo === 'encerrar')  { if(encWrap)  encWrap.style.display='block'; return; }
+  if(tipo === 'reativar')  { if(reatWrap) reatWrap.style.display='block'; return; }
+  if(tipo === 'aguardar')  { return; }
+
+  // Tipos com mensagem sugerida
+  if(CRM_PROX_MSGS[tipo] && msgWrap && msgEl){
+    msgWrap.style.display = 'block';
+    // Só preencher se não tiver mensagem customizada já
+    if(!msgEl.value || Object.values(CRM_PROX_MSGS).includes(msgEl.value)){
+      msgEl.value = CRM_PROX_MSGS[tipo];
+    }
+  }
 }
 
 </script>
