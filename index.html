@@ -6563,6 +6563,55 @@ const CRM_PROX_MSGS = {
   condicao_3m: "Oi, [NOME]!\n\nLembrei de você porque consegui uma condição diferente para quem quer começar agora com um acompanhamento mais enxuto.\n\nPensei em você porque acredito que pode fazer sentido para o momento da [LOJA].\n\nSe tiver interesse, te explico como funciona."
 };
 
+function crmRenderAcaoHoje(op){
+  const el = document.getElementById('crm_exec_conteudo');
+  if(!el) return;
+  const tipo = op.tipo_proxima_acao;
+  const hoje = today();
+  const data = op.data_proxima_acao||'';
+  const NOMES = {
+    primeiro_contato:'Primeiro contato pós-proposta',
+    prova_social:'Prova social',
+    condicao_3m:'Condição 3 meses',
+    objecao:'Responder / tratar objeção',
+    aguardar:'Aguardar retorno',
+    encerrar:'Encerrar negociação',
+    reativar:'Reativar futuramente'
+  };
+  const MSGS = {
+    primeiro_contato: 'Oi, [NOME]! Tudo bem?\n\nPassei aqui porque combinamos de retomar nossa conversa depois que você analisasse a proposta.\n\nConseguiu olhar com calma?\n\nQueria entender como você se sentiu em relação ao que conversamos e definir contigo os próximos passos.',
+    prova_social: 'Oi, [NOME]!\n\nLembrei de você porque vi esse resultado da [ALUNA/LOJA] e não poderia deixar de compartilhar, principalmente por aquilo que conversamos sobre [DOR].\n\nImagino que você esteja na correria e por isso talvez não tenha conseguido me responder ainda.\n\nQueria retomar contigo para a gente definir os próximos passos.',
+    condicao_3m: 'Oi, [NOME]!\n\nLembrei de você porque consegui uma condição diferente para quem quer começar agora com um acompanhamento mais enxuto.\n\nPensei em você porque acredito que pode fazer sentido para o momento da [LOJA].\n\nSe tiver interesse, te explico como funciona.'
+  };
+  if(!tipo){
+    el.innerHTML = '<span style="color:var(--text3)">Nenhuma ação agendada.</span>';
+    return;
+  }
+  const atrasada = data && data < hoje;
+  const paraHoje = data === hoje;
+  let badge = '';
+  if(atrasada) badge = ' <span style="font-size:10px;background:rgba(224,112,112,.15);color:var(--coral);padding:2px 8px;border-radius:4px">Atrasada</span>';
+  else if(paraHoje) badge = ' <span style="font-size:10px;background:rgba(116,198,157,.15);color:var(--g4);padding:2px 8px;border-radius:4px">Para hoje</span>';
+  else if(data) badge = ' <span style="font-size:10px;color:var(--text3)">'+data+'</span>';
+  const msg = op.proxima_acao_msg || MSGS[tipo] || '';
+  let h = '<div style="display:flex;align-items:center;margin-bottom:8px"><b style="color:var(--text)">'+(NOMES[tipo]||tipo)+'</b>'+badge+'</div>';
+  if(op.proxima_objecao && tipo==='objecao') h += '<div style="font-size:12px;color:var(--text2);margin-bottom:8px">Objeção: <b>'+op.proxima_objecao+'</b></div>';
+  if(msg) h += '<textarea id="crm_exec_msg" rows="5" style="width:100%;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:var(--text2);font-size:12px;line-height:1.6;resize:vertical;font-family:inherit"></textarea><br><button id="crm_exec_copy" style="margin-top:6px;font-size:12px;padding:5px 16px;background:var(--g3);color:#fff;border:none;border-radius:5px;cursor:pointer">Copiar mensagem</button>';
+  h += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border)"><button id="crm_exec_feita" style="font-size:12px;padding:5px 14px;background:rgba(116,198,157,.15);color:var(--g4);border:1px solid var(--g3);border-radius:5px;cursor:pointer">✓ Marcar como feita</button> <span style="font-size:11px;color:var(--text3)">Registra no histórico</span></div>';
+  el.innerHTML = h;
+  if(msg){ const ta=document.getElementById('crm_exec_msg'); if(ta) ta.value=msg; }
+  const copyBtn = document.getElementById('crm_exec_copy');
+  if(copyBtn) copyBtn.onclick = function(){ const t=document.getElementById('crm_exec_msg'); if(t) navigator.clipboard.writeText(t.value); this.textContent='✓ Copiado!'; setTimeout(()=>{this.textContent='Copiar mensagem';},1500); };
+  const feitaBtn = document.getElementById('crm_exec_feita');
+  if(feitaBtn) feitaBtn.onclick = crmMarcarFeitoHoje;
+}
+
+function crmMarcarFeitoHoje(){
+  const btn = document.getElementById('crm_exec_feita');
+  if(btn){ btn.textContent='✓ Feita!'; setTimeout(()=>{btn.textContent='✓ Marcar como feita';},2000); }
+  if(typeof crmSalvar==='function') crmSalvar();
+}
+
 function crmProxAcaoTipo(tipo){
   const msgWrap  = document.getElementById('crm_prox_msg_wrap');
   const objWrap  = document.getElementById('crm_prox_obj_wrap');
@@ -6590,4 +6639,59 @@ function crmProxAcaoTipo(tipo){
 
 </script>
 </body>
-</html>
+</html><!-- ── AÇÃO COMERCIAL ── -->
+  <div id="crm_bloco_executar" style="margin-top:10px;background:var(--bg);border:1px solid var(--g2);border-radius:10px;padding:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g3);margin-bottom:6px">Ação de hoje</div>
+    <div id="crm_exec_conteudo" style="font-size:13px;color:var(--text3)">—</div>
+  </div>
+  <div style="margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Agendar próxima ação</div>
+    <div class="crm-grid2" style="margin-bottom:10px">
+      <div class="crm-field"><div class="crm-lbl">Tipo</div>
+        <select class="crm-inp" id="crm_prox_tipo" onchange="crmProxAcaoTipo(this.value)" style="cursor:pointer">
+          <option value="">— selecionar —</option>
+          <option value="primeiro_contato" ${op.tipo_proxima_acao==='primeiro_contato'?'selected':''}>Primeiro contato pós-proposta</option>
+          <option value="prova_social" ${op.tipo_proxima_acao==='prova_social'?'selected':''}>Prova social</option>
+          <option value="condicao_3m" ${op.tipo_proxima_acao==='condicao_3m'?'selected':''}>Condição 3 meses</option>
+          <option value="objecao" ${op.tipo_proxima_acao==='objecao'?'selected':''}>Responder / tratar objeção</option>
+          <option value="aguardar" ${op.tipo_proxima_acao==='aguardar'?'selected':''}>Aguardar retorno</option>
+          <option value="encerrar" ${op.tipo_proxima_acao==='encerrar'?'selected':''}>Encerrar negociação</option>
+          <option value="reativar" ${op.tipo_proxima_acao==='reativar'?'selected':''}>Reativar futuramente</option>
+        </select>
+      </div>
+      <div class="crm-field"><div class="crm-lbl">Data</div>
+        <input class="crm-inp" type="date" id="crm_prox_dt" value="${op.data_proxima_acao||''}">
+      </div>
+    </div>
+    <div id="crm_prox_obj_wrap" style="${op.tipo_proxima_acao==='objecao'?'':'display:none'};margin-bottom:8px">
+      <div class="crm-lbl" style="margin-bottom:4px">Qual foi a objeção?</div>
+      <select class="crm-inp" id="crm_prox_obj">
+        <option value="">— selecionar —</option>
+        <option value="caro" ${op.proxima_objecao==='caro'?'selected':''}>Está caro</option>
+        <option value="marido" ${op.proxima_objecao==='marido'?'selected':''}>Precisa falar com marido/sócia</option>
+        <option value="financeiro" ${op.proxima_objecao==='financeiro'?'selected':''}>Precisa analisar financeiro</option>
+        <option value="pensar" ${op.proxima_objecao==='pensar'?'selected':''}>Quer pensar</option>
+        <option value="momento" ${op.proxima_objecao==='momento'?'selected':''}>Não é o momento</option>
+        <option value="outro" ${op.proxima_objecao==='outro'?'selected':''}>Outra</option>
+      </select>
+    </div>
+    <div id="crm_prox_enc_wrap" style="${op.tipo_proxima_acao==='encerrar'?'':'display:none'};margin-bottom:8px">
+      <div class="crm-lbl" style="margin-bottom:4px">Motivo do encerramento</div>
+      <select class="crm-inp" id="crm_prox_enc">
+        <option value="">— selecionar —</option>
+        <option value="sem_interesse" ${op.proxima_encerramento==='sem_interesse'?'selected':''}>Sem interesse</option>
+        <option value="sem_retorno" ${op.proxima_encerramento==='sem_retorno'?'selected':''}>Sem retorno</option>
+        <option value="momento" ${op.proxima_encerramento==='momento'?'selected':''}>Não é o momento</option>
+        <option value="financeiro" ${op.proxima_encerramento==='financeiro'?'selected':''}>Sem condição financeira</option>
+        <option value="outra_solucao" ${op.proxima_encerramento==='outra_solucao'?'selected':''}>Escolheu outra solução</option>
+        <option value="outro" ${op.proxima_encerramento==='outro'?'selected':''}>Outro</option>
+      </select>
+    </div>
+    <div id="crm_prox_reat_wrap" style="${op.tipo_proxima_acao==='reativar'?'':'display:none'};margin-bottom:8px">
+      <div class="crm-lbl" style="margin-bottom:4px">Gatilho para reativação</div>
+      <input class="crm-inp" id="crm_prox_gatilho" value="${crmEsc(op.proxima_gatilho||'')}" placeholder="ex: após troca da agência...">
+    </div>
+    <div class="crm-field" style="margin-top:8px"><div class="crm-lbl">Observação</div>
+      <input class="crm-inp" id="crm_prox" value="${crmEsc(op.proxima_acao||'')}" placeholder="ex: retomar pois aguarda definição da nova agência...">
+    </div>
+  </div>
