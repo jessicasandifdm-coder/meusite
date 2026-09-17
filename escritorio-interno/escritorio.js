@@ -126,6 +126,7 @@ function escNavegar(modulo) {
 
   switch (modulo) {
     case 'dashboard':    escRenderDashboard(content);    break;
+    case 'tarefas':      escRenderTarefas(content);           break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
@@ -168,9 +169,17 @@ function escTemplateDashboard({ tarefasHoje, reunioesHoje, projetosAtivos, caixa
   const STATUS_BADGE = { pendente: '<span class="badge badge-amber">Pendente</span>', em_andamento: '<span class="badge badge-blue">Em andamento</span>', concluida: '<span class="badge badge-green">Concluída</span>' };
 
   return `
+    <!-- Indicadores de tarefas -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px">
+      <div class="esc-kpi" style="cursor:pointer;padding:14px" onclick="escNavegar('tarefas')">
+        <div class="esc-kpi-val" style="font-size:22px;color:var(--text)">${tarefasHoje.length}</div>
+        <div class="esc-kpi-lbl">Para hoje</div>
+      </div>
+    </div>
+
     <!-- Atalhos rápidos -->
     <div class="esc-shortcuts">
-      <div class="esc-shortcut" onclick="escAbrirModal('nova-tarefa')"><span class="esc-shortcut-icon">✚</span> Nova tarefa</div>
+      <div class="esc-shortcut" onclick="tAbrirForm()"><span class="esc-shortcut-icon">✚</span> Nova tarefa</div>
       <div class="esc-shortcut" onclick="escAbrirModal('nova-reuniao')"><span class="esc-shortcut-icon">📅</span> Nova reunião</div>
       <div class="esc-shortcut" onclick="escAbrirModal('novo-projeto')"><span class="esc-shortcut-icon">📁</span> Novo projeto</div>
       <div class="esc-shortcut" onclick="escAbrirModal('nova-decisao')"><span class="esc-shortcut-icon">⚡</span> Nova decisão</div>
@@ -335,6 +344,10 @@ function escModalForm(tipo) {
 
 // ── SALVAR (com fallback gracioso se tabela não existir) ──
 async function escSalvarTarefa() {
+  // Delegado ao módulo tarefas
+  return tSalvar ? tSalvar() : escToast('Módulo tarefas não carregado.');
+}
+async function _escSalvarTarefa_legacy() {
   const titulo = document.getElementById('esc-form-titulo')?.value?.trim();
   if (!titulo) return escToast('Informe o título da tarefa.');
   const obj = {
