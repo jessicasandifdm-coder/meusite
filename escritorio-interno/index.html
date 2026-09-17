@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escritório Interno — JS Mentoria</title>
+  <link rel="stylesheet" href="escritorio.css">
+  <style>
+    /* ── MODAL ── */
+    #esc-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(2px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 8000; opacity: 0; pointer-events: none; transition: opacity .15s;
+    }
+    #esc-modal-overlay.open { opacity: 1; pointer-events: all; }
+    #esc-modal-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px 32px;
+      width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+    }
+    #esc-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    #esc-modal-title { font-size: 16px; font-weight: 600; color: var(--text); }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="esc-login-overlay">
+  <div class="esc-login-box">
+    <div class="esc-login-title">Escritório Interno</div>
+    <div class="esc-login-sub">Área restrita — JS Mentoria</div>
+    <div class="esc-field">
+      <label class="esc-label">E-mail</label>
+      <input class="esc-input" id="esc-login-email" type="email" placeholder="seu@email.com" autocomplete="email">
+    </div>
+    <div class="esc-field">
+      <label class="esc-label">Senha</label>
+      <input class="esc-input" id="esc-login-senha" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div id="esc-login-err" style="font-size:12px;color:var(--red);min-height:16px;margin-bottom:12px"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="escDoLogin()">Entrar</button>
+    <div style="margin-top:16px;text-align:center">
+      <a href="/" style="font-size:12px;color:var(--text3);text-decoration:none">← Voltar ao sistema comercial</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── NAVEGAÇÃO LATERAL ── -->
+<nav id="esc-nav">
+  <div class="esc-logo">
+    <div class="esc-logo-title">Escritório Interno</div>
+    <div class="esc-logo-sub">JS Mentoria</div>
+  </div>
+
+  <div class="esc-nav-section">
+    <div class="esc-nav-section-label">Geral</div>
+    <button class="esc-nav-item active" data-modulo="dashboard" onclick="escNavegar('dashboard')">
+      <span class="esc-nav-icon">⊞</span> Dashboard
+    </button>
+    <button class="esc-nav-item" data-modulo="caixa" onclick="escNavegar('caixa')">
+      <span class="esc-nav-icon">📥</span> Caixa de Entrada
+    </button>
+  </div>
+
+  <div class="esc-nav-section">
+    <div class="esc-nav-section-label">Execução</div>
+    <button class="esc-nav-item" data-modulo="tarefas" onclick="escNavegar('tarefas')">
+      <span class="esc-nav-icon">✅</span> Tarefas
+    </button>
+    <button class="esc-nav-item" data-modulo="projetos" onclick="escNavegar('projetos')">
+      <span class="esc-nav-icon">📁</span> Projetos
+    </button>
+    <button class="esc-nav-item" data-modulo="reunioes" onclick="escNavegar('reunioes')">
+      <span class="esc-nav-icon">📅</span> Reuniões
+    </button>
+    <button class="esc-nav-item" data-modulo="decisoes" onclick="escNavegar('decisoes')">
+      <span class="esc-nav-icon">⚡</span> Decisões
+    </button>
+  </div>
+
+  <div class="esc-nav-section">
+    <div class="esc-nav-section-label">Planejamento</div>
+    <button class="esc-nav-item" data-modulo="planejamento" onclick="escNavegar('planejamento')">
+      <span class="esc-nav-icon">🗺</span> Planejamento
+    </button>
+    <button class="esc-nav-item" data-modulo="calendario" onclick="escNavegar('calendario')">
+      <span class="esc-nav-icon">📆</span> Calendário
+    </button>
+  </div>
+
+  <div class="esc-nav-section">
+    <div class="esc-nav-section-label">Operação</div>
+    <button class="esc-nav-item" data-modulo="conteudo" onclick="escNavegar('conteudo')">
+      <span class="esc-nav-icon">✏️</span> Conteúdo
+    </button>
+    <button class="esc-nav-item" data-modulo="rotinas" onclick="escNavegar('rotinas')">
+      <span class="esc-nav-icon">🔄</span> Rotinas
+    </button>
+    <button class="esc-nav-item" data-modulo="processos" onclick="escNavegar('processos')">
+      <span class="esc-nav-icon">📋</span> Processos
+    </button>
+  </div>
+
+  <div class="esc-nav-footer">
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">
+      Logado como <span id="esc-user-name" style="color:var(--text2)">—</span>
+    </div>
+    <button class="esc-nav-item" onclick="escLogout()" style="color:var(--text3)">
+      <span class="esc-nav-icon">↩</span> Sair
+    </button>
+    <div style="margin-top:10px">
+      <a href="/" style="font-size:11px;color:var(--text3);text-decoration:none;display:flex;align-items:center;gap:6px;padding:4px 0">
+        <span>←</span> Sistema comercial
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div id="esc-main">
+
+  <!-- Header -->
+  <header id="esc-header">
+    <div>
+      <div id="esc-page-title" class="esc-page-title">Dashboard</div>
+      <div id="esc-page-sub" class="esc-page-sub">Visão geral do dia</div>
+    </div>
+    <div class="esc-header-actions" id="esc-header-actions"></div>
+  </header>
+
+  <!-- Conteúdo -->
+  <main id="esc-content">
+    <!-- Preenchido via JS -->
+  </main>
+
+</div><!-- /main -->
+
+<!-- ── MODAL ── -->
+<div id="esc-modal-overlay">
+  <div id="esc-modal-box">
+    <div id="esc-modal-header">
+      <div id="esc-modal-title">Modal</div>
+      <button class="btn btn-ghost" onclick="escFecharModal()" style="font-size:18px;padding:0 4px">✕</button>
+    </div>
+    <div id="esc-modal-body"></div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="esc-toast"></div>
+
+<script src="escritorio.js"></script>
+</body>
+</html>
