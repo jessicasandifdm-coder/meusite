@@ -128,6 +128,7 @@ function escNavegar(modulo) {
     case 'dashboard':    escRenderDashboard(content);    break;
     case 'tarefas':      escRenderTarefas(content);           break;
     case 'projetos':     escRenderProjetos(content);          break;
+    case 'reunioes':     escRenderReunioes(content);          break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
@@ -179,6 +180,10 @@ function escTemplateDashboard({ tarefasHoje, reunioesHoje, projetosAtivos, caixa
       <div class="esc-kpi" style="cursor:pointer;padding:14px" onclick="escNavegar('projetos')">
         <div class="esc-kpi-val" style="font-size:22px;color:var(--text)">${projetosAtivos.filter(p=>p.status==='em_andamento').length}</div>
         <div class="esc-kpi-lbl">Proj. em andamento</div>
+      </div>
+      <div class="esc-kpi" style="cursor:pointer;padding:14px" onclick="escNavegar('reunioes')">
+        <div class="esc-kpi-val" style="font-size:22px;color:var(--text)">${reunioesHoje.length}</div>
+        <div class="esc-kpi-lbl">Reuniões hoje</div>
       </div>
     </div>
 
