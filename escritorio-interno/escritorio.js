@@ -130,6 +130,7 @@ function escNavegar(modulo) {
     case 'projetos':     escRenderProjetos(content);          break;
     case 'reunioes':     escRenderReunioes(content);          break;
     case 'caixa':        escRenderCaixa(content);             break;
+    case 'decisoes':     escRenderDecisoes(content);          break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
