@@ -131,6 +131,7 @@ function escNavegar(modulo) {
     case 'reunioes':     escRenderReunioes(content);          break;
     case 'caixa':        escRenderCaixa(content);             break;
     case 'decisoes':     escRenderDecisoes(content);          break;
+    case 'planejamento': escRenderPlanejamento(content);      break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
@@ -196,6 +197,7 @@ function escTemplateDashboard({ tarefasHoje, reunioesHoje, projetosAtivos, caixa
     <!-- Atalhos rápidos -->
     <div class="esc-shortcuts">
       <div class="esc-shortcut" onclick="tAbrirForm()"><span class="esc-shortcut-icon">✚</span> Nova tarefa</div>
+      <div class="esc-shortcut" onclick="escNavegar('planejamento')"><span class="esc-shortcut-icon">🗺</span> Planejamento</div>
       <div class="esc-shortcut" onclick="escAbrirModal('nova-reuniao')"><span class="esc-shortcut-icon">📅</span> Nova reunião</div>
       <div class="esc-shortcut" onclick="escAbrirModal('novo-projeto')"><span class="esc-shortcut-icon">📁</span> Novo projeto</div>
       <div class="esc-shortcut" onclick="escAbrirModal('nova-decisao')"><span class="esc-shortcut-icon">⚡</span> Nova decisão</div>
