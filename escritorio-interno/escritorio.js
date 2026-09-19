@@ -89,6 +89,8 @@ function escLogout() {
 
 // ── INIT ──
 async function escInit() {
+  // Carregar contexto de permissões uma vez
+  if (typeof escCarregarContexto === 'function') await escCarregarContexto();
   const userEl = document.getElementById('esc-user-name');
   if (userEl) userEl.textContent = ESC_STATE.usuario || 'Jéssica';
   // Colaboradores vão direto para Meu Escritório
@@ -99,6 +101,17 @@ async function escInit() {
 // ── NAVEGAÇÃO ──
 function escNavegar(modulo) {
   ESC_STATE.modulo = modulo;
+  // Guard de permissão (assíncrono — renderiza apenas se autorizado)
+  if (typeof escGuardNavegacao === 'function') {
+    escGuardNavegacao(modulo).then(autorizado => {
+      if (!autorizado) return; // escGuardNavegacao já renderizou a tela de acesso negado
+      _escNavegar_interno(modulo);
+    });
+    return;
+  }
+  _escNavegar_interno(modulo);
+}
+function _escNavegar_interno(modulo) {
 
   // Atualizar nav items ativos
   document.querySelectorAll('.esc-nav-item').forEach(el => {
@@ -139,9 +152,11 @@ function escNavegar(modulo) {
     case 'calendario':   escRenderCalendario(content);         break;
     case 'rotinas':      escRenderRotinas(content);           break;
     case 'equipe':       escRenderEquipe(content);            break;
+    case 'usuarios':     escRenderUsuarios(content);          break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
+// fim _escNavegar_interno
 
 // ── DASHBOARD ──
 async function escRenderDashboard(el) {
