@@ -92,6 +92,10 @@ async function escInit() {
   // Carregar contexto de permissões uma vez
   if (typeof escCarregarContexto === 'function') await escCarregarContexto();
   const userEl = document.getElementById('esc-user-name');
+  // Inicializar notificações
+  if (typeof notifInicializar === 'function') {
+    notifInicializar().then(()=>{ if(typeof notifVerificarPrazos==='function') notifVerificarPrazos(); });
+  }
   if (userEl) userEl.textContent = ESC_STATE.usuario || 'Jéssica';
   // Colaboradores vão direto para Meu Escritório
   const destino = ESC_STATE.perfil === 'colaborador' ? 'equipe' : 'dashboard';
@@ -153,6 +157,8 @@ function _escNavegar_interno(modulo) {
     case 'rotinas':      escRenderRotinas(content);           break;
     case 'equipe':       escRenderEquipe(content);            break;
     case 'usuarios':     escRenderUsuarios(content);          break;
+    case 'configuracoes':escRenderConfiguracoes(content);      break;
+    case 'integracoes':  escRenderConfiguracoes(content);      break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
