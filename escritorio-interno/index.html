@@ -109,6 +109,9 @@
     <button class="esc-nav-item" data-modulo="usuarios" onclick="escNavegar('usuarios')" id="nav-usuarios">
       <span class="esc-nav-icon">⚙</span> Usuários
     </button>
+    <button class="esc-nav-item" data-modulo="configuracoes" onclick="escNavegar('configuracoes')" id="nav-configuracoes">
+      <span class="esc-nav-icon">🔧</span> Configurações
+    </button>
   </div>
 
   <div class="esc-nav-footer">
@@ -135,7 +138,13 @@
       <div id="esc-page-title" class="esc-page-title">Dashboard</div>
       <div id="esc-page-sub" class="esc-page-sub">Visão geral do dia</div>
     </div>
+    <div style="display:flex;align-items:center;gap:10px">
+    <div style="position:relative;cursor:pointer" onclick="notifAbrirPainel&&notifAbrirPainel()">
+      <span style="font-size:18px">🔔</span>
+      <span id="notif-badge" style="display:none;position:absolute;top:-6px;right:-8px;background:var(--red);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;align-items:center;justify-content:center"></span>
+    </div>
     <div class="esc-header-actions" id="esc-header-actions"></div>
+  </div>
   </header>
 
   <!-- Conteúdo -->
@@ -169,6 +178,8 @@
 <script src="rotinas.js"></script>
 <script src="equipe.js"></script>
 <script src="permissoes.js"></script>
+<script src="notificacoes.js"></script>
+<script src="configuracoes.js"></script>
 <script src="escritorio.js"></script>
 </body>
 </html>
