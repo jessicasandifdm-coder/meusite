@@ -133,6 +133,7 @@ function escNavegar(modulo) {
     case 'decisoes':     escRenderDecisoes(content);          break;
     case 'planejamento': escRenderPlanejamento(content);      break;
     case 'calendario':   escRenderCalendario(content);         break;
+    case 'rotinas':      escRenderRotinas(content);           break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
