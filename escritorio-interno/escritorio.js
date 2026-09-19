@@ -9,7 +9,8 @@ const ESC_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // ── USUÁRIOS (mesmo sistema de auth do index.html) ──
 const ESC_USERS = [
-  { email: 'jessicasandifdm@gmail.com', senha: 'Jesa2011@', nome: 'Jéssica' }
+  { email: 'jessicasandifdm@gmail.com', senha: 'Jesa2011@', nome: 'Jéssica', perfil: 'admin' },
+  { email: 'amanda@jsmentoria.com.br',  senha: 'Amanda2024@', nome: 'Amanda',  perfil: 'colaborador' }
 ];
 
 // ── ESTADO GLOBAL ──
@@ -58,6 +59,7 @@ function escCheckSession() {
   const nome = sessionStorage.getItem('esc_nome');
   if (s === 'true') {
     ESC_STATE.usuario = nome || 'Jéssica';
+  ESC_STATE.perfil  = sessionStorage.getItem('esc_perfil') || 'colaborador';
     document.getElementById('esc-login-overlay').style.display = 'none';
     escInit();
   }
@@ -89,7 +91,9 @@ function escLogout() {
 async function escInit() {
   const userEl = document.getElementById('esc-user-name');
   if (userEl) userEl.textContent = ESC_STATE.usuario || 'Jéssica';
-  escNavegar('dashboard');
+  // Colaboradores vão direto para Meu Escritório
+  const destino = ESC_STATE.perfil === 'colaborador' ? 'equipe' : 'dashboard';
+  escNavegar(destino);
 }
 
 // ── NAVEGAÇÃO ──
@@ -134,6 +138,7 @@ function escNavegar(modulo) {
     case 'planejamento': escRenderPlanejamento(content);      break;
     case 'calendario':   escRenderCalendario(content);         break;
     case 'rotinas':      escRenderRotinas(content);           break;
+    case 'equipe':       escRenderEquipe(content);            break;
     default:             escRenderPlaceholder(content, titulo, sub); break;
   }
 }
