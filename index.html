@@ -4815,6 +4815,12 @@ async function crmDrop(e, novoStatus){
         tipo:'status',descricao:desc,status_anterior:statusAnterior,status_novo:novoStatus,responsavel:''})
     });
 
+    // Meta CAPI — evento de avanço de etapa
+    try{
+      const _mPessoa = (_crmPessoas||[]).find(p=>p.id===op.pessoa_id)||{};
+      await metaEnviarEventoCRM(op, _mPessoa, novoStatus);
+    }catch(e){}
+
     await crmCarregar();
     crmFiltrar();
     showSaved();
@@ -6839,6 +6845,42 @@ function escMontarLayout(){
   const inicio = role==='colaborador'?'equipe':'escritorio';
   escNavegar(inicio);
 }
+
+// ══ META CAPI — API de Conversões ══
+const _META_PIXEL_ID     = '965686512483002';
+const _META_ACCESS_TOKEN = 'EAAUNVSZC3l6UBSuCp6rM96KGP2lDhvzgGpSiEXzaE16KFjNLFJpBgGGeG5LLzPYCIPP6v2SGdfXlyHdldC1bn5ZCn0VnotU7ZBrZAwWJPoZB4HP833MUP9tbAZAZAYQPdlYnjHhRErx3Qtx0L9d5EGXZBKhQT771tah5gaa7cq8kBZCikCtKiugWnpFNzck0jXX4LqAZDZD';
+const META_EVENTO_POR_STATUS = {
+  'qualificado':          'CompleteRegistration',
+  'convite_enviado':      'Schedule',
+  'agendado':             'Schedule',
+  'negociacao':           'InitiateCheckout',
+  'proposta_apresentada': 'InitiateCheckout',
+  'bv_proposta_dm':       'InitiateCheckout',
+  'reat_proposta_dm':     'InitiateCheckout',
+  'ganho':                'Purchase',
+};
+async function _metaSha256(str){
+  if(!str) return null;
+  const buf = await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str.toLowerCase().trim()));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function metaEnviarEventoCRM(op, pessoa, statusNovo){
+  try{
+    const eventName = META_EVENTO_POR_STATUS[statusNovo];
+    if(!eventName) return;
+    const eventTime = Math.floor(Date.now()/1000);
+    const ud = {};
+    if(pessoa?.email)    ud.em = [await _metaSha256(pessoa.email)];
+    if(pessoa?.whatsapp) ud.ph = [await _metaSha256(pessoa.whatsapp.replace(/\D/g,'').replace(/^0/,'55'))];
+    if(pessoa?.nome){ const p=pessoa.nome.trim().split(' '); ud.fn=[await _metaSha256(p[0])]; if(p.length>1) ud.ln=[await _metaSha256(p.slice(1).join(' '))]; }
+    if(op?.fbclid) ud.fbc='fb.1.'+eventTime+'.'+op.fbclid;
+    await fetch('https://graph.facebook.com/v20.0/'+_META_PIXEL_ID+'/events?access_token='+_META_ACCESS_TOKEN,
+      {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:[{event_name:eventName,event_time:eventTime,action_source:'system_generated',user_data:ud,custom_data:{lead_event_source:'JS Mentoria CRM',event_source:'crm',status_crm:statusNovo}}]})}
+    );
+    console.log('[Meta CAPI] '+eventName+' → '+statusNovo);
+  }catch(e){console.warn('[Meta CAPI] Erro:',e);}
+}
+
 </script>
 </body>
 </html>
