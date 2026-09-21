@@ -4362,13 +4362,18 @@ async function centralRefresh(){
 // LOGIN
 // ══════════════════════════════════════════
 const USERS = [
-  { email: 'jessicasandifdm@gmail.com', senha: 'Jesa2011@', nome: 'Jéssica' }
+  { email: 'jessicasandifdm@gmail.com', senha: 'Jesa2011@', nome: 'Jéssica', role: 'admin'      },
+  { email: 'artchique7@gmail.com',       senha: 'Amanda2026@', nome: 'Amanda',  role: 'colaborador' }
 ];
 
 function checkSession(){
   const s = sessionStorage.getItem('js_logged');
   if(s === 'true'){
     document.getElementById('loginOverlay').style.display = 'none';
+    // Garantir que nome/role estejam na sessão (fallback para sessões antigas)
+    if(!sessionStorage.getItem('js_nome')) sessionStorage.setItem('js_nome','Jéssica');
+    if(!sessionStorage.getItem('esc_nome')) sessionStorage.setItem('esc_nome', sessionStorage.getItem('js_nome')||'Jéssica');
+    if(!sessionStorage.getItem('esc_role')) sessionStorage.setItem('esc_role','admin');
     // Renderizar Central ao voltar ao sistema (já logado)
     setTimeout(()=>{ renderCentral(); setTimeout(()=>crmVerificarLeadsNovos(), 1500); }, 400);
   }
@@ -4381,6 +4386,9 @@ function doLogin(){
   const user = USERS.find(u => u.email === email && u.senha === senha);
   if(user){
     sessionStorage.setItem('js_logged','true');
+    sessionStorage.setItem('js_nome', user.nome);
+    sessionStorage.setItem('esc_nome', user.nome);
+    sessionStorage.setItem('esc_role', user.role || 'admin');
     document.getElementById('loginOverlay').style.display='none';
     errEl.style.display='none';
     // Pequeno delay para garantir DOM pronto antes de renderizar
