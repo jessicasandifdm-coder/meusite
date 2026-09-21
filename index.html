@@ -4449,6 +4449,7 @@ const CRM_PIPELINES = {
       { status:'bv_sem_interesse', label:'Sem interesse',         color:'var(--text3)'  },
       { status:'bv_desqualif',     label:'Desqualificado',        color:'var(--coral)'  },
       { status:'bv_convite',       label:'Convite p/ reunião',    color:'var(--purple)' },
+      { status:'bv_proposta_dm',   label:'Proposta enviada na DM', color:'var(--amber)' },
       { status:'ganho',            label:'Ganho direto',          color:'var(--g4)'     },
     ],
     kpis: (ops) => [
@@ -4491,6 +4492,7 @@ const CRM_PIPELINES = {
       { status:'reat_convite',    label:'Convite enviado',        color:'var(--purple)' },
       { status:'reat_interessada',label:'Interessada',            color:'var(--purple)' },
       { status:'agendado',        label:'Agendamento realizado',  color:'var(--g4)'     },
+      { status:'reat_proposta_dm',label:'Proposta enviada na DM', color:'var(--amber)'  },
     ],
     kpis: (ops) => [
       { label:'Form. recebidos',  val: ops.filter(o=>o.status==='reat_form').length,        color:'' },
