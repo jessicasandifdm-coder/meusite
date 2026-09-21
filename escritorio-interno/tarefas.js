@@ -327,7 +327,7 @@ function tAbrirForm(idTarefa) {
       <button class="btn btn-primary" onclick="tSalvar()">${t ? 'Salvar alterações' : 'Criar tarefa'}</button>
     </div>
   `;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('tf-titulo')?.focus();
 }
 
