@@ -461,7 +461,7 @@ function calAbrirFormEvento(id) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="calSalvarEvento()">${ev?'Salvar':'Criar evento'}</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('ef-titulo')?.focus();
 }
 
