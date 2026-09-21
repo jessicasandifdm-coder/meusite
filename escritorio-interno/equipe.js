@@ -297,7 +297,7 @@ function equipeVerDia(ds, nomeUsuario) {
   document.getElementById('esc-modal-title').textContent = label;
   document.getElementById('esc-modal-body').innerHTML = `
     <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Carregando dia...</div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 
   Promise.all([
     escGet(`/rest/v1/escritorio_tarefas?responsavel_id=eq.${encodeURIComponent(nomeUsuario)}&prazo=eq.${ds}`).catch(()=>[]),
@@ -427,7 +427,7 @@ function equipeNovaTarefa(nomeUsuario, dataPreenchida) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="equipeSalvarTarefa('${escEsc(nomeUsuario)}')">Criar tarefa</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('et-titulo')?.focus();
 }
 
@@ -506,7 +506,7 @@ function equipeNotificarJessica(nomeRemetente) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="equipeEnviarNotif('${escEsc(nomeRemetente)}','Jéssica')">Enviar notificação</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('notif-titulo')?.focus();
 }
 
@@ -560,7 +560,7 @@ async function equipeAbrirGerenciar() {
       <button class="btn btn-secondary btn-sm" onclick="equipeAbrirFormUsuario()">+ Novo usuário</button>
       <button class="btn btn-secondary" onclick="escFecharModal()">Fechar</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function equipeCarregarListaUsuarios() {
