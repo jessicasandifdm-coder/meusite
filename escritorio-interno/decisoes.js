@@ -377,7 +377,7 @@ function dNovaTarefa(decisaoId, area, responsavel) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="dSalvarTarefa('${decisaoId}','${area}')">Criar tarefa</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('dt-titulo')?.focus();
 }
 
@@ -446,7 +446,7 @@ function dAbrirRevisao(id) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="dSalvarRevisao('${id}')">Salvar revisão</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function dSalvarRevisao(id) {
@@ -572,7 +572,7 @@ function dAbrirForm(id) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="dSalvar()">${d?'Salvar alterações':'Registrar decisão'}</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('df-titulo')?.focus();
 }
 
@@ -673,7 +673,7 @@ async function ciSalvarComoDecisao_real(ciId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="cdFinalizar('${ciId}')">Registrar decisão</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function cdFinalizar(ciId) {
