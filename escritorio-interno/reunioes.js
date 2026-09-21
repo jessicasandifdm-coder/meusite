@@ -334,7 +334,7 @@ function rEditarCampo(id, campo, valorAtual) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="rSalvarCampo('${id}','${campo}')">Salvar</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('rf-campo-val')?.focus();
 }
 
@@ -412,7 +412,7 @@ function rNovaDecisao(reuniaoId, area) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="rSalvarDecisao('${reuniaoId}','${area}')">Salvar decisão</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('rd-titulo')?.focus();
 }
 
@@ -484,7 +484,7 @@ function rNovaTarefa(reuniaoId, area, responsavel) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="rSalvarTarefa('${reuniaoId}','${area}')">Criar tarefa</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('rt-titulo')?.focus();
 }
 
@@ -608,7 +608,7 @@ function rAbrirForm(id) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="rSalvar()">${r?'Salvar alterações':'Criar reunião'}</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('rf-titulo')?.focus();
 }
 
