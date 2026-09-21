@@ -364,7 +364,7 @@ function ciConverterEmTarefa(ciId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="ciSalvarComoTarefa('${ciId}')">Criar tarefa</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function ciSalvarComoTarefa(ciId) {
@@ -440,7 +440,7 @@ function ciConverterEmProjeto(ciId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="ciSalvarComoProjeto('${ciId}')">Criar projeto</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function ciSalvarComoProjeto(ciId) {
@@ -515,7 +515,7 @@ function ciConverterEmReuniao(ciId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="ciSalvarComoReuniao('${ciId}')">Criar reunião</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function ciSalvarComoReuniao(ciId) {
@@ -657,7 +657,7 @@ function ciAbrirForm(id) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="ciSalvar()">${c?'Salvar':'Registrar'}</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('cif-titulo')?.focus();
 }
 
