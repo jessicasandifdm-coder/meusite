@@ -383,7 +383,7 @@ function plVincularProjeto(plId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="plSalvarVinculo('${plId}','projeto')">Vincular</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 // ── VINCULAR DECISÃO ──
@@ -402,7 +402,7 @@ function plVincularDecisao(plId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="plSalvarVinculo('${plId}','decisao')">Vincular</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 // ── VINCULAR REUNIÃO ──
@@ -421,7 +421,7 @@ function plVincularReuniao(plId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="plSalvarVinculo('${plId}','reuniao')">Vincular</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function plSalvarVinculo(plId, tipo) {
@@ -473,7 +473,7 @@ function plNovaPrioridade(plId) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="plSalvarPrioridade('${plId}')">Salvar</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('pp-titulo')?.focus();
 }
 
@@ -553,7 +553,7 @@ function plAbrirRevisao(id) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="plSalvarRevisao('${id}')">Salvar revisão</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
 }
 
 async function plSalvarRevisao(id) {
@@ -668,7 +668,7 @@ function plAbrirForm(id) {
       <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
       <button class="btn btn-primary" onclick="plSalvar()">${pl?'Salvar alterações':'Criar planejamento'}</button>
     </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
+  if(typeof escAbrirModal==='function'){escAbrirModal();}else{const _ov=document.getElementById('esc-modal-overlay');if(_ov){_ov.style.opacity='1';_ov.style.pointerEvents='all';_ov.classList.add('open');}}
   document.getElementById('pf-titulo')?.focus();
 
   // Trigger para mostrar/ocultar campos de trimestre/mês
