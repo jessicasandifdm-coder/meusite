@@ -340,6 +340,7 @@ src="https://www.facebook.com/tr?id=965686512483002&ev=PageView&noscript=1"
         <p class="cap-desc">Como nossa equipe vai te encontrar para dar continuidade à sua aplicação.</p>
         <div class="campo-grupo"><label class="campo-label" for="nome">Seu nome completo</label><input class="campo-input" type="text" id="nome" placeholder="Ex: Maria Silva" autocomplete="name"><div class="campo-erro" id="erro-nome">Por favor, informe seu nome.</div></div>
         <div class="campo-grupo"><label class="campo-label" for="whatsapp">WhatsApp</label><input class="campo-input" type="tel" id="whatsapp" placeholder="(51) 99999-9999" autocomplete="tel"><div class="campo-erro" id="erro-whatsapp">Por favor, informe seu WhatsApp.</div></div>
+        <div class="campo-grupo"><label class="campo-label" for="email">E-mail</label><input class="campo-input" type="email" id="email" placeholder="seu@email.com" autocomplete="email"><div class="campo-erro" id="erro-email">Por favor, informe seu e-mail.</div></div>
         <div class="campo-grupo"><label class="campo-label" for="instagram">Instagram da sua loja</label><input class="campo-input" type="text" id="instagram" placeholder="@sualoja"></div>
         <div class="campo-grupo"><label class="campo-label" for="nome_loja">Nome da sua loja</label><input class="campo-input" type="text" id="nome_loja" placeholder="Ex: Studio Maria"><div class="campo-erro" id="erro-nome_loja">Por favor, informe o nome da sua loja.</div></div>
         <div class="cap-footer"><button type="button" class="btn-avancar" onclick="avancar(1)">Continuar →</button></div>
@@ -414,14 +415,67 @@ src="https://www.facebook.com/tr?id=965686512483002&ev=PageView&noscript=1"
 <script>
 const SUPA_URL='https://lnfghtlrzoioaotamzvy.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZmdodGxyem9pb2FvdGFtenZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg5MTMsImV4cCI6MjA5MjI4NDkxM30.lNHckve8P--rp9axdwZ6v6zTl4LLnk-1xY_kJS3wfFo';
+// ── META: capturar fbclid e UTMs da URL ──
+const _urlParams = new URLSearchParams(window.location.search);
+const _fbclid     = _urlParams.get('fbclid') || '';
+const _utmSource  = _urlParams.get('utm_source') || '';
+const _utmCampaign= _urlParams.get('utm_campaign') || '';
+const _utmMedium  = _urlParams.get('utm_medium') || '';
+
+// ── META PIXEL ──
+const META_PIXEL_ID    = '965686512483002';
+const META_ACCESS_TOKEN = 'EAAUNVSZC3l6UBSuCp6rM96KGP2lDhvzgGpSiEXzaE16KFjNLFJpBgGGeG5LLzPYCIPP6v2SGdfXlyHdldC1bn5ZCn0VnotU7ZBrZAwWJPoZB4HP833MUP9tbAZAZAYQPdlYnjHhRErx3Qtx0L9d5EGXZBKhQT771tah5gaa7cq8kBZCikCtKiugWnpFNzck0jXX4LqAZDZD';
+
+// Hash SHA-256 para dados do usuário (exigido pela Meta)
+async function sha256(str){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str.toLowerCase().trim()));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// Enviar evento Lead para a Meta via API de Conversões
+async function enviarEventoMeta(pessoaData, eventName='Lead'){
+  try {
+    const eventTime = Math.floor(Date.now()/1000);
+    const userData  = {};
+    if(pessoaData.email)    userData.em = [await sha256(pessoaData.email)];
+    if(pessoaData.whatsapp) userData.ph = [await sha256(pessoaData.whatsapp.replace(/\D/g,'55').replace(/^0/,'55'))];
+    if(pessoaData.nome){
+      const partes = pessoaData.nome.trim().split(' ');
+      userData.fn = [await sha256(partes[0])];
+      if(partes.length>1) userData.ln = [await sha256(partes.slice(1).join(' '))];
+    }
+    if(_fbclid) userData.fbc = 'fb.1.'+eventTime+'.'+_fbclid;
+
+    const payload = {
+      data: [{
+        event_name: eventName,
+        event_time: eventTime,
+        action_source: 'system_generated',
+        event_source_url: window.location.href,
+        user_data: userData,
+        custom_data: {
+          lead_event_source: 'JS Mentoria CRM',
+          event_source: 'crm'
+        }
+      }]
+    };
+    await fetch(
+      'https://graph.facebook.com/v20.0/'+META_PIXEL_ID+'/events?access_token='+META_ACCESS_TOKEN,
+      {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)}
+    );
+    console.log('[Meta] Evento '+eventName+' enviado');
+  } catch(e){ console.warn('[Meta] Erro ao enviar evento:', e); }
+}
+
 let capAtual=1;const TOTAL=5;
 function atualizarProgresso(){const p=((capAtual-1)/TOTAL)*100;document.getElementById('progressFill').style.width=p+'%';document.getElementById('progressLabel').textContent=(capAtual-1)+' / '+TOTAL;document.getElementById('progressBar').style.display=capAtual>1?'flex':'none';}
 function mostrarCap(n){document.querySelectorAll('.capitulo').forEach(c=>c.classList.remove('ativo'));const c=document.getElementById('cap-'+n);if(c){c.classList.add('ativo');c.scrollIntoView({behavior:'smooth',block:'start'});}capAtual=n;atualizarProgresso();}
 const V={1:()=>{let ok=true;[{id:'nome',e:'erro-nome'},{id:'whatsapp',e:'erro-whatsapp'},{id:'nome_loja',e:'erro-nome_loja'}].forEach(f=>{const el=document.getElementById(f.id),er=document.getElementById(f.e);if(!el.value.trim()){el.classList.add('erro');er.style.display='block';ok=false;}else{el.classList.remove('erro');er.style.display='none';}});return ok;},2:()=>{let ok=true;['tempo_loja','faturamento','canal_vendas'].forEach(n=>{const s=document.querySelector('input[name="'+n+'"]:checked'),e=document.getElementById('erro-'+n);if(!s){e.style.display='block';ok=false;}else{e.style.display='none';}});return ok;},3:()=>{let ok=true;const d=document.querySelector('input[name="desafio"]:checked'),ed=document.getElementById('erro-desafio');if(!d){ed.style.display='block';ok=false;}else{ed.style.display='none';};['transformacao','impedimento'].forEach(id=>{const el=document.getElementById(id),er=document.getElementById('erro-'+id);if(!el.value.trim()){el.classList.add('erro');er.style.display='block';ok=false;}else{el.classList.remove('erro');er.style.display='none';}});return ok;},4:()=>{let ok=true;['motivacao','resultado'].forEach(id=>{const el=document.getElementById(id),er=document.getElementById('erro-'+id);if(!el.value.trim()){el.classList.add('erro');er.style.display='block';ok=false;}else{el.classList.remove('erro');er.style.display='none';}});return ok;},5:()=>{let ok=true;['ciclo','comprometimento'].forEach(n=>{const s=document.querySelector('input[name="'+n+'"]:checked'),e=document.getElementById('erro-'+n);if(!s){e.style.display='block';ok=false;}else{e.style.display='none';}});return ok;}};
 function avancar(n){if(!V[n]())return;mostrarCap(n+1);}
 function voltar(n){mostrarCap(n-1);}
-function getDados(){const g=id=>(document.getElementById(id)?.value||'').trim(),r=n=>document.querySelector('input[name="'+n+'"]:checked')?.value||'';const fat=r('faturamento');const q=['De R$ 10 mil a R$ 20 mil','De R$ 20 mil a R$ 40 mil','De R$ 40 mil a R$ 70 mil','De R$ 70 mil a R$ 100 mil','Acima de R$ 100 mil'];return{nome:g('nome'),whatsapp:g('whatsapp'),instagram:g('instagram'),nome_loja:g('nome_loja'),lap_tempo_loja:r('tempo_loja'),lap_faturamento:fat,lap_canal_vendas:r('canal_vendas'),lap_desafio:r('desafio'),lap_transformacao:g('transformacao'),lap_impedimento:g('impedimento'),lap_motivacao:g('motivacao'),lap_resultado:g('resultado'),lap_ciclo:r('ciclo'),lap_comprometimento:r('comprometimento'),lap_info_extra:g('info_extra'),lap_qualificacao:q.includes(fat)?'qualificado':'desqualificado'};}
-async function enviarFormulario(){if(!V[5]())return;const btn=document.getElementById('btnEnviar'),erroEl=document.getElementById('form-erro');btn.disabled=true;btn.textContent='Enviando...';erroEl.style.display='none';const d=getDados();try{let pessoaId='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);const wa=d.whatsapp.replace(/\D/g,'');if(wa){const rC=await fetch(SUPA_URL+'/rest/v1/crm_pessoas?whatsapp=ilike.*'+encodeURIComponent(wa)+'*&select=id',{headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});if(rC.ok){const ex=await rC.json();if(ex.length)pessoaId=ex[0].id;}}await fetch(SUPA_URL+'/rest/v1/crm_pessoas?on_conflict=id',{method:'POST',headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:pessoaId,nome:d.nome,whatsapp:d.whatsapp,instagram:d.instagram,observacoes:'Loja: '+d.nome_loja+' | Aplicação Lapidar'})});const opId='op_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);const rOp=await fetch(SUPA_URL+'/rest/v1/crm_oportunidades',{method:'POST',headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({id:opId,pessoa_id:pessoaId,pipeline:'aplicacao',funil:'reativacao',origem:'formulario_lapidar',status:'lap_nova',responsavel:'Amanda',proxima_acao:'Analisar aplicação e entrar em contato',data_entrada:new Date().toISOString().split('T')[0],pipeline_origem:'',qualificacao_lead:d.lap_qualificacao,qualificacao_obs:'Auto pelo faturamento: '+d.lap_faturamento,lap_tempo_loja:d.lap_tempo_loja,lap_faturamento:d.lap_faturamento,lap_canal_vendas:d.lap_canal_vendas,lap_desafio:d.lap_desafio,lap_transformacao:d.lap_transformacao,lap_impedimento:d.lap_impedimento,lap_motivacao:d.lap_motivacao,lap_resultado:d.lap_resultado,lap_ciclo:d.lap_ciclo,lap_comprometimento:d.lap_comprometimento,lap_info_extra:d.lap_info_extra,lap_qualificacao:d.lap_qualificacao})});if(!rOp.ok)throw new Error('HTTP '+rOp.status);await fetch(SUPA_URL+'/rest/v1/crm_eventos',{method:'POST',headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({id:'ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),oportunidade_id:opId,pessoa_id:pessoaId,tipo:'criacao',descricao:'Aplicação Lapidar via formulário. Qualificação: '+d.lap_qualificacao+' (fat: '+d.lap_faturamento+')',status_anterior:'',status_novo:'lap_nova',responsavel:'Sistema'})});try{if(typeof fbq==='function'){fbq('track','Lead',{content_name:'Aplicação Lapidar'});if(d.lap_qualificacao==='qualificado'){fbq('trackCustom','LeadQualificado');}}}catch(_){}
+function getDados(){const g=id=>(document.getElementById(id)?.value||'').trim(),r=n=>document.querySelector('input[name="'+n+'"]:checked')?.value||'';const fat=r('faturamento');const q=['De R$ 10 mil a R$ 20 mil','De R$ 20 mil a R$ 40 mil','De R$ 40 mil a R$ 70 mil','De R$ 70 mil a R$ 100 mil','Acima de R$ 100 mil'];return{nome:g('nome'),email:g('email'),whatsapp:g('whatsapp'),instagram:g('instagram'),nome_loja:g('nome_loja'),lap_tempo_loja:r('tempo_loja'),lap_faturamento:fat,lap_canal_vendas:r('canal_vendas'),lap_desafio:r('desafio'),lap_transformacao:g('transformacao'),lap_impedimento:g('impedimento'),lap_motivacao:g('motivacao'),lap_resultado:g('resultado'),lap_ciclo:r('ciclo'),lap_comprometimento:r('comprometimento'),lap_info_extra:g('info_extra'),lap_qualificacao:q.includes(fat)?'qualificado':'desqualificado'};}
+async function enviarFormulario(){if(!V[5]())return;const btn=document.getElementById('btnEnviar'),erroEl=document.getElementById('form-erro');btn.disabled=true;btn.textContent='Enviando...';erroEl.style.display='none';const d=getDados();try{let pessoaId='p_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);const wa=d.whatsapp.replace(/\D/g,'');if(wa){const rC=await fetch(SUPA_URL+'/rest/v1/crm_pessoas?whatsapp=ilike.*'+encodeURIComponent(wa)+'*&select=id',{headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});if(rC.ok){const ex=await rC.json();if(ex.length)pessoaId=ex[0].id;}}await fetch(SUPA_URL+'/rest/v1/crm_pessoas?on_conflict=id',{method:'POST',headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:pessoaId,nome:d.nome,email:d.email||null,whatsapp:d.whatsapp,instagram:d.instagram,fbclid:_fbclid||null,observacoes:'Loja: '+d.nome_loja+' | Aplicação Lapidar'})});const opId='op_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);const rOp=await fetch(SUPA_URL+'/rest/v1/crm_oportunidades',{method:'POST',headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({id:opId,pessoa_id:pessoaId,pipeline:'aplicacao',funil:'reativacao',origem:'formulario_lapidar',fbclid:_fbclid||null,utm_source:_utmSource||null,utm_campaign:_utmCampaign||null,utm_medium:_utmMedium||null,status:'lap_nova',responsavel:'Amanda',proxima_acao:'Analisar aplicação e entrar em contato',data_entrada:new Date().toISOString().split('T')[0],pipeline_origem:'',qualificacao_lead:d.lap_qualificacao,qualificacao_obs:'Auto pelo faturamento: '+d.lap_faturamento,lap_tempo_loja:d.lap_tempo_loja,lap_faturamento:d.lap_faturamento,lap_canal_vendas:d.lap_canal_vendas,lap_desafio:d.lap_desafio,lap_transformacao:d.lap_transformacao,lap_impedimento:d.lap_impedimento,lap_motivacao:d.lap_motivacao,lap_resultado:d.lap_resultado,lap_ciclo:d.lap_ciclo,lap_comprometimento:d.lap_comprometimento,lap_info_extra:d.lap_info_extra,lap_qualificacao:d.lap_qualificacao})});if(!rOp.ok)throw new Error('HTTP '+rOp.status);
+await enviarEventoMeta({email:d.email,whatsapp:d.whatsapp,nome:d.nome});await fetch(SUPA_URL+'/rest/v1/crm_eventos',{method:'POST',headers:{apikey:SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({id:'ev_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),oportunidade_id:opId,pessoa_id:pessoaId,tipo:'criacao',descricao:'Aplicação Lapidar via formulário. Qualificação: '+d.lap_qualificacao+' (fat: '+d.lap_faturamento+')',status_anterior:'',status_novo:'lap_nova',responsavel:'Sistema'})});try{if(typeof fbq==='function'){fbq('track','Lead',{content_name:'Aplicação Lapidar'});if(d.lap_qualificacao==='qualificado'){fbq('trackCustom','LeadQualificado');}}}catch(_){}
 document.getElementById('form-section').style.display='none';document.querySelector('footer').style.display='none';const s=document.getElementById('tela-sucesso');s.style.display='flex';window.scrollTo(0,0);}catch(e){console.error(e);erroEl.textContent='Erro ao enviar. Tente novamente ou nos contate pelo WhatsApp.';erroEl.style.display='block';btn.disabled=false;btn.textContent='Enviar minha aplicação';}}
 atualizarProgresso();
 </script>
