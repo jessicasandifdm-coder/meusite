@@ -441,7 +441,18 @@ async function escSalvarConteudo() {
 
 // ── MODAL ──
 function escFecharModal() {
-  document.getElementById('esc-modal-overlay')?.classList.remove('open');
+  const ov = document.getElementById('esc-modal-overlay');
+  if (!ov) return;
+  ov.style.opacity = '0';
+  ov.style.pointerEvents = 'none';
+  ov.classList.remove('open');
+}
+function escAbrirModal() {
+  const ov = document.getElementById('esc-modal-overlay');
+  if (!ov) return;
+  ov.style.opacity = '1';
+  ov.style.pointerEvents = 'all';
+  ov.classList.add('open');
 }
 
 // ── DROPDOWN + ADICIONAR ──
