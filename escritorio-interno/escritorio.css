@@ -316,7 +316,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   z-index: 8000; opacity: 0; pointer-events: none; transition: opacity .15s;
 }
-#esc-modal-overlay.open { opacity: 1; pointer-events: all; }
+#esc-modal-overlay.open { opacity: 1 !important; pointer-events: all !important; }
 #esc-modal-box {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius-lg); padding: 24px 28px;
