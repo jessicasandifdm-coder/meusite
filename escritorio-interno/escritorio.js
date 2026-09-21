@@ -8,7 +8,7 @@ const ESC_SUPA_URL = 'https://lnfghtlrzoioaotamzvy.supabase.co';
 const ESC_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZmdodGxyem9pb2FvdGFtenZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg5MTMsImV4cCI6MjA5MjI4NDkxM30.lNHckve8P--rp9axdwZ6v6zTl4LLnk-1xY_kJS3wfFo';
 const ESC_USERS = [
   { email:'jessicasandifdm@gmail.com', senha:'Jesa2011@',   nome:'Jéssica', role:'admin'      },
-  { email:'amanda@jsmentoria.com.br',  senha:'Amanda2024@', nome:'Amanda',  role:'colaborador' },
+  { email:'artchique7@gmail.com',       senha:'Amanda2026@', nome:'Amanda',  role:'colaborador' },
 ];
 
 // ── ESTADO ──
