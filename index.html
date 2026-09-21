@@ -5006,8 +5006,11 @@ function crmFichaHtml(op, pessoa, eventos=[]){
       <div class="crm-field"><div class="crm-lbl">Tipo</div>
         <select class="crm-inp" id="crm_prox_tipo" onchange="crmProxAcaoTipo(this.value)" style="cursor:pointer">
           <option value="">— selecionar —</option>
+          <option value="enviar_proposta" ${op.tipo_proxima_acao==='enviar_proposta'?'selected':''}>Enviar proposta</option>
           <option value="primeiro_contato" ${op.tipo_proxima_acao==='primeiro_contato'?'selected':''}>Primeiro contato pós-proposta</option>
-          <option value="prova_social" ${op.tipo_proxima_acao==='prova_social'?'selected':''}>Prova social</option>
+          <option value="chamar_resposta" ${op.tipo_proxima_acao==='chamar_resposta'?'selected':''}>Chamar para ver resposta</option>
+          <option value="prova_social" ${op.tipo_proxima_acao==='prova_social'?'selected':''}>Enviar prova social</option>
+          <option value="chamar_direct" ${op.tipo_proxima_acao==='chamar_direct'?'selected':''}>Chamar no direct</option>
           <option value="condicao_3m" ${op.tipo_proxima_acao==='condicao_3m'?'selected':''}>Condição 3 meses</option>
           <option value="objecao" ${op.tipo_proxima_acao==='objecao'?'selected':''}>Responder / tratar objeção</option>
           <option value="aguardar" ${op.tipo_proxima_acao==='aguardar'?'selected':''}>Aguardar retorno</option>
@@ -6562,7 +6565,10 @@ function cerebroAbrirFU(id){
 const CRM_PROX_MSGS = {
   primeiro_contato: "Oi, [NOME]! Tudo bem?\n\nPassei aqui porque combinamos de retomar nossa conversa depois que você analisasse a proposta.\n\nConseguiu olhar com calma?\n\nQueria entender como você se sentiu em relação ao que conversamos e definir contigo os próximos passos.",
   prova_social: "Oi, [NOME]!\n\nLembrei de você porque vi esse resultado da [ALUNA/LOJA] e não poderia deixar de compartilhar contigo, principalmente por aquilo que conversamos na nossa reunião sobre [DOR].\n\nImagino que você esteja na correria e por isso talvez não tenha conseguido me responder ainda.\n\nQueria retomar contigo para a gente definir os próximos passos.",
-  condicao_3m: "Oi, [NOME]!\n\nLembrei de você porque consegui uma condição diferente para quem quer começar agora com um acompanhamento mais enxuto.\n\nPensei em você porque acredito que pode fazer sentido para o momento da [LOJA].\n\nSe tiver interesse, te explico como funciona."
+  condicao_3m: "Oi, [NOME]!\n\nLembrei de você porque consegui uma condição diferente para quem quer começar agora com um acompanhamento mais enxuto.\n\nPensei em você porque acredito que pode fazer sentido para o momento da [LOJA].\n\nSe tiver interesse, te explico como funciona.",
+  enviar_proposta: "Oi, [NOME]! Que ótimo ter conversado contigo hoje.\n\nComo combinamos, preparei a proposta da Lapidar especialmente para o momento da sua loja.\n\nManda uma mensagem quando puder dar uma olhada — quero entender o que fez sentido pra você e definir os próximos passos juntas.",
+  chamar_resposta: "Oi, [NOME]! Tudo bem?\n\nPassei aqui porque enviei a proposta há alguns dias e queria saber se você conseguiu analisar com calma.\n\nTem alguma dúvida ou algo que ficou em aberto? Fico à disposição para te ajudar a tomar a melhor decisão.",
+  chamar_direct: "Oi, [NOME]! Passei aqui porque tentei retomar nossa conversa algumas vezes e não recebi seu retorno.\n\nEntendo que a rotina da loja é corrida. Se ainda não for o momento certo, tudo bem — mas queria entender se posso te ajudar de alguma forma antes de encerrar por aqui."
 };
 
 function crmRenderAcaoHoje(op){
@@ -6572,8 +6578,11 @@ function crmRenderAcaoHoje(op){
   const hoje = today();
   const data = op.data_proxima_acao||'';
   const NOMES = {
+    enviar_proposta:'Enviar proposta',
     primeiro_contato:'Primeiro contato pós-proposta',
-    prova_social:'Prova social',
+    chamar_resposta:'Chamar para ver resposta',
+    prova_social:'Enviar prova social',
+    chamar_direct:'Chamar no direct',
     condicao_3m:'Condição 3 meses',
     objecao:'Responder / tratar objeção',
     aguardar:'Aguardar retorno',
@@ -6648,8 +6657,11 @@ function crmRenderAcaoHoje(op){
   const hoje = today();
   const data = op.data_proxima_acao||'';
   const NOMES = {
+    enviar_proposta:'Enviar proposta',
     primeiro_contato:'Primeiro contato pós-proposta',
-    prova_social:'Prova social',
+    chamar_resposta:'Chamar para ver resposta',
+    prova_social:'Enviar prova social',
+    chamar_direct:'Chamar no direct',
     condicao_3m:'Condição 3 meses',
     objecao:'Responder / tratar objeção',
     aguardar:'Aguardar retorno',
