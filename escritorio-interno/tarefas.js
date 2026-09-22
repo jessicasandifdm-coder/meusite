@@ -100,8 +100,9 @@ function tLimparFiltros() {
 }
 
 async function tCarregar() {
+  const _usuario = ESC_STATE?.usuario || 'Jéssica';
   try {
-    const data = await escGet('/rest/v1/escritorio_tarefas?order=created_at.desc');
+    const data = await escGet('/rest/v1/escritorio_tarefas?responsavel_id=eq.'+encodeURIComponent(_usuario)+'&order=prazo.asc,created_at.desc');
     _tarefasCache = Array.isArray(data) ? data : [];
   } catch(e) {
     _tarefasCache = [];
@@ -416,8 +417,9 @@ async function tConcluir(id) {
 // ── DASHBOARD: bloco tarefas ──
 async function tDashboardBloco() {
   const hoje = new Date().toISOString().split('T')[0];
+  const _usr = ESC_STATE?.usuario || 'Jéssica';
   let tarefas = [];
-  try { tarefas = await escGet('/rest/v1/escritorio_tarefas?status=neq.concluida&order=prioridade.asc'); }
+  try { tarefas = await escGet('/rest/v1/escritorio_tarefas?responsavel_id=eq.'+encodeURIComponent(_usr)+'&status=neq.concluida&order=prioridade.asc'); }
   catch(e) { tarefas = escMockTarefas(); }
 
   const paraHoje  = tarefas.filter(t => t.prazo === hoje);
