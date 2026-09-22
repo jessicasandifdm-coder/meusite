@@ -4381,7 +4381,7 @@ function checkSession(){
 
 function doLogin(){
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const senha = document.getElementById('loginSenha').value;
+  const senha = document.getElementById('loginSenha').value.trim();
   const errEl = document.getElementById('loginError');
   const user = USERS.find(u => u.email === email && u.senha === senha);
   if(user){
