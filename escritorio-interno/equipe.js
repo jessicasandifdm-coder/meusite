@@ -142,14 +142,12 @@ async function equipeRenderPortal(el, nomeUsuario) {
 
   let tarefas=[], reunioes=[], rotinas=[];
   try { tarefas  = await escGet(`/rest/v1/escritorio_tarefas?responsavel_id=eq.${encodeURIComponent(nomeUsuario)}&status=neq.concluida&order=prazo.asc`); } catch(e) {}
-  try { reunioes = await escGet(`/rest/v1/escritorio_reunioes?status=neq.cancelada&order=data.asc`); } catch(e) {}
+  try { reunioes = await escGet(`/rest/v1/escritorio_reunioes?responsavel_id=eq.${encodeURIComponent(nomeUsuario)}&status=neq.cancelada&order=data.asc`); } catch(e) {}
   try { rotinas  = await escGet(`/rest/v1/escritorio_rotinas?responsavel_id=eq.${encodeURIComponent(nomeUsuario)}&ativo=eq.true&order=proxima_execucao.asc`); } catch(e) {}
 
   // Participações em reuniões (via reuniao_participantes)
-  let minhasReunioes = reunioes.filter(r =>
-    r.responsavel_id === nomeUsuario ||
-    r.titulo?.toLowerCase().includes(nomeUsuario.toLowerCase())
-  );
+  // Reuniões já vêm filtradas por responsavel_id da query
+  let minhasReunioes = reunioes;
   const tarefasHoje  = tarefas.filter(t => t.prazo === hojeStr);
   const tarefasAtras = tarefas.filter(t => t.prazo && t.prazo < hojeStr);
   const rodinasHoje  = rotinas.filter(r => r.proxima_execucao === hojeStr);
@@ -301,7 +299,7 @@ function equipeVerDia(ds, nomeUsuario) {
 
   Promise.all([
     escGet(`/rest/v1/escritorio_tarefas?responsavel_id=eq.${encodeURIComponent(nomeUsuario)}&prazo=eq.${ds}`).catch(()=>[]),
-    escGet(`/rest/v1/escritorio_reunioes?data=eq.${ds}&status=neq.cancelada`).catch(()=>[]),
+    escGet(`/rest/v1/escritorio_reunioes?data=eq.${ds}&responsavel_id=eq.${encodeURIComponent(nomeUsuario)}&status=neq.cancelada`).catch(()=>[]),
   ]).then(([tarefas, reunioes]) => {
     const hojeStr = new Date().toISOString().split('T')[0];
     document.getElementById('esc-modal-body').innerHTML = `
