@@ -4639,7 +4639,39 @@ async function crmCarregar(){
     if(!rOp.ok||!rPes.ok) throw new Error('HTTP error');
     _crmOps = await rOp.json();
     _crmPessoas = await rPes.json();
+    // Notificação de novos leads BV
+    crmNotificarNovosBV();
   }catch(e){console.error('CRM carregar:',e);}
+}
+function crmNotificarNovosBV(){
+  const novos = _crmOps.filter(op=>{
+    if(op.funil!=='bv' || op.visto_em) return false;
+    const dataEnt = op.data_entrada || op.created_at?.split('T')[0] || '';
+    if(!dataEnt) return false;
+    const horas = (Date.now()-new Date(dataEnt+'T00:00:00').getTime())/3600000;
+    return horas < 48;
+  });
+  if(!novos.length) return;
+  // Badge no menu BV
+  const tabBV = document.querySelector('[data-pipeline="bv"]');
+  if(tabBV && !tabBV.querySelector('.bv-novo-badge')){
+    const badge = document.createElement('span');
+    badge.className = 'bv-novo-badge';
+    badge.textContent = novos.length;
+    badge.style.cssText = 'display:inline-block;background:var(--g4);color:#fff;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;margin-left:5px;vertical-align:middle';
+    tabBV.appendChild(badge);
+  }
+  // Toast discreto
+  const jaNotificou = sessionStorage.getItem('bv_notif_'+novos.map(o=>o.id).sort().join());
+  if(!jaNotificou){
+    sessionStorage.setItem('bv_notif_'+novos.map(o=>o.id).sort().join(), '1');
+    setTimeout(()=>{
+      if(typeof showSaved==='function'){
+        const el=document.getElementById('savedIndicator');
+        if(el){ el.textContent=novos.length+' novo'+(novos.length>1?'s':'')+' no BV'; el.style.color='var(--g4)'; setTimeout(()=>{el.textContent='✓ salvo';el.style.color='';},4000); }
+      }
+    }, 1500);
+  }
 }
 
 // ── Pipeline ──
@@ -4759,7 +4791,12 @@ function crmCardHtml(op){
     : '';
   const atrasadoBorder = (op.proxima_acao && op.data_proxima_acao && op.data_proxima_acao < today())
     ? 'border-left:3px solid var(--coral);' : '';
-  return `<div class="crm-card" draggable="true" style="${atrasadoBorder}"
+  const dataEntBorder = op.data_entrada || op.created_at?.split('T')[0] || '';
+  const horasCardBV   = dataEntBorder ? (Date.now()-new Date(dataEntBorder+'T00:00:00').getTime())/3600000 : 9999;
+  const novoBorder    = (op.funil==='bv' && horasCardBV < 48 && !op.visto_em)
+    ? 'border:1.5px solid var(--g4);box-shadow:0 0 0 1px rgba(62,207,142,.2);' : '';
+  const borderFinal   = atrasadoBorder || novoBorder;
+  return `<div class="crm-card" draggable="true" style="${borderFinal}"
     ondragstart="crmDragStart(event,'${op.id}')"
     ondragend="document.querySelectorAll('.crm-col').forEach(c=>c.classList.remove('drag-over'))"
     onclick="crmAbrirFicha('${op.id}')">
@@ -4774,7 +4811,25 @@ function crmCardHtml(op){
       return `<div style="font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.04em">DESDE ${MESES[parseInt(m)-1]}/${a.slice(2)}</div>`;
     })()}
     <div class="crm-card-row">${fTag}${origemLine}<span style="color:var(--text3)">${crmEsc(op.responsavel)||'—'}</span></div>
-    ${op.funil==='bv' && op.created_at ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Entrou ${crmFmtDt(op.created_at.split('T')[0])}</div>` : ''}
+    ${(()=>{
+      if(op.funil!=='bv') return '';
+      const dataEnt = op.data_entrada || op.created_at?.split('T')[0] || '';
+      const agora   = Date.now();
+      const entradaTs = dataEnt ? new Date(dataEnt+'T00:00:00').getTime() : 0;
+      const horas   = entradaTs ? (agora - entradaTs) / 3600000 : 9999;
+      const isNovo  = horas < 48 && !op.visto_em;
+      const DIAS_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+      const dObj    = dataEnt ? new Date(dataEnt+'T12:00:00') : null;
+      const diaSem  = dObj ? DIAS_PT[dObj.getDay()] : '';
+      return `
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+          ${dataEnt ? `<div style="font-size:10px;color:var(--text3);display:flex;align-items:center;gap:3px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ${diaSem} ${crmFmtDt(dataEnt)}
+          </div>` : ''}
+          ${isNovo ? `<span style="font-size:9px;font-weight:700;letter-spacing:.06em;background:var(--g4);color:#fff;border-radius:3px;padding:1px 5px">NOVO</span>` : ''}
+        </div>`;
+    })()}
     ${reuniaoLine}${acaoLine}${noshowLine}${qualifLine}
   </div>`;
 }
@@ -4887,6 +4942,19 @@ function crmNovaOportunidade(){
 async function crmAbrirFicha(opId){
   _crmEditId = opId;
   const op = _crmOps.find(o=>o.id===opId)||{};
+  // Marcar como visto se BV novo e ainda não visto
+  if(op.funil==='bv' && !op.visto_em){
+    const dataEnt = op.data_entrada || op.created_at?.split('T')[0] || '';
+    const horas   = dataEnt ? (Date.now()-new Date(dataEnt+'T00:00:00').getTime())/3600000 : 9999;
+    if(horas < 48){
+      const agoraISO = new Date().toISOString();
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+opId,{
+        method:'PATCH',
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+        body:JSON.stringify({visto_em:agoraISO})
+      }).then(()=>{ const idx=_crmOps.findIndex(o=>o.id===opId); if(idx>=0) _crmOps[idx].visto_em=agoraISO; crmFiltrar(); });
+    }
+  }
   const pessoa = _crmPessoas.find(p=>p.id===op.pessoa_id)||{};
   let eventos = [];
   try{
