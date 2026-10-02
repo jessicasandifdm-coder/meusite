@@ -675,7 +675,7 @@ button{font-family:var(--font)}
 
   <!-- KPIs topo -->
   <div id="centralKpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px">
-    <div class="central-kpi" id="ck-vendas"><div class="ck-val" id="ck-vendas-val">—</div><div class="ck-lbl">Vendas</div><div class="ck-delta" id="ck-vendas-delta"></div></div>
+    <div class="central-kpi" id="ck-vendas"><div class="ck-val" id="ck-vendas-val">—</div><div class="ck-lbl">Vendas</div><div class="ck-delta" id="ck-vendas-delta"></div><div id="ck-vendas-origem" style="display:none;font-size:10px;color:var(--amber);background:rgba(240,184,74,.12);border-radius:4px;padding:2px 6px;margin-top:4px;font-weight:600"></div></div>
     <div class="central-kpi" id="ck-fat"><div class="ck-val" id="ck-fat-val">—</div><div class="ck-lbl">Faturamento</div><div class="ck-delta" id="ck-fat-delta"></div></div>
     <div class="central-kpi" id="ck-reun"><div class="ck-val" id="ck-reun-val">—</div><div class="ck-lbl">Realizadas</div><div class="ck-delta" id="ck-reun-delta"></div></div>
     <div class="central-kpi" id="ck-conv"><div class="ck-val" id="ck-conv-val">—</div><div class="ck-lbl">Fechamento (reun→venda)</div><div class="ck-delta" id="ck-conv-delta"></div></div>
@@ -2855,7 +2855,7 @@ async function crmBuscarDadosMes(ano, mes){
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&select=id,reagendamento_count', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&status=eq.nao_compareceu&select=id', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+iISO+'&data_realizada=lte.'+fISO+'&select=id', {headers:H}),
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+iISO+'&data_ganho=lte.'+fISO+'&select=id,valor_venda', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+iISO+'&data_ganho=lte.'+fISO+'&select=id,valor_venda,data_entrada,funil,pipeline', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim+'&select=id,bv_qualificacao', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/vendas?data_venda=gte.'+inicio+'&data_venda=lte.'+fim+'&status=neq.cancelada&select=id,valor', {headers:H}),
     ]);
@@ -2885,6 +2885,10 @@ async function crmBuscarDadosMes(ano, mes){
       noshow:         noshowRows.length,
       ganho:          ganhoRows.length,
       fat_ganho:      ganhoRows.reduce((s,r)=>s+(parseFloat(r.valor_venda)||0),0),
+      ganho_mes_anterior: ganhoRows.filter(r=>{
+        if(!r.data_entrada) return false;
+        return r.data_entrada.slice(0,7) < `${ano}-${String(mes+1).padStart(2,'0')}`;
+      }).length,
       vendas_avulsas: vendasRows.length,
       fat_avulsas:    vendasRows.reduce((s,r)=>s+(parseFloat(r.valor)||0),0),
       bv_total:       bvRows.length,
@@ -4061,6 +4065,12 @@ async function renderCentral(){
     }
   }
   setKpi('vendas', vendas, prevVend,  false);
+  const _nAnt = crmD.ganho_mes_anterior || 0;
+  const _elAnt = document.getElementById('ck-vendas-origem');
+  if(_elAnt){
+    _elAnt.textContent = _nAnt > 0 ? _nAnt+' de mês anterior' : '';
+    _elAnt.style.display = _nAnt > 0 ? 'inline-block' : 'none';
+  }
   setKpi('fat',    fat,    prevFat,   true);
   setKpi('reun',   reun,   prevReun,  false);
   setKpi('conv',   taxaFech+'%', null, false);
@@ -4754,6 +4764,15 @@ function crmCardHtml(op){
     ondragend="document.querySelectorAll('.crm-col').forEach(c=>c.classList.remove('drag-over'))"
     onclick="crmAbrirFicha('${op.id}')">
     <div class="crm-card-name">${crmEsc(p.nome)}</div>
+    ${(()=>{
+      if(!op.data_entrada) return '';
+      const mesOrig = op.data_entrada.slice(0,7);
+      const mesAtual = new Date().toISOString().slice(0,7);
+      if(mesOrig >= mesAtual) return '';
+      const [a,m] = mesOrig.split('-');
+      const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+      return `<div style="font-size:9px;color:var(--amber);font-weight:600;letter-spacing:.04em">DESDE ${MESES[parseInt(m)-1]}/${a.slice(2)}</div>`;
+    })()}
     <div class="crm-card-row">${fTag}${origemLine}<span style="color:var(--text3)">${crmEsc(op.responsavel)||'—'}</span></div>
     ${op.funil==='bv' && op.created_at ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="width:10px;height:10px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Entrou ${crmFmtDt(op.created_at.split('T')[0])}</div>` : ''}
     ${reuniaoLine}${acaoLine}${noshowLine}${qualifLine}
