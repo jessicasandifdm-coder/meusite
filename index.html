@@ -4652,11 +4652,21 @@ function crmFiltrar(){
   const def     = CRM_PIPELINES[_crmPipeline];
   const statusDoPipeline = def.cols.map(c=>c.status);
 
+  // Status encerrados só aparecem no mês em que foram fechados
+  const STATUS_ENCERRADOS = ['ganho','perda','perdido','encerrado','arquivado'];
+  const mesAtual = new Date().toISOString().slice(0,7); // 'YYYY-MM'
+
   const filtradas = _crmOps.filter(op=>{
     // Pertence a este pipeline?
     if(op.pipeline !== _crmPipeline) return false;
     // Status válido para este pipeline?
     if(!statusDoPipeline.includes(op.status)) return false;
+    // Encerrados (ganho/perda): só mostra se foi fechado neste mês
+    if(STATUS_ENCERRADOS.includes(op.status)){
+      const dataRef = op.data_fechamento || op.updated_at || op.created_at || '';
+      const mesOp   = dataRef.slice(0,7);
+      if(mesOp && mesOp !== mesAtual) return false;
+    }
     if(fResp && op.responsavel !== fResp) return false;
     if(busca){
       const p = _crmPessoas.find(x=>x.id===op.pessoa_id)||{};
@@ -4764,6 +4774,8 @@ async function crmDrop(e, novoStatus){
 
   const statusAnterior = op.status;
   const agora = new Date().toISOString();
+  // Registrar data de fechamento ao encerrar
+  const STATUS_ENCERRADOS_DF = ['ganho','perda','perdido','encerrado','arquivado'];
 
   // Determinar novo pipeline pelas regras automáticas
   const novoPipeline = CRM_STATUS_PIPELINE_RULES[novoStatus] || op.pipeline;
