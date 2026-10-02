@@ -4767,8 +4767,12 @@ function crmRenderKanban(cols, ops){
 function crmCardHtml(op){
   const p = _crmPessoas.find(x=>x.id===op.pessoa_id)||{nome:'?'};
   const fTag = `<span class="crm-card-tag ${op.funil}">${CRM_FUNIL_LABELS[op.funil]||op.funil}</span>`;
-  const origemLine = op.pipeline_origem
-    ? `<span class="crm-card-tag" style="color:var(--text3)">via ${CRM_PIPELINES[op.pipeline_origem]?.label||op.pipeline_origem}</span>` : '';
+  // origemLine só aparece se o funil de origem é DIFERENTE do pipeline atual
+  // (evita mostrar "BV" + "via BV" ao mesmo tempo)
+  const origemLabel = CRM_PIPELINES[op.pipeline_origem]?.label || CRM_FUNIL_LABELS[op.pipeline_origem] || op.pipeline_origem;
+  const funilAtualLabel = CRM_FUNIL_LABELS[op.funil] || op.funil;
+  const origemLine = (op.pipeline_origem && op.pipeline_origem !== op.pipeline && op.pipeline_origem !== op.funil)
+    ? `<span class="crm-card-tag" style="color:var(--text3)">via ${origemLabel}</span>` : '';
   // Só mostra a data da reunião se ainda está em status de agendamento
   const mostrarReuniao = ['agendado','nao_compareceu'].includes(op.status);
   const reuniaoLine = (op.reuniao_data && mostrarReuniao)
@@ -4887,7 +4891,9 @@ async function crmDrop(e, novoStatus){
     await fetch(SUPA_URL+'/rest/v1/crm_oportunidades?id=eq.'+opId,{
       method:'PATCH',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body:JSON.stringify({status:novoStatus, pipeline:novoPipeline, ...datesUpdate, ...pipelineOrigemUpdate})
+      body:JSON.stringify({status:novoStatus, pipeline:novoPipeline, ...datesUpdate, ...pipelineOrigemUpdate,
+        // Limpar próxima ação ao avançar de etapa (novo status requer nova ação)
+        proxima_acao: '', tipo_proxima_acao: '', data_proxima_acao: null, proxima_acao_msg: ''})
     });
 
     // Evento no histórico
