@@ -534,6 +534,30 @@ button{font-family:var(--font)}
 .crm-transcricao-wrap{margin-top:14px}
 
 /* ── Badge de notificação nos tabs ── */
+/* ── CRM Arquivo (Ganhos/Perdidos histórico) ── */
+.crm-arquivo-panel{display:none}
+.crm-arquivo-panel.ativo{display:block}
+.crm-arquivo-filtros{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.crm-arquivo-tipo{display:flex;gap:4px}
+.crm-arq-tipo-btn{font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid var(--border2);background:none;color:var(--text3);cursor:pointer;transition:all .15s}
+.crm-arq-tipo-btn.active{background:var(--g3);border-color:var(--g3);color:#fff}
+.crm-arq-tipo-btn.perdido.active{background:var(--coral);border-color:var(--coral);color:#fff}
+.crm-arquivo-lista{display:flex;flex-direction:column;gap:8px;max-height:calc(100vh - 280px);overflow-y:auto}
+.crm-arq-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;cursor:pointer;transition:border-color .15s}
+.crm-arq-card:hover{border-color:var(--g3)}
+.crm-arq-card.ganho{border-left:3px solid var(--g3)}
+.crm-arq-card.perdido{border-left:3px solid var(--coral)}
+.crm-arq-card-head{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.crm-arq-nome{font-size:13px;font-weight:600;color:var(--text)}
+.crm-arq-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase}
+.crm-arq-tag.ganho{background:rgba(116,198,157,.15);color:var(--g4)}
+.crm-arq-tag.perdido{background:rgba(224,112,112,.12);color:var(--coral)}
+.crm-arq-meta{font-size:11px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap}
+.crm-arq-vazio{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+.crm-arquivo-resumo{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.crm-arq-stat{font-size:12px;color:var(--text3);background:var(--surface2);padding:6px 12px;border-radius:6px}
+.crm-arq-stat b{color:var(--text);font-weight:600}
+
 .crm-pipe-tab{position:relative}
 .crm-tab-badge{
   position:absolute;
@@ -897,6 +921,7 @@ button{font-family:var(--font)}
     <button class="crm-pipe-tab" onclick="crmSetPipeline('reativacao',this)">Reativação</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('nutricao',this)">Nutrição</button>
     <button class="crm-pipe-tab" onclick="crmSetPipeline('aplicacao',this);crmLimparBadge()">Aplicação Lapidar<span class="crm-tab-badge" id="badgeAplicacao"></span></button>
+    <button class="crm-pipe-tab" onclick="crmAbrirArquivo(this)" id="crmTabArquivo" style="border-left:1px solid var(--border2);margin-left:4px;padding-left:16px">Arquivo</button>
   </div>
 
   <!-- KPIs dinâmicos por pipeline -->
@@ -935,6 +960,21 @@ button{font-family:var(--font)}
 
   <!-- Kanban -->
   <div class="crm-kanban" id="crmKanban"></div>
+
+  <!-- Arquivo Ganhos/Perdidos -->
+  <div class="crm-arquivo-panel" id="crmArquivoPanel">
+    <div class="crm-arquivo-filtros">
+      <div class="crm-arquivo-tipo">
+        <button class="crm-arq-tipo-btn active" id="arqBtnGanho" onclick="crmArquivoTipo('ganho')">Ganhos</button>
+        <button class="crm-arq-tipo-btn perdido" id="arqBtnPerdido" onclick="crmArquivoTipo('perdido')">Perdidos</button>
+      </div>
+      <input type="month" id="arqMes" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font);font-size:12px;padding:5px 8px;cursor:pointer" onchange="crmArquivoRender()">
+      <input class="crm-search" type="text" id="arqBusca" placeholder="Buscar nome, Instagram..." oninput="crmArquivoRender()" style="max-width:240px">
+      <span style="font-size:12px;color:var(--text3);margin-left:auto" id="arqPeriodoInfo"></span>
+    </div>
+    <div class="crm-arquivo-resumo" id="arqResumo"></div>
+    <div class="crm-arquivo-lista" id="arqLista"></div>
+  </div>
 
 </div>
 
@@ -2853,7 +2893,7 @@ async function crmBuscarDadosMes(ano, mes){
     const [rAbord, rAgend, rNoShow, rRealiz, rGanho, rBv, rVendas] = await Promise.all([
       fetch(SUPA_URL+'/rest/v1/crm_abordagens?data_reg=gte.'+inicio+'&data_reg=lte.'+fim, {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&select=id,reagendamento_count', {headers:H}),
-      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_agendamento=gte.'+iISO+'&data_agendamento=lte.'+fISO+'&status=eq.nao_compareceu&select=id', {headers:H}),
+      fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_no_show=gte.'+iISO+'&data_no_show=lte.'+fISO+'&select=id', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_realizada=gte.'+iISO+'&data_realizada=lte.'+fISO+'&select=id', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?data_ganho=gte.'+iISO+'&data_ganho=lte.'+fISO+'&select=id,valor_venda,data_entrada,funil,pipeline', {headers:H}),
       fetch(SUPA_URL+'/rest/v1/crm_oportunidades?pipeline=eq.bv&data_entrada=gte.'+inicio+'&data_entrada=lte.'+fim+'&select=id,bv_qualificacao', {headers:H}),
@@ -2934,13 +2974,13 @@ async function renderMensal(){
   const temLegado = (aggLeg.abord||0) > 0;
 
   // Abordagens = SOMENTE primeiros contatos (anti-dup por dia via get_anual)
-  const abord   = temLegado ? (aggLeg.abord||0) : (crmDados.abord||0);
-  const abordPc = temLegado ? (aggLeg.pc?.abord||0) : (crmDados.abord_pc||0);
-  const abordIs = temLegado ? (aggLeg.is?.leads||0) : (crmDados.abord_isca||0);
-  const abordRe = temLegado ? (aggLeg.re?.abord||0) : (crmDados.abord_reat||0);
-  const abordFu = temLegado
-    ? ((aggLeg.pc_fu||0)+(aggLeg.reat_fu||0)+(aggLeg.isca_fu||0)+(aggLeg.followup||0))
-    : (crmDados.followup||0);
+  // SOMA legado + CRM: são períodos distintos do mesmo mês (ex: 1-14/ago = legado, 15+/ago = CRM)
+  const abord   = (aggLeg.abord||0) + (crmDados.abord||0);
+  const abordPc = (aggLeg.pc?.abord||0) + (crmDados.abord_pc||0);
+  const abordIs = (aggLeg.is?.leads||0) + (crmDados.abord_isca||0);
+  const abordRe = (aggLeg.re?.abord||0) + (crmDados.abord_reat||0);
+  const abordFu = ((aggLeg.pc_fu||0)+(aggLeg.reat_fu||0)+(aggLeg.isca_fu||0)+(aggLeg.followup||0))
+    + (crmDados.followup||0);
   const followup = abordFu;
 
   // Reuniões: SOMA legado + CRM (períodos diferentes, sem duplicidade)
@@ -4684,7 +4724,122 @@ function crmSetPipeline(pipeline, btn){
   if(sub) sub.textContent = def.sub;
   const abordBar = document.getElementById('crmAbordBar');
   if(abordBar) abordBar.style.display = def.showAbord ? '' : 'none';
+  // Esconder painel arquivo, mostrar kanban e toolbar
+  const arqPanel = document.getElementById('crmArquivoPanel');
+  const kanban   = document.getElementById('crmKanban');
+  const toolbar  = document.querySelector('.crm-toolbar');
+  const kpiRow   = document.getElementById('crmKpiRow');
+  if(arqPanel) arqPanel.classList.remove('ativo');
+  if(kanban)   kanban.style.display = '';
+  if(toolbar)  toolbar.style.display = '';
+  if(kpiRow)   kpiRow.style.display = '';
   crmFiltrar();
+}
+
+// ── Arquivo Ganhos/Perdidos ──
+let _arqTipo = 'ganho';
+
+function crmAbrirArquivo(btn){
+  document.querySelectorAll('.crm-pipe-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  // Esconder kanban e toolbar, mostrar painel arquivo
+  const kanban   = document.getElementById('crmKanban');
+  const toolbar  = document.querySelector('.crm-toolbar');
+  const kpiRow   = document.getElementById('crmKpiRow');
+  const abordBar = document.getElementById('crmAbordBar');
+  const arqPanel = document.getElementById('crmArquivoPanel');
+  if(kanban)   kanban.style.display = 'none';
+  if(toolbar)  toolbar.style.display = 'none';
+  if(kpiRow)   kpiRow.style.display = 'none';
+  if(abordBar) abordBar.style.display = 'none';
+  if(arqPanel) arqPanel.classList.add('ativo');
+  // Pré-selecionar mês atual se não tiver seleção
+  const mesInput = document.getElementById('arqMes');
+  if(mesInput && !mesInput.value) mesInput.value = new Date().toISOString().slice(0,7);
+  crmArquivoRender();
+}
+
+function crmArquivoTipo(tipo){
+  _arqTipo = tipo;
+  document.getElementById('arqBtnGanho')?.classList.toggle('active', tipo==='ganho');
+  document.getElementById('arqBtnPerdido')?.classList.toggle('active', tipo==='perdido');
+  crmArquivoRender();
+}
+
+function crmArquivoRender(){
+  const mesSel  = document.getElementById('arqMes')?.value || '';
+  const busca   = (document.getElementById('arqBusca')?.value||'').toLowerCase();
+  const listaEl = document.getElementById('arqLista');
+  const resumoEl= document.getElementById('arqResumo');
+  const infoEl  = document.getElementById('arqPeriodoInfo');
+  if(!listaEl) return;
+
+  const STATUS_GANHO   = ['ganho'];
+  const STATUS_PERDIDO = ['perdido','perda','encerrado','arquivado'];
+  const statusAlvo = _arqTipo === 'ganho' ? STATUS_GANHO : STATUS_PERDIDO;
+
+  let ops = _crmOps.filter(op=>{
+    if(!statusAlvo.includes(op.status)) return false;
+    // Data de referência por status
+    const dataRef = op.status==='ganho' ? (op.data_ganho||'') : (op.data_perda||op.data_no_show||op.updated_at||'');
+    if(mesSel && dataRef.slice(0,7) !== mesSel) return false;
+    if(busca){
+      const p = _crmPessoas.find(x=>x.id===op.pessoa_id)||{};
+      const txt = ((p.nome||'')+' '+(p.instagram||'')+' '+(p.whatsapp||'')).toLowerCase();
+      if(!txt.includes(busca)) return false;
+    }
+    return true;
+  });
+
+  // Ordenar mais recentes primeiro
+  ops = ops.sort((a,b)=>{
+    const da = (a.status==='ganho'?a.data_ganho:a.data_perda)||a.updated_at||'';
+    const db = (b.status==='ganho'?b.data_ganho:b.data_perda)||b.updated_at||'';
+    return db.localeCompare(da);
+  });
+
+  // Resumo estatístico
+  if(resumoEl){
+    const total = ops.length;
+    const fat   = ops.reduce((s,o)=>s+(parseFloat(o.valor_venda)||0),0);
+    let resumoHtml = `<div class="crm-arq-stat"><b>${total}</b> ${_arqTipo==='ganho'?'ganhos':'perdidos'}${mesSel?' em '+mesSel:''}</div>`;
+    if(_arqTipo==='ganho' && fat>0) resumoHtml += `<div class="crm-arq-stat"><b>R$ ${fat.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})}</b> faturado</div>`;
+    if(_arqTipo==='perdido' && !mesSel) resumoHtml += `<div class="crm-arq-stat" style="color:var(--teal);font-size:11px">Selecione um mês ou deixe em branco para ver todos</div>`;
+    resumoEl.innerHTML = resumoHtml;
+  }
+
+  if(ops.length===0){
+    listaEl.innerHTML = `<div class="crm-arq-vazio">${_arqTipo==='ganho'?'Nenhum ganho':'Nenhum perdido'} encontrado${mesSel?' em '+mesSel:''}.</div>`;
+    return;
+  }
+
+  listaEl.innerHTML = ops.map(op=>{
+    const p = _crmPessoas.find(x=>x.id===op.pessoa_id)||{};
+    const nome = p.nome || '(sem nome)';
+    const ig   = p.instagram ? p.instagram : '';
+    const dataRef = op.status==='ganho' ? (op.data_ganho||'') : (op.data_perda||op.data_no_show||'');
+    const dtFmt = dataRef ? crmFmtDt(dataRef) : '—';
+    const funil = CRM_FUNIL_LABELS?.[op.funil] || op.funil || '—';
+    const valor = op.valor_venda ? ' · R$ '+parseFloat(op.valor_venda).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}) : '';
+    const tipo  = op.status==='ganho' ? 'ganho' : 'perdido';
+    return `<div class="crm-arq-card ${tipo}" onclick="crmAbrirModalOportunidade('${op.id}')">
+      <div class="crm-arq-card-head">
+        <span class="crm-arq-nome">${crmEsc(nome)}</span>
+        <span class="crm-arq-tag ${tipo}">${tipo==='ganho'?'Ganho':'Perdido'}</span>
+      </div>
+      <div class="crm-arq-meta">
+        <span>${dtFmt}</span>
+        <span>${funil}</span>
+        ${ig?`<span>@${crmEsc(ig)}</span>`:''}
+        ${valor?`<span style="color:var(--g4);font-weight:600">${valor}</span>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Abre ficha de uma oportunidade a partir do arquivo
+function crmAbrirModalOportunidade(id){
+  crmAbrirFicha(id);
 }
 
 // ── Filtro ──
@@ -4704,10 +4859,17 @@ function crmFiltrar(){
     // Status válido para este pipeline?
     if(!statusDoPipeline.includes(op.status)) return false;
     // Encerrados (ganho/perda): só mostra se foi fechado neste mês
+    // Usa campos de data específicos por status para evitar falsos positivos com updated_at
     if(STATUS_ENCERRADOS.includes(op.status)){
-      const dataRef = op.data_fechamento || op.updated_at || op.created_at || '';
-      const mesOp   = dataRef.slice(0,7);
-      if(mesOp && mesOp !== mesAtual) return false;
+      let dataRef = '';
+      if(op.status==='ganho')                                        dataRef = op.data_ganho || '';
+      else if(op.status==='perdido'||op.status==='perda')            dataRef = op.data_perda || op.data_no_show || '';
+      else if(op.status==='encerrado'||op.status==='arquivado')      dataRef = op.data_perda || op.data_ganho || '';
+      // fallback conservador: só oculta se tiver uma data de referência clara de mês anterior
+      if(dataRef){
+        const mesOp = dataRef.slice(0,7);
+        if(mesOp && mesOp !== mesAtual) return false;
+      }
     }
     if(fResp && op.responsavel !== fResp) return false;
     if(busca){
@@ -5487,14 +5649,14 @@ async function crmExcluirLeadCompleto(){
   const pessoa = _crmPessoas.find(p=>p.id===pessoaId);
   const nome = pessoa?.nome || 'este lead';
 
-  if(!confirm('Excluir "'+nome+'" completamente?\
-\
-Isso vai remover:\
-• A pessoa\
-• Todas as oportunidades\
-• Todo o histórico\
-\
-Essa ação não pode ser desfeita.')) return;
+  // Verificar quantas oportunidades existem para esta pessoa
+  const opsDestaPessoa = _crmOps.filter(o=>o.pessoa_id===pessoaId);
+  const qtdOps = opsDestaPessoa.length;
+  const aviso = qtdOps > 1
+    ? `⚠️ Atenção: "${nome}" tem ${qtdOps} oportunidades em funis diferentes.\nTodas serão excluídas.\n\n`
+    : '';
+
+  if(!confirm(aviso+'Excluir "'+nome+'" completamente?\n\nIsso vai remover:\n• A pessoa\n• Todas as oportunidades ('+qtdOps+')\n• Todo o histórico\n\nEssa ação não pode ser desfeita.')) return;
 
   try{
     // Buscar todas as oportunidades da pessoa
