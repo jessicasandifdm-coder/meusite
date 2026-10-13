@@ -5392,12 +5392,14 @@ function crmBuscaDup(){
       return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
     });
     if(dup){
-      const firstOp = _crmOps.find(o=>o.pessoa_id===dup.id);
+      const opsAtivas = _crmOps.filter(o=>o.pessoa_id===dup.id&&!['ganho','perdido','perda','encerrado','arquivado','nutricao'].includes(o.status));
+      const firstOp = opsAtivas[0] || _crmOps.find(o=>o.pessoa_id===dup.id);
       const nOps = _crmOps.filter(o=>o.pessoa_id===dup.id).length;
-      av.innerHTML=`⚠ <b>${crmEsc(dup.nome)}</b> já existe (${nOps} oportunidade${nOps!==1?'s':''}).`
-        +(firstOp?` <span style="color:var(--g4);cursor:pointer;text-decoration:underline" onclick="crmFecharModal();crmAbrirFicha('${firstOp.id}')">Ver ficha</span>`:'');
-      av.classList.add('show');
-    } else { av.classList.remove('show'); av.innerHTML=''; }
+      const temAtiva = opsAtivas.length > 0;
+      av.innerHTML=`⚠ <b>${crmEsc(dup.nome)}</b> já existe no CRM (${nOps} oportunidade${nOps!==1?'s':''})${temAtiva?' — oportunidade ativa':''}.`
+        +(firstOp?` <button style="margin-left:8px;font-size:11px;padding:3px 12px;background:var(--g3);color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:600" onclick="crmFecharModal();crmAbrirFicha('${firstOp.id}')">Abrir ficha →</button>`:'');
+      av.style.cssText='background:rgba(220,50,50,.12);border:1px solid var(--coral);border-radius:6px;padding:8px 12px;color:var(--coral);font-size:12px;display:block;margin:8px 0';
+    } else { av.style.cssText=''; av.classList.remove('show'); av.innerHTML=''; }
   }, 400);
 }
 
@@ -5406,6 +5408,29 @@ async function crmSalvar(){
   const st = document.getElementById('crmSaveSt');
   const nome = (document.getElementById('crm_nome')?.value||'').trim();
   if(!nome){showError('Informe o nome da pessoa.');return;}
+
+  // Bloquear criação de nova op se a pessoa já existe no CRM
+  if(!_crmEditId){
+    const wa = (document.getElementById('crm_wa')?.value||'').replace(/\D/g,'');
+    const ig = (document.getElementById('crm_ig')?.value||'').toLowerCase().replace('@','');
+    const dup = _crmPessoas.find(p=>{
+      const pwa=(p.whatsapp||'').replace(/\D/g,'');
+      const pig=(p.instagram||'').toLowerCase().replace('@','');
+      return (wa&&pwa&&pwa===wa)||(ig&&pig&&pig===ig);
+    });
+    if(dup){
+      const ops = _crmOps.filter(o=>o.pessoa_id===dup.id);
+      const opAtiva = ops.find(o=>!['ganho','perdido','perda','encerrado','arquivado','nutricao'].includes(o.status));
+      if(opAtiva){
+        showError('⚠ '+dup.nome+' já tem uma oportunidade ativa no CRM. Abra a ficha existente para atualizar.');
+        // Destacar o aviso existente
+        const av = document.getElementById('crmDupWarn');
+        if(av) av.style.cssText='background:rgba(220,50,50,.15);border:1px solid var(--coral);border-radius:6px;padding:8px 12px;color:var(--coral);font-size:12px;display:block;margin:8px 0';
+        return;
+      }
+    }
+  }
+
   if(st){st.textContent='salvando...';st.className='crm-save-st ok';}
 
   try{
