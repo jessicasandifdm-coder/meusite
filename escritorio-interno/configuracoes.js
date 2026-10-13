@@ -4,6 +4,7 @@
    ══════════════════════════════════════════════════ */
 
 let _configIntegracoes = [];
+const GCAL_FN = 'https://lnfghtlrzoioaotamzvy.supabase.co/functions/v1/google-calendar';
 let _configPrefs       = null;
 
 async function escRenderConfiguracoes(el) {
@@ -37,37 +38,27 @@ async function escRenderConfiguracoes(el) {
             <span class="badge badge-${usuario?.role==='admin'?'blue':'gray'}" style="margin-top:4px">${usuario?.role==='admin'?'Admin':'Equipe'}</span>
           </div>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="configEditarConta()">✏ Editar perfil</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="configEditarConta()">✏ Editar perfil</button>
+          <button class="btn btn-secondary btn-sm" onclick="configTrocarSenha()">🔒 Trocar minha senha</button>
+        </div>
       </div>
 
       <!-- INTEGRAÇÕES -->
       <div class="esc-card" style="margin-bottom:16px">
         <div class="esc-card-title">Integrações</div>
 
-        <!-- Google Calendar -->
+        <!-- Google (Tasks + Agenda) -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)">
           <div style="display:flex;align-items:flex-start;gap:12px">
             <div style="font-size:26px">📅</div>
             <div>
-              <div style="font-size:14px;font-weight:600;color:var(--text)">Google Calendar</div>
-              <div style="font-size:12px;color:var(--text3);margin-top:2px">Sincronize reuniões, eventos e compromissos com o Google Calendar.</div>
-              <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
-                <div style="width:8px;height:8px;border-radius:50%;background:${ST_COR[gcal?.status||'desconectado']}"></div>
-                <span style="font-size:12px;color:${ST_COR[gcal?.status||'desconectado']}">${ST_LBL[gcal?.status||'desconectado']}</span>
-                ${gcal?.last_sync_at?`<span style="font-size:11px;color:var(--text3)">· Última sync: ${new Date(gcal.last_sync_at).toLocaleDateString('pt-BR')}</span>`:''}
-              </div>
-              <!-- Status de implementação honesto -->
-              <div style="margin-top:8px;padding:8px 12px;background:var(--amber-dim);border-radius:6px;font-size:11px;color:var(--amber)">
-                ⚠ Integração OAuth requer configuração de Client ID/Secret no servidor. Tokens nunca são armazenados no frontend. 
-                <a href="https://console.cloud.google.com/" target="_blank" style="color:var(--accent)">Configurar no Google Cloud Console →</a>
-              </div>
+              <div style="font-size:14px;font-weight:600;color:var(--text)">Google Agenda e Tarefas</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:2px">Suas tarefas vão para o Google Tasks (com check de concluir) e reuniões/eventos para o Google Agenda. Concluiu no Google, conclui aqui também.</div>
+              <div id="gcal-status" style="font-size:12px;color:var(--text3);margin-top:6px">Verificando…</div>
             </div>
           </div>
-          <div style="flex-shrink:0">
-            ${gcal?.status==='conectado'
-              ? `<button class="btn btn-secondary btn-sm" style="color:var(--red)" onclick="configDesconectarIntegracao('${gcal.id}')">Desconectar</button>`
-              : `<button class="btn btn-secondary btn-sm" onclick="configIniciarOAuth('google_calendar')" disabled title="Requer configuração de OAuth no servidor">Conectar <span style="font-size:9px;color:var(--text3)">(em breve)</span></button>`}
-          </div>
+          <div style="flex-shrink:0" id="gcal-acoes"></div>
         </div>
 
         <!-- Futuras integrações -->
@@ -123,6 +114,7 @@ async function escRenderConfiguracoes(el) {
         </div>
       </div>
     </div>`;
+  gcalAtualizarCartao();
 }
 
 // ── EDITAR CONTA ──
@@ -208,3 +200,83 @@ async function configDesconectarIntegracao(id) {
     escRenderConfiguracoes(document.getElementById('esc-content'));
   } catch(e){ escToast('Erro.'); }
 }
+
+
+// ── TROCAR SENHA (Supabase Auth) ──
+function configTrocarSenha() {
+  const box = document.getElementById('esc-modal-content') || document.getElementById('esc-modal-body');
+  if (!box) { escToast('Não foi possível abrir o formulário.'); return; }
+  box.innerHTML = `
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px">Trocar minha senha</div>
+    <div class="esc-field"><label class="esc-label">Nova senha</label>
+      <input class="esc-input" type="password" id="cs-nova" autocomplete="new-password"></div>
+    <div class="esc-field"><label class="esc-label">Repetir nova senha</label>
+      <input class="esc-input" type="password" id="cs-conf" autocomplete="new-password"></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Mínimo de 10 caracteres. Vale para todos os sistemas em que você entra com este e-mail.</div>
+    <div id="cs-err" style="font-size:12px;color:var(--red);min-height:16px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="configSalvarSenha()">Salvar senha</button>
+    </div>`;
+  if (typeof escAbrirModal === 'function') escAbrirModal();
+}
+async function configSalvarSenha() {
+  const nova = document.getElementById('cs-nova')?.value || '';
+  const conf = document.getElementById('cs-conf')?.value || '';
+  const err  = document.getElementById('cs-err');
+  if (nova.length < 10) { err.textContent = 'Use pelo menos 10 caracteres.'; return; }
+  if (nova !== conf)    { err.textContent = 'As senhas não conferem.'; return; }
+  try {
+    await JSAuth.trocarSenha(nova);
+    escFecharModal();
+    escToast('Senha alterada.');
+  } catch (e) { err.textContent = e.message; }
+}
+
+
+// ── GOOGLE (Tasks + Agenda) ──
+async function gcalChamar(action) {
+  const r = await fetch(GCAL_FN, { method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': ESC_SUPA_KEY }, body: JSON.stringify({ action }) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.erro || 'Falha na integração');
+  return d;
+}
+async function gcalAtualizarCartao() {
+  const st = document.getElementById('gcal-status'), ac = document.getElementById('gcal-acoes');
+  if (!st || !ac) return;
+  try {
+    const d = await gcalChamar('status');
+    if (d.conectado) {
+      st.innerHTML = `<span style="color:var(--green)">● Conectado</span>${d.email ? ' · ' + escEsc(d.email) : ''}`;
+      ac.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btn btn-secondary btn-sm" onclick="gcalSincronizar()">↻ Sincronizar agora</button>
+        <button class="btn btn-secondary btn-sm" style="color:var(--red)" onclick="gcalDesconectar()">Desconectar</button></div>`;
+    } else {
+      st.innerHTML = d.status === 'erro' ? '<span style="color:var(--red)">● Conexão expirou — conecte de novo</span>' : 'Não conectado';
+      ac.innerHTML = d.configurado
+        ? `<button class="btn btn-primary btn-sm" onclick="gcalConectar()">Conectar Google</button>`
+        : `<span style="font-size:11px;color:var(--amber)">Aguardando credencial do Google</span>`;
+    }
+  } catch (e) { st.textContent = 'Não foi possível verificar a conexão.'; }
+}
+async function gcalConectar() {
+  try { const d = await gcalChamar('start'); location.href = d.url; }
+  catch (e) { escToast(e.message); }
+}
+async function gcalSincronizar() {
+  escToast('Sincronizando…');
+  try { const d = await gcalChamar('sync_all'); escToast(`${d.itens} itens sincronizados.`); gcalAtualizarCartao(); }
+  catch (e) { escToast(e.message); }
+}
+async function gcalDesconectar() {
+  if (!confirm('Desconectar sua conta Google? O que já está lá continua, mas nada novo será enviado.')) return;
+  try { await gcalChamar('disconnect'); gcalAtualizarCartao(); } catch (e) { escToast(e.message); }
+}
+// retorno do Google depois de autorizar
+(function () {
+  const p = new URLSearchParams(location.search).get('gcal');
+  if (!p) return;
+  const msg = { ok: 'Google conectado! Suas tarefas e reuniões estão sendo enviadas.', cancelado: 'Conexão com o Google cancelada.', expirado: 'O link expirou. Tente conectar de novo.', erro: 'Não foi possível conectar ao Google. Tente de novo.' }[p];
+  history.replaceState(null, '', location.pathname);
+  setTimeout(() => { if (msg && typeof escToast === 'function') escToast(msg); }, 1500);
+})();

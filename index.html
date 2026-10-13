@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sistema Operacional — JS Mentoria</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="/js-auth.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -4411,39 +4412,24 @@ async function centralRefresh(){
 // ══════════════════════════════════════════
 // LOGIN
 // ══════════════════════════════════════════
-const USERS = [
-  { email: 'jessicasandifdm@gmail.com', senha: 'Jesa2011@', nome: 'Jéssica', role: 'admin'      },
-  { email: 'artchique7@gmail.com',       senha: 'Amanda2026@', nome: 'Amanda',  role: 'colaborador' }
-];
-
-function checkSession(){
-  const s = sessionStorage.getItem('js_logged');
-  if(s === 'true'){
-    document.getElementById('loginOverlay').style.display = 'none';
-    // Garantir que nome/role estejam na sessão (fallback para sessões antigas)
-    if(!sessionStorage.getItem('js_nome')) sessionStorage.setItem('js_nome','Jéssica');
-    if(!sessionStorage.getItem('esc_nome')) sessionStorage.setItem('esc_nome', sessionStorage.getItem('js_nome')||'Jéssica');
-    if(!sessionStorage.getItem('esc_role')) sessionStorage.setItem('esc_role','admin');
-    // Renderizar Central ao voltar ao sistema (já logado)
-    setTimeout(()=>{ renderCentral(); setTimeout(()=>crmVerificarLeadsNovos(), 1500); }, 400);
-  }
+// Login: feito pelo Supabase Auth (ver /js-auth.js). Nenhuma senha fica no código.
+async function checkSession(){
+  const p = window.JSAuth ? await JSAuth.restaurar() : null;
+  if(!p) return; // sem sessão: mostra a tela de login
+  document.getElementById('loginOverlay').style.display = 'none';
+  setTimeout(()=>{ renderCentral(); setTimeout(()=>crmVerificarLeadsNovos(), 1500); }, 400);
 }
 
-function doLogin(){
-  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
-  const senha = document.getElementById('loginSenha').value.trim();
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value;
+  const senha = document.getElementById('loginSenha').value;
   const errEl = document.getElementById('loginError');
-  const user = USERS.find(u => u.email === email && u.senha === senha);
-  if(user){
-    sessionStorage.setItem('js_logged','true');
-    sessionStorage.setItem('js_nome', user.nome);
-    sessionStorage.setItem('esc_nome', user.nome);
-    sessionStorage.setItem('esc_role', user.role || 'admin');
+  try{
+    await JSAuth.login(email, senha);
     document.getElementById('loginOverlay').style.display='none';
     errEl.style.display='none';
-    // Pequeno delay para garantir DOM pronto antes de renderizar
     setTimeout(()=>renderCentral(), 50);
-  } else {
+  }catch(e){
     errEl.style.display='block';
     document.getElementById('loginSenha').value='';
     document.getElementById('loginSenha').focus();
