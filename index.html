@@ -4480,13 +4480,14 @@ const CRM_PIPELINES = {
     label: 'BV',
     sub: 'Novos seguidores — do formulário à reunião',
     cols: [
-      { status:'bv_qualif',        label:'Qualificado',           color:'var(--g4)'     },
-      { status:'bv_aguardando',    label:'Aguardando decisão',    color:'var(--amber)'  },
-      { status:'bv_sem_interesse', label:'Sem interesse',         color:'var(--text3)'  },
-      { status:'bv_desqualif',     label:'Desqualificado',        color:'var(--coral)'  },
-      { status:'bv_convite',       label:'Convite p/ reunião',    color:'var(--purple)' },
-      { status:'bv_proposta_dm',   label:'Proposta enviada na DM', color:'var(--amber)' },
-      { status:'ganho',            label:'Ganho direto',          color:'var(--g4)'     },
+      { status:'bv_qualif',      label:'Qualificado',            color:'var(--g4)'     },
+      { status:'bv_convite',     label:'Convite p/ reunião',     color:'var(--purple)' },
+      { status:'bv_desqualif',   label:'Desqualificado',         color:'var(--coral)'  },
+      { status:'bv_conversa_dm', label:'Conversa na DM',         color:'var(--teal)'   },
+      { status:'bv_proposta_dm', label:'Proposta enviada na DM', color:'var(--amber)'  },
+      { status:'ganho',          label:'Ganho direto',           color:'var(--g4)'     },
+      { status:'perdido',        label:'Perdido',                color:'var(--coral)'  },
+      { status:'bv_aguardando',  label:'Aguardando decisão',     color:'var(--text3)'  },
     ],
     kpis: (ops) => [
       { label:'Total leads',       val: ops.length,                                              color:'' },
@@ -4616,7 +4617,7 @@ function crmFmtDtHr(dt){if(!dt)return'—';const d=new Date(dt);return d.toLocal
 // ── Carregar ──
 async function renderCRM(){
   await crmCarregar();
-  await crmMigrarPerdidosParaNutricao();
+  // crmMigrarPerdidosParaNutricao desabilitada — perdidos ficam no arquivo
   crmSetPipeline('reunioes', document.querySelector('.crm-pipe-tab'));
   await crmCarregarAbordHoje();
   // Verificar leads novos ao abrir o CRM
