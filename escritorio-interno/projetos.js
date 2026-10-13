@@ -208,7 +208,7 @@ async function pAbrirDetalhe(id) {
 
   // Buscar tarefas do projeto
   let tarefas = [];
-  try { tarefas = await escGet(`/rest/v1/escritorio_tarefas?projeto_id=eq.${id}&order=created_at.desc`); }
+  try { tarefas = await escGet(`/rest/v1/escritorio_tarefas?${escFiltroDono()}&projeto_id=eq.${id}&order=created_at.desc`); }
   catch(e) {}
 
   const hoje = new Date().toISOString().split('T')[0];

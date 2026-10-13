@@ -84,7 +84,7 @@ function rotLimparFiltros() {
 
 async function rotCarregar() {
   try {
-    _rotCache = await escGet('/rest/v1/escritorio_rotinas?order=proxima_execucao.asc,titulo.asc');
+    _rotCache = await escGet('/rest/v1/escritorio_rotinas?'+escFiltroDono()+'&order=proxima_execucao.asc,titulo.asc');
     if (!Array.isArray(_rotCache)) _rotCache = [];
   } catch(e) { _rotCache = []; console.error(e); }
   rotRenderKpis();
@@ -486,7 +486,8 @@ async function rotSalvarExecucao(rotId) {
       const titulo = document.getElementById('re-tarefa-titulo')?.value?.trim() || r?.titulo || 'Tarefa de rotina';
       const tObj = {
         titulo, area: r?.area||null,
-        responsavel_id: r?.responsavel_id||null,
+        responsavel_id: r?.responsavel_id||escDono(),
+        compartilhado_com: r?.compartilhado_com||[],
         prioridade:     document.getElementById('re-tarefa-prio')?.value||'normal',
         prazo:          document.getElementById('re-tarefa-prazo')?.value||null,
         projeto_id:     document.getElementById('re-tarefa-proj')?.value||null,
@@ -607,6 +608,7 @@ function rotAbrirForm(id) {
         </select>
       </div>
     </div>
+    ${escCampoCompartilhar(r)}
     <!-- Campos condicionais de frequência -->
     <div id="rf-dias-wrap" style="${(r?.frequencia||'semanal')==='semanal'?'':'display:none'}" class="esc-field">
       <label class="esc-label">Dias da semana</label>
@@ -691,7 +693,8 @@ async function rotSalvar() {
     area:            document.getElementById('rf-area')?.value||null,
     categoria:       document.getElementById('rf-cat')?.value||null,
     frequencia:      freq,
-    responsavel_id:  document.getElementById('rf-resp')?.value||null,
+    responsavel_id:  document.getElementById('rf-resp')?.value||escDono(),
+    compartilhado_com: escLerCompartilhar(),
     dias_semana:     freq==='semanal'&&diasSel.length?JSON.stringify(diasSel):null,
     dia_mes:         freq==='mensal'?parseInt(document.getElementById('rf-dia-mes')?.value)||null:null,
     horario:         document.getElementById('rf-horario')?.value||null,

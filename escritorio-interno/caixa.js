@@ -92,7 +92,7 @@ function ciLimparFiltros() {
 
 async function ciCarregar() {
   try {
-    _caixa_cache = await escGet('/rest/v1/escritorio_caixa_entrada?order=created_at.desc');
+    _caixa_cache = await escGet('/rest/v1/escritorio_caixa_entrada?'+escFiltroDono()+'&order=created_at.desc');
     if (!Array.isArray(_caixa_cache)) _caixa_cache = [];
   } catch(e) { _caixa_cache = []; console.error(e); }
   ciRenderKpis();
@@ -188,6 +188,7 @@ async function ciCapturarRapido() {
   if (!titulo) { inp?.focus(); return; }
   const obj = {
     titulo, status:'nova', prioridade:'normal',
+    responsavel_id: escDono(),
     created_by: ESC_STATE?.usuario||'Jéssica',
   };
   try {
@@ -373,7 +374,7 @@ async function ciSalvarComoTarefa(ciId) {
   const obj = {
     titulo,
     area:           document.getElementById('cc-area')?.value||null,
-    responsavel_id: document.getElementById('cc-resp')?.value||null,
+    responsavel_id: document.getElementById('cc-resp')?.value||escDono(),
     prioridade:     document.getElementById('cc-prio')?.value||'normal',
     prazo:          document.getElementById('cc-prazo')?.value||null,
     projeto_id:     document.getElementById('cc-projeto')?.value||null,
@@ -449,7 +450,7 @@ async function ciSalvarComoProjeto(ciId) {
   const obj = {
     nome,
     area:          document.getElementById('cp-area')?.value||null,
-    responsavel_id:document.getElementById('cp-resp')?.value||null,
+    responsavel_id:document.getElementById('cp-resp')?.value||escDono(),
     descricao:     document.getElementById('cp-desc')?.value||null,
     prazo:         document.getElementById('cp-prazo')?.value||null,
     status:        'planejamento',
@@ -643,6 +644,7 @@ function ciAbrirForm(id) {
         </select>
       </div>
     </div>
+    ${escCampoCompartilhar(c)}
     <div class="esc-field">
       <label class="esc-label">Descrição</label>
       <textarea class="esc-textarea" id="cif-desc" rows="4" placeholder="Contexto ou detalhes...">${escEsc(c?.descricao||'')}</textarea>
@@ -669,7 +671,8 @@ async function ciSalvar() {
     tipo:           document.getElementById('cif-tipo')?.value||null,
     area:           document.getElementById('cif-area')?.value||null,
     prioridade:     document.getElementById('cif-prio')?.value||'normal',
-    responsavel_id: document.getElementById('cif-resp')?.value||null,
+    responsavel_id: document.getElementById('cif-resp')?.value||escDono(),
+    compartilhado_com: escLerCompartilhar(),
     descricao:      document.getElementById('cif-desc')?.value||null,
     status:         document.getElementById('cif-status')?.value||'nova',
     created_by:     ESC_STATE?.usuario||'Jéssica',

@@ -102,7 +102,7 @@ function tLimparFiltros() {
 async function tCarregar() {
   const _usuario = ESC_STATE?.usuario || 'Jéssica';
   try {
-    const data = await escGet('/rest/v1/escritorio_tarefas?responsavel_id=eq.'+encodeURIComponent(_usuario)+'&order=prazo.asc,created_at.desc');
+    const data = await escGet('/rest/v1/escritorio_tarefas?'+escFiltroDono()+'&order=prazo.asc,created_at.desc');
     _tarefasCache = Array.isArray(data) ? data : [];
   } catch(e) {
     _tarefasCache = [];
@@ -314,6 +314,7 @@ function tAbrirForm(idTarefa) {
       <label class="esc-label">Descrição</label>
       <textarea class="esc-textarea" id="tf-desc" placeholder="Detalhes, contexto ou instruções...">${escEsc(t?.descricao||'')}</textarea>
     </div>
+    ${escCampoCompartilhar(t)}
     <div class="esc-field">
       <label class="esc-label">Origem</label>
       <select class="esc-select" id="tf-origem">
@@ -341,7 +342,8 @@ async function tSalvar() {
   const obj = {
     titulo,
     area,
-    responsavel_id: document.getElementById('tf-resp')?.value || null,
+    responsavel_id: document.getElementById('tf-resp')?.value || escDono(),
+    compartilhado_com: escLerCompartilhar(),
     prioridade:     document.getElementById('tf-prio')?.value || 'normal',
     status:         document.getElementById('tf-status')?.value || 'a_fazer',
     prazo:          document.getElementById('tf-prazo')?.value || null,
@@ -419,7 +421,7 @@ async function tDashboardBloco() {
   const hoje = new Date().toISOString().split('T')[0];
   const _usr = ESC_STATE?.usuario || 'Jéssica';
   let tarefas = [];
-  try { tarefas = await escGet('/rest/v1/escritorio_tarefas?responsavel_id=eq.'+encodeURIComponent(_usr)+'&status=neq.concluida&order=prioridade.asc'); }
+  try { tarefas = await escGet('/rest/v1/escritorio_tarefas?'+escFiltroDono()+'&status=neq.concluida&order=prioridade.asc'); }
   catch(e) { tarefas = escMockTarefas(); }
 
   const paraHoje  = tarefas.filter(t => t.prazo === hoje);

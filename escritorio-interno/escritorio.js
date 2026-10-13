@@ -116,6 +116,26 @@ function escNavegar(modulo) {
   }
 }
 
+// ── SEPARAÇÃO POR USUÁRIA ──
+// Cada pessoa vê só o que é dela (responsavel_id) ou o que foi marcado como compartilhado.
+function escDono() { return ESC_STATE.usuario || 'Jéssica'; }
+function escFiltroDono() {
+  const u = encodeURIComponent(escDono());
+  return `or=(responsavel_id.eq.${u},compartilhado_com.cs.%7B${u}%7D)`;
+}
+function escEhMeu(item) {
+  const u = escDono();
+  return item && (item.responsavel_id === u || (Array.isArray(item.compartilhado_com) && item.compartilhado_com.includes(u)));
+}
+function escCampoCompartilhar(item) {
+  const marcado = Array.isArray(item?.compartilhado_com) && item.compartilhado_com.length > 0;
+  return `<div class="esc-field"><label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);cursor:pointer">
+    <input type="checkbox" id="esc-compartilhar" ${marcado?'checked':''}> Compartilhado — aparece para Jéssica e Amanda</label></div>`;
+}
+function escLerCompartilhar() {
+  return document.getElementById('esc-compartilhar')?.checked ? ['Jéssica','Amanda'] : [];
+}
+
 // ── HELPERS SUPABASE ──
 async function escGet(path) {
   const r = await fetch(ESC_SUPA_URL + path, {
@@ -168,13 +188,13 @@ async function escRenderHome(el) {
   let tarefasHoje=[], tarefasAtras=[], reunioesHoje=[], projetosAtivos=[], proximos=[];
 
   try {
-    const todas = await escGet(`/rest/v1/escritorio_tarefas?responsavel_id=eq.${encodeURIComponent(usuario)}&status=neq.concluida&order=prazo.asc,prioridade.asc&limit=50`);
+    const todas = await escGet(`/rest/v1/escritorio_tarefas?${escFiltroDono()}&status=neq.concluida&order=prazo.asc,prioridade.asc&limit=50`);
     tarefasHoje = todas.filter(t => t.prazo === hojeStr);
     tarefasAtras= todas.filter(t => t.prazo && t.prazo < hojeStr);
   } catch(e) {}
 
   try {
-    reunioesHoje = await escGet(`/rest/v1/escritorio_reunioes?data=eq.${hojeStr}&status=neq.cancelada&order=hora_inicio.asc`);
+    reunioesHoje = await escGet(`/rest/v1/escritorio_reunioes?${escFiltroDono()}&data=eq.${hojeStr}&status=neq.cancelada&order=hora_inicio.asc`);
   } catch(e) {}
 
   try {
@@ -184,7 +204,7 @@ async function escRenderHome(el) {
   try {
     const amanha = new Date(hoje); amanha.setDate(amanha.getDate()+1);
     const em7 = new Date(hoje); em7.setDate(em7.getDate()+7);
-    const p = await escGet(`/rest/v1/escritorio_tarefas?responsavel_id=eq.${encodeURIComponent(usuario)}&prazo=gte.${amanha.toISOString().split('T')[0]}&prazo=lte.${em7.toISOString().split('T')[0]}&status=neq.concluida&order=prazo.asc&limit=8`);
+    const p = await escGet(`/rest/v1/escritorio_tarefas?${escFiltroDono()}&prazo=gte.${amanha.toISOString().split('T')[0]}&prazo=lte.${em7.toISOString().split('T')[0]}&status=neq.concluida&order=prazo.asc&limit=8`);
     proximos = p;
   } catch(e) {}
 

@@ -73,7 +73,7 @@ function rLimparFiltros() {
 
 async function rCarregar() {
   try {
-    _reunioesCache = await escGet('/rest/v1/escritorio_reunioes?order=data_hora_inicio.asc');
+    _reunioesCache = await escGet('/rest/v1/escritorio_reunioes?'+escFiltroDono()+'&order=data_hora_inicio.asc');
     if(!Array.isArray(_reunioesCache)) _reunioesCache = [];
   } catch(e) { _reunioesCache = []; console.error(e); }
   rRenderKpis();
@@ -493,7 +493,7 @@ async function rSalvarTarefa(reuniaoId, area) {
   if (!titulo) { escToast('Informe o título da tarefa.'); return; }
   const obj = {
     titulo, area,
-    responsavel_id: document.getElementById('rt-resp')?.value||null,
+    responsavel_id: document.getElementById('rt-resp')?.value||escDono(),
     prioridade:     document.getElementById('rt-prio')?.value||'normal',
     prazo:          document.getElementById('rt-prazo')?.value||null,
     projeto_id:     document.getElementById('rt-projeto')?.value||null,
@@ -597,6 +597,7 @@ function rAbrirForm(id) {
       <label class="esc-label">Pauta</label>
       <textarea class="esc-textarea" id="rf-pauta" rows="4" placeholder="Assuntos a discutir...">${escEsc(r?.pauta||'')}</textarea>
     </div>
+    ${escCampoCompartilhar(r)}
     <div class="esc-field">
       <label class="esc-label">Vincular a projeto</label>
       <select class="esc-select" id="rf-projeto">
@@ -634,7 +635,8 @@ async function rSalvar() {
     hora_fim:     hFim||null,
     data_hora_inicio: hIni ? `${data}T${hIni}:00` : `${data}T00:00:00`,
     data_hora_fim:    hFim ? `${data}T${hFim}:00` : null,
-    responsavel_id:   resp||null,
+    responsavel_id:   resp||escDono(),
+    compartilhado_com: escLerCompartilhar(),
     local:    document.getElementById('rf-local')?.value||null,
     link:     document.getElementById('rf-link')?.value||null,
     objetivo: document.getElementById('rf-objetivo')?.value||null,

@@ -106,7 +106,7 @@ async function calCarregarPeriodo() {
 
   // 1. Tarefas com prazo no período
   try {
-    const tarefas = await escGet(`/rest/v1/escritorio_tarefas?prazo=gte.${iniStr}&prazo=lte.${fimStr}&status=neq.concluida&order=prazo.asc`);
+    const tarefas = await escGet(`/rest/v1/escritorio_tarefas?${escFiltroDono()}&prazo=gte.${iniStr}&prazo=lte.${fimStr}&status=neq.concluida&order=prazo.asc`);
     (tarefas||[]).forEach(t=>_calItems.push({
       tipo:'tarefa', id:t.id, titulo:t.titulo, data:t.prazo, hora:null,
       area:t.area, responsavel:t.responsavel_id, prioridade:t.prioridade,
@@ -116,7 +116,7 @@ async function calCarregarPeriodo() {
 
   // 2. Reuniões no período
   try {
-    const reunioes = await escGet(`/rest/v1/escritorio_reunioes?data=gte.${iniStr}&data=lte.${fimStr}&status=neq.cancelada&order=data.asc,hora_inicio.asc`);
+    const reunioes = await escGet(`/rest/v1/escritorio_reunioes?${escFiltroDono()}&data=gte.${iniStr}&data=lte.${fimStr}&status=neq.cancelada&order=data.asc,hora_inicio.asc`);
     (reunioes||[]).forEach(r=>_calItems.push({
       tipo:'reuniao', id:r.id, titulo:r.titulo, data:r.data||r.data_hora_inicio?.substring(0,10),
       hora:r.hora_inicio||r.data_hora_inicio?.substring(11,16),
@@ -127,7 +127,7 @@ async function calCarregarPeriodo() {
 
   // 3. Eventos criados diretamente
   try {
-    const eventos = await escGet(`/rest/v1/escritorio_eventos?data_inicio=gte.${iniStr}&data_inicio=lte.${fimStr}&status=eq.ativo&order=data_inicio.asc,hora_inicio.asc`);
+    const eventos = await escGet(`/rest/v1/escritorio_eventos?${escFiltroDono()}&data_inicio=gte.${iniStr}&data_inicio=lte.${fimStr}&status=eq.ativo&order=data_inicio.asc,hora_inicio.asc`);
     (eventos||[]).forEach(ev=>_calItems.push({
       tipo:'evento', id:ev.id, titulo:ev.titulo, data:ev.data_inicio,
       hora:ev.hora_inicio, hora_fim:ev.hora_fim, dia_inteiro:ev.dia_inteiro,
@@ -452,6 +452,7 @@ function calAbrirFormEvento(id) {
       <label class="esc-label">Descrição</label>
       <textarea class="esc-textarea" id="ef-desc" rows="2" placeholder="Detalhes opcionais...">${escEsc(ev?.descricao||'')}</textarea>
     </div>
+    ${escCampoCompartilhar(ev)}
     <div class="esc-field">
       <label class="esc-label">Link</label>
       <input class="esc-input" id="ef-link" value="${escEsc(ev?.link||'')}" placeholder="https://...">
@@ -478,7 +479,8 @@ async function calSalvarEvento() {
     hora_inicio:    document.getElementById('ef-hora-ini')?.value||null,
     hora_fim:       document.getElementById('ef-hora-fim')?.value||null,
     dia_inteiro:    document.getElementById('ef-inteiro')?.checked||false,
-    responsavel_id: document.getElementById('ef-resp')?.value||null,
+    responsavel_id: document.getElementById('ef-resp')?.value||escDono(),
+    compartilhado_com: escLerCompartilhar(),
     local:          document.getElementById('ef-local')?.value||null,
     descricao:      document.getElementById('ef-desc')?.value||null,
     link:           document.getElementById('ef-link')?.value||null,
