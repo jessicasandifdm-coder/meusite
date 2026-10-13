@@ -6,10 +6,7 @@
 // ── CONFIG ──
 const ESC_SUPA_URL = 'https://lnfghtlrzoioaotamzvy.supabase.co';
 const ESC_SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxuZmdodGxyem9pb2FvdGFtenZ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MDg5MTMsImV4cCI6MjA5MjI4NDkxM30.lNHckve8P--rp9axdwZ6v6zTl4LLnk-1xY_kJS3wfFo';
-const ESC_USERS = [
-  { email:'jessicasandifdm@gmail.com', senha:'Jesa2011@',   nome:'Jéssica', role:'admin'      },
-  { email:'artchique7@gmail.com',       senha:'Amanda2026@', nome:'Amanda',  role:'colaborador' },
-];
+// Login: feito pelo Supabase Auth (ver /js-auth.js). Nenhuma senha fica no código.
 
 // ── ESTADO ──
 const ESC_STATE = { modulo:'escritorio', usuario:null, role:null, usuario_id:null, perfil:null };
@@ -42,31 +39,31 @@ function icon(name, size='16') {
 }
 
 // ── AUTH ──
-function escCheckSession() {
-  const logged = sessionStorage.getItem('esc_logged');
-  if (logged === 'true') {
-    ESC_STATE.usuario = sessionStorage.getItem('esc_nome') || 'Jéssica';
-    ESC_STATE.role    = sessionStorage.getItem('esc_role') || 'admin';
-    document.getElementById('esc-login-overlay').style.display = 'none';
-    escInit();
-  }
-}
-function escDoLogin() {
-  const email = document.getElementById('esc-login-email')?.value?.trim().toLowerCase();
-  const senha = document.getElementById('esc-login-senha')?.value || '';
-  const err   = document.getElementById('esc-login-err');
-  const user  = ESC_USERS.find(u => u.email === email && u.senha === senha);
-  if (!user) { if(err) err.textContent = 'E-mail ou senha incorretos.'; return; }
-  sessionStorage.setItem('esc_logged', 'true');
-  sessionStorage.setItem('esc_nome',   user.nome);
-  sessionStorage.setItem('esc_role',   user.role);
-  ESC_STATE.usuario = user.nome;
-  ESC_STATE.role    = user.role;
+async function escCheckSession() {
+  const p = window.JSAuth ? await JSAuth.restaurar() : null;
+  if (!p) return; // sem sessão: mostra a tela de login
+  ESC_STATE.usuario = p.nome;
+  ESC_STATE.role    = p.role;
   document.getElementById('esc-login-overlay').style.display = 'none';
   escInit();
 }
-function escLogout() {
-  ['esc_logged','esc_nome','esc_role'].forEach(k => sessionStorage.removeItem(k));
+async function escDoLogin() {
+  const email = document.getElementById('esc-login-email')?.value || '';
+  const senha = document.getElementById('esc-login-senha')?.value || '';
+  const err   = document.getElementById('esc-login-err');
+  if (err) err.textContent = '';
+  try {
+    const p = await JSAuth.login(email, senha);
+    ESC_STATE.usuario = p.nome;
+    ESC_STATE.role    = p.role;
+    document.getElementById('esc-login-overlay').style.display = 'none';
+    escInit();
+  } catch (e) {
+    if (err) err.textContent = /Invalid login|credentials/i.test(e.message) ? 'E-mail ou senha incorretos.' : e.message;
+  }
+}
+async function escLogout() {
+  if (window.JSAuth) await JSAuth.logout();
   location.reload();
 }
 

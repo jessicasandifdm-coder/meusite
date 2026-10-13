@@ -37,7 +37,10 @@ async function escRenderConfiguracoes(el) {
             <span class="badge badge-${usuario?.role==='admin'?'blue':'gray'}" style="margin-top:4px">${usuario?.role==='admin'?'Admin':'Equipe'}</span>
           </div>
         </div>
-        <button class="btn btn-secondary btn-sm" onclick="configEditarConta()">✏ Editar perfil</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-secondary btn-sm" onclick="configEditarConta()">✏ Editar perfil</button>
+          <button class="btn btn-secondary btn-sm" onclick="configTrocarSenha()">🔒 Trocar minha senha</button>
+        </div>
       </div>
 
       <!-- INTEGRAÇÕES -->
@@ -207,4 +210,36 @@ async function configDesconectarIntegracao(id) {
     escToast('Integração desconectada.');
     escRenderConfiguracoes(document.getElementById('esc-content'));
   } catch(e){ escToast('Erro.'); }
+}
+
+
+// ── TROCAR SENHA (Supabase Auth) ──
+function configTrocarSenha() {
+  const box = document.getElementById('esc-modal-content') || document.getElementById('esc-modal-body');
+  if (!box) { escToast('Não foi possível abrir o formulário.'); return; }
+  box.innerHTML = `
+    <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:14px">Trocar minha senha</div>
+    <div class="esc-field"><label class="esc-label">Nova senha</label>
+      <input class="esc-input" type="password" id="cs-nova" autocomplete="new-password"></div>
+    <div class="esc-field"><label class="esc-label">Repetir nova senha</label>
+      <input class="esc-input" type="password" id="cs-conf" autocomplete="new-password"></div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Mínimo de 10 caracteres. Vale para todos os sistemas em que você entra com este e-mail.</div>
+    <div id="cs-err" style="font-size:12px;color:var(--red);min-height:16px;margin-bottom:8px"></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="configSalvarSenha()">Salvar senha</button>
+    </div>`;
+  if (typeof escAbrirModal === 'function') escAbrirModal();
+}
+async function configSalvarSenha() {
+  const nova = document.getElementById('cs-nova')?.value || '';
+  const conf = document.getElementById('cs-conf')?.value || '';
+  const err  = document.getElementById('cs-err');
+  if (nova.length < 10) { err.textContent = 'Use pelo menos 10 caracteres.'; return; }
+  if (nova !== conf)    { err.textContent = 'As senhas não conferem.'; return; }
+  try {
+    await JSAuth.trocarSenha(nova);
+    escFecharModal();
+    escToast('Senha alterada.');
+  } catch (e) { err.textContent = e.message; }
 }
