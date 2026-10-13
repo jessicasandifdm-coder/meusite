@@ -1,4 +1,4 @@
-// Google Agenda ⇄ Escritório Interno (sentido único: Escritório → Google)
+// Google (Tasks + Agenda) ⇄ Escritório Interno
 //
 // Ações (POST JSON):
 //   start       — (usuária logada) devolve a URL de autorização do Google
