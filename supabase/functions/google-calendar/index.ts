@@ -18,7 +18,7 @@ const CLIENT_SECRET = Deno.env.get("GOOGLE_CLIENT_SECRET") ?? "";
 const REDIRECT_URI = `${SUPA_URL}/functions/v1/google-calendar`;
 const SITE = "https://www.ecoladenegociosjs.com/escritorio-interno/";
 const TZ = "America/Sao_Paulo";
-const SCOPES = "https://www.googleapis.com/auth/calendar.events openid email";
+const SCOPES = "https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/tasks openid email";
 
 const db = createClient(SUPA_URL, SRK, { auth: { persistSession: false } });
 
@@ -102,10 +102,6 @@ function quando(data: string, ini?: string | null, fim?: string | null, dataFim?
 function montar(tipo: string, it: any): Record<string, unknown> | null {
   const rodape = "\n\n— Escritório Interno";
   const base = { extendedProperties: { private: { escritorio_tipo: tipo, escritorio_id: it.id } }, reminders: { useDefault: true }, status: "confirmed" };
-  if (tipo === "tarefa") {
-    if (!it.prazo || it.status === "concluida") return null;
-    return { ...base, summary: `☐ ${it.titulo}`, description: (it.descricao || "") + rodape, ...quando(it.prazo), transparency: "transparent" };
-  }
   if (tipo === "reuniao") {
     const data = it.data || (it.data_hora_inicio || "").slice(0, 10);
     if (!data || it.status === "cancelada") return null;
@@ -128,7 +124,103 @@ async function gcal(token: string, method: string, path: string, body?: unknown)
   return r;
 }
 
+// ── TAREFAS → Google Tasks (com check de concluir) ──
+async function gtasks(token: string, method: string, path: string, body?: unknown) {
+  return fetch(`https://tasks.googleapis.com/tasks/v1${path}`, {
+    method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+}
+
+async function syncTarefa(id: string) {
+  const { data: conectadas } = await db.from("escritorio_google_tokens").select("usuario");
+  if (!conectadas?.length) return { ok: true, motivo: "ninguém conectada" };
+  const { data: it } = await db.from("escritorio_tarefas").select("*").eq("id", id).maybeSingle();
+  const donas = it ? new Set([it.responsavel_id, ...(it.compartilhado_com || [])].filter(Boolean)) : new Set<string>();
+  const { data: mapas } = await db.from("escritorio_google_tarefas").select("*").eq("tarefa_id", id);
+  const res: Record<string, string> = {};
+
+  for (const { usuario } of conectadas) {
+    const mapa = (mapas || []).find((m: any) => m.usuario === usuario);
+    const quer = !!it && donas.has(usuario);
+    if (!quer && !mapa) continue;
+    const token = await tokenDe(usuario);
+    if (!token) { res[usuario] = "sem token"; continue; }
+
+    if (!quer) { // tarefa apagada ou deixou de ser dela
+      await gtasks(token, "DELETE", `/lists/${mapa.lista_id}/tasks/${mapa.task_id}`);
+      await db.from("escritorio_google_tarefas").delete().eq("tarefa_id", id).eq("usuario", usuario);
+      res[usuario] = "removida"; continue;
+    }
+    const corpo: Record<string, unknown> = {
+      title: it.titulo,
+      notes: [it.descricao, it.area && `Área: ${it.area}`, "— Escritório Interno"].filter(Boolean).join("\n\n"),
+      status: it.status === "concluida" ? "completed" : "needsAction",
+      due: it.prazo ? `${it.prazo}T00:00:00.000Z` : null,
+    };
+    if (corpo.status === "needsAction") corpo.completed = null;
+
+    if (mapa) {
+      const r = await gtasks(token, "PATCH", `/lists/${mapa.lista_id}/tasks/${mapa.task_id}`, corpo);
+      if (r.ok) { res[usuario] = "atualizada"; continue; }
+      if (r.status !== 404) { res[usuario] = `erro ${r.status}`; console.error(await r.text()); continue; }
+      await db.from("escritorio_google_tarefas").delete().eq("tarefa_id", id).eq("usuario", usuario);
+    }
+    if (corpo.status === "completed") { res[usuario] = "concluída, nada a criar"; continue; }
+    // reserva a linha antes de criar, para não duplicar se dois avisos chegarem juntos
+    const { error: reserva } = await db.from("escritorio_google_tarefas").insert({ tarefa_id: id, usuario, lista_id: "@default", task_id: "pendente" });
+    if (reserva) { res[usuario] = "já em criação"; continue; }
+    const r = await gtasks(token, "POST", "/lists/@default/tasks", corpo);
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.id) {
+      await db.from("escritorio_google_tarefas").update({ task_id: d.id }).eq("tarefa_id", id).eq("usuario", usuario);
+      res[usuario] = "criada";
+    } else {
+      await db.from("escritorio_google_tarefas").delete().eq("tarefa_id", id).eq("usuario", usuario);
+      res[usuario] = `erro ${r.status}`; console.error(d);
+    }
+  }
+  return { ok: true, res };
+}
+
+// ── volta do Google: concluiu lá → conclui no Escritório (e vice-versa) ──
+async function puxarConclusoes() {
+  const { data: conectadas } = await db.from("escritorio_google_tokens").select("usuario,tasks_lido_em");
+  let mudou = 0;
+  for (const { usuario, tasks_lido_em } of conectadas || []) {
+    const token = await tokenDe(usuario);
+    if (!token) continue;
+    const inicio = new Date();
+    const desde = new Date(new Date(tasks_lido_em || Date.now() - 86400000).getTime() - 120000).toISOString();
+    let pageToken = "";
+    do {
+      const q = new URLSearchParams({ showCompleted: "true", showHidden: "true", updatedMin: desde, maxResults: "100" });
+      if (pageToken) q.set("pageToken", pageToken);
+      const r = await gtasks(token, "GET", `/lists/@default/tasks?${q}`);
+      if (!r.ok) { console.error("listar tasks", usuario, r.status); break; }
+      const d = await r.json();
+      for (const t of d.items || []) {
+        const { data: mapa } = await db.from("escritorio_google_tarefas").select("tarefa_id").eq("usuario", usuario).eq("task_id", t.id).maybeSingle();
+        if (!mapa) continue;
+        const { data: tarefa } = await db.from("escritorio_tarefas").select("status").eq("id", mapa.tarefa_id).maybeSingle();
+        if (!tarefa) continue;
+        if (t.status === "completed" && tarefa.status !== "concluida") {
+          await db.from("escritorio_tarefas").update({ status: "concluida", concluida_em: t.completed || new Date().toISOString(), updated_at: new Date().toISOString() }).eq("id", mapa.tarefa_id);
+          mudou++;
+        } else if (t.status === "needsAction" && tarefa.status === "concluida") {
+          await db.from("escritorio_tarefas").update({ status: "a_fazer", concluida_em: null, updated_at: new Date().toISOString() }).eq("id", mapa.tarefa_id);
+          mudou++;
+        }
+      }
+      pageToken = d.nextPageToken || "";
+    } while (pageToken);
+    await db.from("escritorio_google_tokens").update({ tasks_lido_em: inicio.toISOString() }).eq("usuario", usuario);
+  }
+  return mudou;
+}
+
 async function syncItem(tipo: string, id: string) {
+  if (tipo === "tarefa") return syncTarefa(id);
   if (!TABELA[tipo]) return { ok: false, motivo: "tipo inválido" };
   const { data: conectadas } = await db.from("escritorio_google_tokens").select("usuario");
   if (!conectadas?.length) return { ok: true, motivo: "ninguém conectada" };
@@ -158,7 +250,7 @@ async function syncTudo(usuario: string) {
   const hoje = new Date().toISOString().slice(0, 10);
   const filtro = (q: any) => q.or(`responsavel_id.eq.${usuario},compartilhado_com.cs.{${usuario}}`);
   const [t, r, e] = await Promise.all([
-    filtro(db.from("escritorio_tarefas").select("id").gte("prazo", hoje).neq("status", "concluida")),
+    filtro(db.from("escritorio_tarefas").select("id").neq("status", "concluida")),
     filtro(db.from("escritorio_reunioes").select("id").gte("data", hoje).neq("status", "cancelada")),
     filtro(db.from("escritorio_eventos").select("id").gte("data_inicio", hoje).eq("status", "ativo")),
   ]);
@@ -207,6 +299,9 @@ Deno.serve(async (req) => {
   const body = await req.json().catch(() => ({}));
   const acao = body.action;
 
+  if (acao === "poll") {
+    return json({ ok: true, alteradas: await puxarConclusoes() });
+  }
   if (acao === "sync") {
     return json(await syncItem(String(body.tipo || ""), String(body.id || "")));
   }
