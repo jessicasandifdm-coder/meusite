@@ -1464,6 +1464,25 @@ button{font-family:var(--font)}
     </div>
   </div>
 
+  <!-- ISCA DE LIVE -->
+  <div class="script-card" id="script-card-isca_live">
+    <div class="script-head" onclick="toggleScript(this)">
+      <div style="display:flex;align-items:center;gap:10px"><span class="badge badge-a">Funil 4b</span><span class="script-name">Isca de Live — Comentou LIVE no vídeo</span></div>
+      <span class="script-status done" id="status-isca_live">Completo</span>
+    </div>
+    <div class="script-body">
+      <div class="script-editor-wrap">
+        <div class="script-editor-label">Roteiro de abordagem — edite diretamente</div>
+        <textarea class="script-textarea" id="editor-isca_live" placeholder="Cole ou escreva o script aqui..."></textarea>
+        <div class="script-editor-footer">
+          <button class="script-save-btn" onclick="saveScript('isca_live')">Salvar</button>
+          <span class="script-save-status" id="save-status-isca_live">✓ salvo</span>
+          <span class="script-tip">Ctrl+Enter para salvar rapidamente</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- FOLLOW-UP -->
   <div class="script-card" id="script-card-followup_reativacao">
     <div class="script-head" onclick="toggleScript(this)">
@@ -6316,7 +6335,7 @@ async function excluirMaterial(id){
 // ══════════════════════════════════════════
 // SCRIPTS DOS FUNIS — EDITOR EDITÁVEL
 // ══════════════════════════════════════════
-const SCRIPTS_FUNIS = ['bv_automatico','pc_outbound','stories_engagement','isca_digital','followup_reativacao','reativacao'];
+const SCRIPTS_FUNIS = ['bv_automatico','pc_outbound','stories_engagement','isca_digital','isca_live','followup_reativacao','reativacao'];
 
 const PC_DEFAULT_CONTENT = `1. ABORDAGEM
 "Oi! Vi seu conteúdo no explorar e adorei a forma como você [cita algo específico: ex. mostra as peças / conduz o provador]. Sou mentora de lojistas e analiso muitos perfis, mas o seu me chamou atenção pela dedicação... parabéns!"
@@ -6440,7 +6459,7 @@ document.addEventListener('keydown', function(e){
 
 // Adiciona registro de funis no Supabase se não existir (garante os 6 registros)
 async function ensureScriptRows(){
-  const funis = ['bv_automatico','pc_outbound','stories_engagement','isca_digital','followup_reativacao','reativacao'];
+  const funis = ['bv_automatico','pc_outbound','stories_engagement','isca_digital','isca_live','followup_reativacao','reativacao'];
   for(const funil of funis){
     try{
       const url = SUPA_URL+'/rest/v1/scripts_funis?funil=eq.'+encodeURIComponent(funil);
