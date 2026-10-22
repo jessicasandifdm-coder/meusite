@@ -329,132 +329,7 @@ function escRenderAgenda(el) {
   }
 }
 
-// ── CONTEÚDO ──
-async function escRenderConteudo(el) {
-  el.innerHTML = `<div style="color:var(--text3);font-size:13px;text-align:center;padding:40px">Carregando...</div>`;
-
-  // Verificar se tabela escritorio_conteudo existe
-  let conteudos = [];
-  try { conteudos = await escGet('/rest/v1/escritorio_conteudo?order=data_publicacao.asc&limit=30'); } catch(e) {}
-
-  const TABS = ['Ideias','Em produção','Programados','Publicados'];
-  const STATUS_MAP = {Ideias:'ideia','Em produção':'producao',Programados:'programado',Publicados:'publicado'};
-
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div>
-        <div style="font-size:18px;font-weight:700;color:var(--text)">Conteúdo</div>
-        <div style="font-size:12px;color:var(--text3);margin-top:2px">Calendário editorial e produção de conteúdo</div>
-      </div>
-      <button class="btn btn-primary" onclick="escAbrirNovoConteudo()">
-        ${icon('plus','14')} Novo conteúdo
-      </button>
-    </div>
-    <div class="esc-tabs" id="cont-tabs">
-      ${TABS.map((t,i)=>`<button class="esc-tab ${i===0?'active':''}" onclick="contSetTab(this,'${STATUS_MAP[t]}')">${t}</button>`).join('')}
-    </div>
-    <div id="cont-lista">
-      ${escRenderConteudoLista(conteudos, 'ideia')}
-    </div>`;
-
-  window._conteudoCache = conteudos;
-}
-
-function contSetTab(btn, status) {
-  document.querySelectorAll('#cont-tabs .esc-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const lista = document.getElementById('cont-lista');
-  if(lista) lista.innerHTML = escRenderConteudoLista(window._conteudoCache||[], status);
-}
-
-function escRenderConteudoLista(lista, status) {
-  const filtrado = lista.filter(c=>c.status===status);
-  if(!filtrado.length) return `<div class="esc-empty" style="min-height:180px">
-    <div class="esc-empty-title">Nenhum conteúdo aqui</div>
-    <div class="esc-empty-sub">Adicione um novo conteúdo para começar.</div>
-  </div>`;
-  return `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px">
-    ${filtrado.map(c=>`
-      <div class="esc-content-card">
-        <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">${escEsc(c.titulo||c.ideia||'Sem título')}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--text3)">
-          ${c.formato?`<span>${escEsc(c.formato)}</span>`:''}
-          ${c.canal?`<span>${escEsc(c.canal)}</span>`:''}
-          ${c.data_publicacao?`<span>${new Date(c.data_publicacao+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}</span>`:''}
-        </div>
-      </div>`).join('')}
-  </div>`;
-}
-
-function escAbrirNovoConteudo() {
-  document.getElementById('esc-modal-title').textContent = 'Novo conteúdo';
-  document.getElementById('esc-modal-body').innerHTML = `
-    <div class="esc-field"><label class="esc-label">Título / Ideia</label><input class="esc-input" id="nc-titulo" placeholder="Sobre o que é?"></div>
-    <div class="grid-2">
-      <div class="esc-field"><label class="esc-label">Formato</label>
-        <select class="esc-select" id="nc-formato">
-          <option value="">Selecionar</option>
-          <option>Reels</option><option>Carrossel</option><option>Stories</option>
-          <option>Post estático</option><option>Live</option><option>Podcast</option>
-        </select>
-      </div>
-      <div class="esc-field"><label class="esc-label">Canal</label>
-        <select class="esc-select" id="nc-canal">
-          <option value="">Selecionar</option>
-          <option>Instagram</option><option>YouTube</option><option>TikTok</option><option>Email</option>
-        </select>
-      </div>
-    </div>
-    <div class="grid-2">
-      <div class="esc-field"><label class="esc-label">Status</label>
-        <select class="esc-select" id="nc-status">
-          <option value="ideia">Ideia</option><option value="producao">Em produção</option>
-          <option value="programado">Programado</option><option value="publicado">Publicado</option>
-        </select>
-      </div>
-      <div class="esc-field"><label class="esc-label">Data de publicação</label>
-        <input class="esc-input" type="date" id="nc-data">
-      </div>
-    </div>
-    <div class="esc-field"><label class="esc-label">Roteiro / Legenda</label>
-      <textarea class="esc-textarea" id="nc-roteiro" placeholder="Detalhes do conteúdo..." rows="3"></textarea>
-    </div>
-    <div style="display:flex;gap:10px;justify-content:flex-end">
-      <button class="btn btn-secondary" onclick="escFecharModal()">Cancelar</button>
-      <button class="btn btn-primary" onclick="escSalvarConteudo()">Salvar</button>
-    </div>`;
-  document.getElementById('esc-modal-overlay').classList.add('open');
-  document.getElementById('nc-titulo')?.focus();
-}
-
-async function escSalvarConteudo() {
-  const titulo = document.getElementById('nc-titulo')?.value?.trim();
-  if(!titulo){escToast('Informe o título.'); return;}
-  const data_pub = document.getElementById('nc-data')?.value;
-  const obj = {
-    titulo, status: document.getElementById('nc-status')?.value||'ideia',
-    formato: document.getElementById('nc-formato')?.value||null,
-    canal:   document.getElementById('nc-canal')?.value||null,
-    roteiro: document.getElementById('nc-roteiro')?.value||null,
-    data_publicacao: data_pub||null,
-    responsavel_id:  ESC_STATE.usuario,
-    created_by:      ESC_STATE.usuario,
-  };
-  try {
-    await fetch(ESC_SUPA_URL+'/rest/v1/escritorio_conteudo',{
-      method:'POST',
-      headers:{'apikey':ESC_SUPA_KEY,'Authorization':'Bearer '+ESC_SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
-      body: JSON.stringify(obj)
-    });
-    escToast('Conteúdo salvo!');
-    escFecharModal();
-    escRenderConteudo(document.getElementById('esc-content'));
-  } catch(e){
-    // Tabela não existe ainda — criar
-    escToast('Tabela de conteúdo será criada na próxima atualização.');
-    escFecharModal();
-  }
-}
+// ── CONTEÚDO ── (ver conteudo.js)
 
 // ── MODAL ──
 function escFecharModal() {
@@ -463,6 +338,8 @@ function escFecharModal() {
   ov.style.opacity = '0';
   ov.style.pointerEvents = 'none';
   ov.classList.remove('open');
+  const box = document.getElementById('esc-modal-box');
+  if (box) box.style.maxWidth = '';
 }
 function escAbrirModal() {
   const ov = document.getElementById('esc-modal-overlay');
@@ -504,7 +381,7 @@ function escAddItem(tipo) {
       else escToast('Módulo Reuniões não carregado.');
       break;
     case 'conteudo':
-      escAbrirNovoConteudo();
+      contAbrir(null);
       break;
     case 'nota':
       escAbrirNota();
