@@ -14,7 +14,7 @@ const CONT_FORMATOS = ['Reels', 'Carrossel', 'Foto', 'Stories', 'Live', 'Post es
 const CONT_PILARES  = ['Marketing', 'Vendas', 'Rotina comercial', 'Método', 'Pessoal'];
 const CONT_DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-const CONT_STATE = { lista: [], vista: 'semanas', passadas: false };
+const CONT_STATE = { lista: [], vista: 'calendario', passadas: false, mes: null, diaSel: null };
 
 function contStatusLabel(v) { return (CONT_STATUS.find(s => s.v === v) || {}).l || v || ''; }
 function contData(iso) { return iso ? new Date(iso + 'T12:00:00') : null; }
@@ -76,6 +76,30 @@ function contCss() {
   .cont-txt{white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--text2);background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;max-height:340px;overflow:auto}
   .cont-sec{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:16px 0 6px;display:flex;justify-content:space-between;align-items:center}
   .cont-sec button{font-size:11px;text-transform:none;letter-spacing:0}
+
+  .cal-nav{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .cal-nav b{font-size:15px;color:var(--text);min-width:150px;text-align:center}
+  .cal-nav button{background:var(--card);border:1px solid var(--border);color:var(--text2);border-radius:var(--radius);padding:5px 10px;cursor:pointer;font-family:inherit;font-size:13px}
+  .cal-leg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--text3);margin-left:auto}
+  .cal-leg i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:0}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border-top:1px solid var(--border);border-left:1px solid var(--border)}
+  .cal-wd{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding:6px 8px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface)}
+  .cal-cel{min-height:118px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:6px;cursor:pointer;display:flex;flex-direction:column;gap:3px;min-width:0}
+  .cal-cel:hover{background:rgba(255,255,255,.02)}
+  .cal-cel.fora{opacity:.35}
+  .cal-cel.hoje{background:var(--accent-dim)}
+  .cal-cel.sel{outline:1px solid var(--accent);outline-offset:-1px}
+  .cal-n{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:2px}
+  .cal-cel.hoje .cal-n{color:var(--accent)}
+  .cal-it{font-size:11px;line-height:1.3;padding:3px 6px;border-radius:4px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:3px solid var(--border2);background:var(--card)}
+  .cal-it:hover{background:var(--card-hover)}
+  .cal-it.publicado{opacity:.5;text-decoration:line-through}
+  .cal-it.b-Reels{border-left-color:#f08a8a} .cal-it.b-Carrossel{border-left-color:var(--accent)} .cal-it.b-Live{border-left-color:var(--green)} .cal-it.b-Foto{border-left-color:var(--text3)} .cal-it.b-Stories{border-left-color:var(--amber)}
+  .cal-grav{font-size:10.5px;color:var(--amber);padding:2px 6px;border-radius:4px;background:var(--amber-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cal-dots{display:none}
+  .cal-dia-lista{margin-top:14px}
+  .cf-lab{display:flex;justify-content:space-between;align-items:center}
+  .cf-lab button{font-size:11px;padding:2px 6px}
   .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
   @media (max-width:640px){
     .cont-row{grid-template-columns:48px 1fr;gap:4px 10px;align-items:start}
@@ -84,6 +108,13 @@ function contCss() {
     .cont-row > div:nth-child(3){grid-column:2;grid-row:2}
     .cont-row > .cont-st{grid-column:2;grid-row:3}
     .grid-3{grid-template-columns:1fr}
+    .cal-cel{min-height:54px;padding:4px}
+    .cal-cel .cal-it,.cal-cel .cal-grav{display:none}
+    .cal-dots{display:flex;gap:3px;flex-wrap:wrap}
+    .cal-dots i{width:6px;height:6px;border-radius:50%;background:var(--text3)}
+    .cal-dots i.b-Reels{background:#f08a8a} .cal-dots i.b-Carrossel{background:var(--accent)} .cal-dots i.b-Live{background:var(--green)} .cal-dots i.g{background:var(--amber)}
+    .cal-wd{padding:4px 2px;text-align:center;font-size:10px}
+    .cal-leg{margin-left:0}
   }`;
   document.head.appendChild(s);
 }
@@ -111,13 +142,14 @@ function contDesenhar(el) {
       </div>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <div class="cont-switch">
-          <button class="${v==='semanas'?'on':''}" onclick="contVista('semanas')">Semana a semana</button>
+          <button class="${v==='calendario'?'on':''}" onclick="contVista('calendario')">Calendário</button>
+          <button class="${v==='semanas'?'on':''}" onclick="contVista('semanas')">Lista</button>
           <button class="${v==='status'?'on':''}" onclick="contVista('status')">Por status</button>
         </div>
         <button class="btn btn-primary" onclick="contAbrir(null)">${icon('plus','14')} Novo conteúdo</button>
       </div>
     </div>
-    ${v === 'semanas' ? contHtmlGravar() + contHtmlSemanas() : contHtmlStatus()}`;
+    ${v === 'calendario' ? contHtmlCalendario() : v === 'semanas' ? contHtmlGravar() + contHtmlSemanas() : contHtmlStatus()}`;
 }
 function contVista(v) { CONT_STATE.vista = v; contDesenhar(); }
 
@@ -194,19 +226,80 @@ function contHtmlStatus() {
     ${itens.length ? itens.map(contLinha).join('') : `<div class="esc-empty" style="min-height:160px"><div class="esc-empty-title">Nenhum conteúdo aqui</div></div>`}`;
 }
 
+
+/* ── CALENDÁRIO DO MÊS ── */
+function contMudarMes(n) {
+  const [a, m] = CONT_STATE.mes.split('-').map(Number);
+  const d = new Date(a, m - 1 + n, 1);
+  CONT_STATE.mes = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  CONT_STATE.diaSel = null;
+  contDesenhar();
+}
+function contMesHoje() { CONT_STATE.mes = contHojeISO().slice(0, 7); CONT_STATE.diaSel = null; contDesenhar(); }
+function contClicarDia(iso) {
+  if (window.matchMedia('(max-width:640px)').matches) { CONT_STATE.diaSel = iso; contDesenhar(); return; }
+  contAbrir(null, iso);
+}
+function contHtmlCalendario() {
+  if (!CONT_STATE.mes) CONT_STATE.mes = contHojeISO().slice(0, 7);
+  const hoje = contHojeISO();
+  const ini = CONT_STATE.mes + '-01';
+  const primeiro = contSegunda(ini);
+  const [a, m] = CONT_STATE.mes.split('-').map(Number);
+  const ultimoDia = new Date(a, m, 0).getDate();
+  const fim = contSomaDias(contSegunda(CONT_STATE.mes + '-' + String(ultimoDia).padStart(2, '0')), 6);
+  const porPub = {}, porGrav = {};
+  CONT_STATE.lista.forEach(c => {
+    if (c.data_publicacao) (porPub[c.data_publicacao] = porPub[c.data_publicacao] || []).push(c);
+    if (c.data_gravacao && (c.status === 'ideia' || c.status === 'producao')) (porGrav[c.data_gravacao] = porGrav[c.data_gravacao] || []).push(c);
+  });
+  let nomeMes = new Date(a, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  nomeMes = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
+  let cels = '';
+  for (let d = primeiro; d <= fim; d = contSomaDias(d, 1)) {
+    const pubs = porPub[d] || [], gravs = porGrav[d] || [];
+    const cls = ['cal-cel', d.slice(0, 7) !== CONT_STATE.mes ? 'fora' : '', d === hoje ? 'hoje' : '', d === CONT_STATE.diaSel ? 'sel' : ''].join(' ');
+    cels += `<div class="${cls}" onclick="contClicarDia('${d}')">
+      <div class="cal-n">${Number(d.slice(8))}</div>
+      ${gravs.length ? `<div class="cal-grav" title="${escEsc(gravs.map(g => g.titulo).join(' · '))}">Gravar ${gravs.length}: ${escEsc(gravs.map(g => g.formato).join(', '))}</div>` : ''}
+      ${pubs.map(c => `<div class="cal-it b-${escEsc(c.formato||'')} ${c.status}" title="${escEsc(c.formato||'')} · ${escEsc(c.titulo)}" onclick="event.stopPropagation();contAbrir('${c.id}')">${escEsc(c.titulo)}</div>`).join('')}
+      <div class="cal-dots">${gravs.length ? '<i class="g"></i>' : ''}${pubs.map(c => `<i class="b-${escEsc(c.formato||'')}"></i>`).join('')}</div>
+    </div>`;
+  }
+  let lista = '';
+  if (CONT_STATE.diaSel) {
+    const d = CONT_STATE.diaSel;
+    const pubs = porPub[d] || [], gravs = porGrav[d] || [];
+    lista = `<div class="cal-dia-lista"><div class="cont-sem-h"><b>${contDia(d)} ${contDM(d)}</b>
+      <button class="btn btn-secondary" style="font-size:12px;padding:4px 10px" onclick="contAbrir(null,'${d}')">${icon('plus','12')} Adicionar</button></div>
+      ${gravs.length ? `<div class="cont-gravar-dia" style="color:var(--amber)">Gravar neste dia</div>${gravs.map(contLinha).join('')}` : ''}
+      ${pubs.length ? `<div class="cont-gravar-dia">Postar neste dia</div>${pubs.map(contLinha).join('')}` : ''}
+      ${!gravs.length && !pubs.length ? '<div style="font-size:12px;color:var(--text3);padding:8px 0">Nada neste dia.</div>' : ''}</div>`;
+  }
+  return `<div class="cal-nav">
+      <button onclick="contMudarMes(-1)">‹</button><b>${nomeMes}</b><button onclick="contMudarMes(1)">›</button>
+      <button onclick="contMesHoje()">Hoje</button>
+      <div class="cal-leg"><span><i style="background:#f08a8a"></i>Reels</span><span><i style="background:var(--accent)"></i>Carrossel</span><span><i style="background:var(--green)"></i>Live</span><span><i style="background:var(--text3)"></i>Foto</span><span><i style="background:var(--amber)"></i>Gravar</span></div>
+    </div>
+    <div class="cal-grid">${['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(w => `<div class="cal-wd">${w}</div>`).join('')}${cels}</div>
+    ${lista}`;
+}
+
 /* ── FICHA DO CONTEÚDO ── */
-function contAbrir(id) {
-  const c = id ? CONT_STATE.lista.find(x => x.id === id) : { status: 'ideia', canal: 'Instagram' };
+function contAbrir(id, dataPadrao) {
+  const c = id ? CONT_STATE.lista.find(x => x.id === id) : { status: 'ideia', canal: 'Instagram', data_publicacao: dataPadrao || '' };
   if (!c) return;
   CONT_STATE.editando = id;
   const opt = (arr, val) => arr.map(o => `<option ${o===val?'selected':''}>${escEsc(o)}</option>`).join('');
-  const area = (k, label, rows) => `<div class="esc-field"><label class="esc-label">${label}</label>
-      <textarea class="esc-textarea" id="cf-${k}" rows="${rows}">${escEsc(c[k]||'')}</textarea></div>`;
-  const leitura = (k, label) => c[k] ? `<div class="cont-sec">${label}
-      <button class="btn btn-ghost" onclick="contCopiar('${k}')">Copiar</button></div><div class="cont-txt">${escEsc(c[k])}</div>` : '';
+  const area = (k, label, rows, ph) => `<div class="esc-field"><label class="esc-label cf-lab"><span>${label}</span>
+      <button class="btn btn-ghost" type="button" onclick="contCopiar('${k}')">Copiar</button></label>
+      <textarea class="esc-textarea" id="cf-${k}" rows="${rows}" placeholder="${ph||''}">${escEsc(c[k]||'')}</textarea></div>`;
 
-  document.getElementById('esc-modal-title').textContent = id ? `${contDia(c.data_publicacao)} ${contDM(c.data_publicacao)} · ${c.formato||'Conteúdo'}` : 'Novo conteúdo';
-  document.getElementById('esc-modal-box').style.maxWidth = '760px';
+  document.getElementById('esc-modal-title').textContent = id
+    ? `${contDia(c.data_publicacao)} ${contDM(c.data_publicacao)} · ${c.formato||'Conteúdo'}`
+    : 'Novo conteúdo' + (dataPadrao ? ` · ${contDia(dataPadrao)} ${contDM(dataPadrao)}` : '');
+  const box = document.getElementById('esc-modal-box') || document.getElementById('esc-modal-overlay').firstElementChild;
+  if (box) { if (box.dataset.mw === undefined) box.dataset.mw = box.style.maxWidth || ''; box.style.maxWidth = '760px'; }
   document.getElementById('esc-modal-body').innerHTML = `
     <div class="esc-field"><label class="esc-label">Título</label><input class="esc-input" id="cf-titulo" value="${escEsc(c.titulo||'')}"></div>
     <div class="grid-3">
@@ -219,23 +312,15 @@ function contAbrir(id) {
       <div class="esc-field"><label class="esc-label">Pilar</label><select class="esc-select" id="cf-pilar"><option value="">—</option>${opt(CONT_PILARES, c.pilar)}</select></div>
       <div class="esc-field"><label class="esc-label">Palavra-chave</label><input class="esc-input" id="cf-palavra_chave" value="${escEsc(c.palavra_chave||'')}" placeholder="ex.: PLANO"></div>
     </div>
-    ${c.ideia ? `<div class="cont-sec">Ideia e função</div><div class="cont-txt">${escEsc(c.ideia)}</div>` : ''}
-    ${leitura('roteiro', 'Roteiro')}
-    ${leitura('legenda', 'Legenda')}
-    ${leitura('stories', 'Stories de reforço')}
-    ${c.observacoes ? `<div class="cont-sec">Observações</div><div class="cont-txt">${escEsc(c.observacoes)}</div>` : ''}
-    <details style="margin-top:16px" ${id?'':'open'}>
-      <summary style="cursor:pointer;font-size:12px;color:var(--text3);margin-bottom:10px">Editar textos</summary>
-      ${area('ideia','Ideia e função',2)}
-      ${area('roteiro','Roteiro',8)}
-      ${area('legenda','Legenda',5)}
-      ${area('stories','Stories de reforço',3)}
-      ${area('observacoes','Observações',2)}
-      <div class="grid-2">
-        <div class="esc-field"><label class="esc-label">Fase do plano</label><input class="esc-input" id="cf-fase" value="${escEsc(c.fase||'')}"></div>
-        <div class="esc-field"><label class="esc-label">Modelo / estrutura</label><input class="esc-input" id="cf-referencia" value="${escEsc(c.referencia||'')}"></div>
-      </div>
-    </details>
+    ${area('ideia','Ideia e função',2,'Do que se trata e para que serve')}
+    ${area('roteiro','Roteiro',8,'Fala a fala, texto da tela, onde gravar')}
+    ${area('legenda','Legenda',5,'Texto da legenda')}
+    ${area('stories','Stories de reforço',3,'O que postar nos stories')}
+    ${area('observacoes','Observações',2,'')}
+    <div class="grid-2">
+      <div class="esc-field"><label class="esc-label">Fase do plano</label><input class="esc-input" id="cf-fase" value="${escEsc(c.fase||'')}"></div>
+      <div class="esc-field"><label class="esc-label">Modelo / estrutura</label><input class="esc-input" id="cf-referencia" value="${escEsc(c.referencia||'')}"></div>
+    </div>
     <div style="display:flex;gap:10px;justify-content:space-between;margin-top:18px;flex-wrap:wrap">
       <div>${id ? `<button class="btn btn-danger" onclick="contArquivar()">Arquivar</button>` : ''}</div>
       <div style="display:flex;gap:10px">
@@ -243,15 +328,14 @@ function contAbrir(id) {
         <button class="btn btn-primary" onclick="contSalvar()">Salvar</button>
       </div>
     </div>`;
-  const ov = document.getElementById('esc-modal-overlay');
-  ov.style.opacity = ''; ov.style.pointerEvents = '';
-  ov.classList.add('open');
+  escAbrirModal();
 }
 
 function contCopiar(k) {
-  const c = CONT_STATE.lista.find(x => x.id === CONT_STATE.editando);
-  if (!c || !c[k]) return;
-  navigator.clipboard.writeText(c[k]).then(() => escToast('Copiado.'), () => escToast('Não consegui copiar.'));
+  const el = document.getElementById('cf-' + k);
+  const txt = el ? el.value : '';
+  if (!txt) { escToast('Campo vazio.'); return; }
+  navigator.clipboard.writeText(txt).then(() => escToast('Copiado.'), () => escToast('Não consegui copiar.'));
 }
 
 async function contSalvar() {

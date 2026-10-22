@@ -339,7 +339,7 @@ function escFecharModal() {
   ov.style.pointerEvents = 'none';
   ov.classList.remove('open');
   const box = document.getElementById('esc-modal-box');
-  if (box) box.style.maxWidth = '';
+  if (box && box.dataset.mw !== undefined) box.style.maxWidth = box.dataset.mw;
 }
 function escAbrirModal() {
   const ov = document.getElementById('esc-modal-overlay');
