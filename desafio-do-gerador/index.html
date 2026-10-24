@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Desafio do Gerador</title>
+<meta name="description" content="Selos e regras do Desafio do Gerador de Caixa.">
+<meta property="og:title" content="Desafio do Gerador">
+<meta property="og:description" content="Salve os selos e participe: uma ação por semana até 20/12.">
+<meta property="og:image" content="https://www.ecoladenegociosjs.com/desafio-do-gerador/selos/selo-pedido-com-carinho-verde.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Identidade do Gerador de Caixa: branco + verde forte, Fraunces + Work Sans */
+:root{--paper:#FAFAF8;--card:#FFFFFF;--ink:#1C201D;--soft:#6B7268;--verde:#143F35;--verde2:#0B2A23;--menta:#4E9C7C;--menta-claro:#B7D9C9;--line:#E2E4DE;
+  --serif:Fraunces,Georgia,serif;--sans:'Work Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;color-scheme:light}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topo{background:var(--verde);color:#fff;padding-top:env(safe-area-inset-top,0px)}
+.topo .wrap{padding-block:40px 36px;display:grid;gap:14px}
+.marca{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
+.marca i{width:32px;height:32px;border-radius:9px;background:var(--menta);display:grid;place-items:center}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.6rem,10vw,3.8rem);line-height:.98;margin:0;letter-spacing:-.02em}
+h1 em{font-style:italic;font-weight:500;color:var(--menta-claro)}
+.datas{font-family:var(--mono);font-size:.78rem;letter-spacing:.14em;color:var(--menta-claro)}
+section{padding-block:30px}
+h2{font-family:var(--serif);font-weight:600;font-size:1.6rem;margin:0 0 14px;line-height:1.1}
+ol.regras{list-style:none;margin:0;padding:0;counter-reset:n;display:grid}
+ol.regras li{counter-increment:n;padding:14px 0 14px 48px;border-bottom:1px solid var(--line);position:relative}
+ol.regras li:before{content:counter(n);position:absolute;left:0;top:12px;width:32px;height:32px;border-radius:50%;background:var(--verde);color:#fff;font:600 1rem/32px var(--serif);text-align:center}
+.premio{margin-top:18px;border:1.5px solid var(--verde);border-radius:14px;padding:16px 18px}
+.premio b{color:var(--verde)}
+.selos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.selo{background:repeating-conic-gradient(#EEF0EB 0 25%,#FFFFFF 0 50%) 0 0/18px 18px;border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;place-items:center}
+.selo img{width:100%;max-width:220px;height:auto;display:block;-webkit-touch-callout:default}
+.dica{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:6px}
+.dica h3{margin:0;font-family:var(--serif);font-weight:600;font-size:1.15rem}
+.dica p{margin:0;color:var(--soft)}
+.dicas{display:grid;gap:10px}
+.lead{color:var(--soft);margin:-6px 0 16px}
+footer{padding-block:20px 40px;color:var(--soft);font-size:.8rem;padding-bottom:max(40px,env(safe-area-inset-bottom,0px))}
+</style>
+</head>
+<body>
+<div class="topo"><div class="wrap">
+  <div class="marca"><i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1.2 12H6.2z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></i>Gerador de Caixa</div>
+  <h1>Desafio do <em>Gerador</em></h1>
+  <div class="datas">26/10 A 20/12 · UMA AÇÃO POR SEMANA</div>
+</div></div>
+
+<div class="wrap">
+  <section>
+    <h2>Como participar</h2>
+    <ol class="regras">
+      <li>Toda segunda, a ação da semana do Gerador chega no grupo.</li>
+      <li>Aplicou na sua loja? Posta as vendas da ação nos stories: sacolas, pedidos, clientes.</li>
+      <li>Coloca um dos selos abaixo e marca <b>@jessicasandimentora</b>.</li>
+    </ol>
+    <div class="premio">As <b>3 lojistas que aplicarem mais ações</b> até 20/12 ganham uma conversa de 30 minutos com a Jéssica para montar o plano de janeiro da loja.</div>
+  </section>
+
+  <section style="padding-top:0">
+    <h2>Os selos</h2>
+    <p class="lead">Segure o dedo no selo e toque em "Salvar imagem". Ele fica no seu celular com o fundo transparente.</p>
+    <div class="selos">
+      <div class="selo"><img src="selos/selo-pedido-com-carinho-verde.png" alt="Selo Pedido feito com carinho, verde"></div>
+      <div class="selo"><img src="selos/selo-pedido-com-carinho-branco.png" alt="Selo Pedido feito com carinho, branco"></div>
+      <div class="selo"><img src="selos/selo-pedido-com-amor-verde.png" alt="Selo Seu pedido saiu com amor, verde"></div>
+      <div class="selo"><img src="selos/selo-pedido-com-amor-branco.png" alt="Selo Seu pedido saiu com amor, branco"></div>
+      <div class="selo"><img src="selos/selo-mais-um-pedido-verde.png" alt="Selo Mais um pedido a caminho, verde"></div>
+      <div class="selo"><img src="selos/selo-mais-um-pedido-branco.png" alt="Selo Mais um pedido a caminho, branco"></div>
+      <div class="selo"><img src="selos/selo-embalado-para-voce-verde.png" alt="Selo Embalado especialmente para você, verde"></div>
+      <div class="selo"><img src="selos/selo-embalado-para-voce-branco.png" alt="Selo Embalado especialmente para você, branco"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <h2>Como colocar no story</h2>
+    <div class="dicas">
+      <div class="dica"><h3>iPhone</h3><p>Abra o selo na galeria, segure o dedo nele e toque em "Copiar". No story, toque na tela e escolha "Colar". O selo entra sem fundo.</p></div>
+      <div class="dica"><h3>Android</h3><p>No story, toque no ícone de figurinhas, escolha a figurinha de foto da galeria e selecione o selo.</p></div>
+    </div>
+  </section>
+</div>
+<footer><div class="wrap">Desafio do Gerador · Gerador de Caixa · Jéssica Sandi</div></footer>
+</body>
+</html>
