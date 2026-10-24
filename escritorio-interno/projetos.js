@@ -475,6 +475,7 @@ async function pSalvar() {
 }
 
 async function pConcluir(id) {
+  if (!confirm('Marcar este projeto como concluído?')) return;
   try {
     const agora = new Date().toISOString();
     const r = await fetch(ESC_SUPA_URL+'/rest/v1/escritorio_projetos?id=eq.'+id, {
@@ -482,14 +483,21 @@ async function pConcluir(id) {
       headers:{'apikey':ESC_SUPA_KEY,'Authorization':'Bearer '+ESC_SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
       body:JSON.stringify({status:'concluido', concluido_em:agora, updated_at:agora})
     });
+    if (!r.ok) { escToast('Erro ao concluir projeto. ('+r.status+')'); return; }
     const updated = await r.json();
-    if(Array.isArray(updated)){
+    if(Array.isArray(updated) && updated[0]){
       const idx=_projetosCache.findIndex(x=>x.id===id);
       if(idx>=0) _projetosCache[idx]=updated[0];
+      else _projetosCache.push(updated[0]);
     }
     escToast('Projeto concluído! 🎉');
-    pRenderKpis(); await pRenderLista();
-  } catch(e) { escToast('Erro ao concluir projeto.'); }
+    // Se está na tela de detalhe, reabrir para refletir novo status
+    if(_pDetalheId === id) {
+      await pAbrirDetalhe(id);
+    } else {
+      pRenderKpis(); await pRenderLista();
+    }
+  } catch(e) { console.error(e); escToast('Erro ao concluir projeto.'); }
 }
 
 // ── INTEGRAÇÃO COM TAREFAS ──
