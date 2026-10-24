@@ -20,7 +20,7 @@ const T_ORIGENS = ['manual', 'projeto', 'reuniao', 'caixa_entrada', 'decisao', '
 const T_RESPONSAVEIS = ['Jéssica', 'Amanda'];
 
 // Filtros ativos
-let _tfiltros = { view: 'todas', area: '', responsavel: '', status: '', prioridade: '' };
+let _tfiltros = { view: 'dia', area: '', responsavel: '', status: '', prioridade: '' };
 let _tarefasCache = [];
 let _tarefaEditandoId = null;
 
@@ -70,19 +70,102 @@ async function escRenderTarefas(el) {
 
 function tRenderViews() {
   const VIEWS = [
-    { id: 'todas',     label: 'Todas' },
-    { id: 'hoje',      label: 'Hoje' },
-    { id: 'proximas',  label: 'Próximas' },
-    { id: 'atrasadas', label: 'Atrasadas' },
-    { id: 'concluidas',label: 'Concluídas' },
+    { id: 'dia',        label: 'Dia' },
+    { id: 'semana',     label: 'Semana' },
+    { id: 'mes',        label: 'Mês' },
+    { id: 'atrasadas',  label: 'Atrasadas' },
+    { id: 'concluidas', label: 'Concluídas' },
   ];
   document.getElementById('t-views').innerHTML = VIEWS.map(v => `
     <button class="btn ${_tfiltros.view === v.id ? 'btn-primary' : 'btn-secondary'} btn-sm" onclick="tSetView('${v.id}')">${v.label}</button>
   `).join('');
 }
 
+// ── PERÍODO (dia / semana / mês) ──
+let _tRef = null; // data de referência (YYYY-MM-DD) da visão por período
+function tHojeISO() { const d = new Date(); return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+function tIsoDe(d) { return new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+function tDataDe(iso) { const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); }
+function tPeriodoIntervalo(modo, ref) {
+  const d = tDataDe(ref);
+  if (modo === 'semana') {
+    const dow = (d.getDay() + 6) % 7; // segunda = 0
+    const ini = new Date(d); ini.setDate(d.getDate() - dow);
+    const fim = new Date(ini); fim.setDate(ini.getDate() + 6);
+    return [tIsoDe(ini), tIsoDe(fim)];
+  }
+  if (modo === 'mes') {
+    return [tIsoDe(new Date(d.getFullYear(), d.getMonth(), 1)), tIsoDe(new Date(d.getFullYear(), d.getMonth()+1, 0))];
+  }
+  return [ref, ref];
+}
+function tPeriodoMover(modo, ref, passo) {
+  const d = tDataDe(ref);
+  if (modo === 'semana') d.setDate(d.getDate() + 7*passo);
+  else if (modo === 'mes') { d.setDate(1); d.setMonth(d.getMonth() + passo); }
+  else d.setDate(d.getDate() + passo);
+  return tIsoDe(d);
+}
+const T_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const T_DIAS = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+function tDdMm(iso) { const [y,m,d] = iso.split('-'); return d+'/'+m; }
+function tPeriodoRotulo(modo, ref) {
+  const [ini, fim] = tPeriodoIntervalo(modo, ref);
+  if (modo === 'semana') return tDdMm(ini) + ' a ' + tDdMm(fim);
+  if (modo === 'mes') { const d = tDataDe(ref); return T_MESES[d.getMonth()] + ' ' + d.getFullYear(); }
+  const d = tDataDe(ref); const hoje = tHojeISO();
+  return (ref === hoje ? 'Hoje · ' : '') + T_DIAS[d.getDay()] + ', ' + tDdMm(ref);
+}
+function tDiaTitulo(iso) {
+  const d = tDataDe(iso); const hoje = tHojeISO();
+  return (iso === hoje ? 'Hoje · ' : '') + T_DIAS[d.getDay()] + ', ' + tDdMm(iso);
+}
+// Barra de navegação: ‹ rótulo › Hoje. fn = nome da função global que recebe o passo (-1, 0, 1)
+function tPeriodoNavHtml(modo, ref, fn) {
+  return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+    <button class="btn btn-secondary btn-sm" onclick="${fn}(-1)" aria-label="Período anterior">‹</button>
+    <div style="font-size:14px;font-weight:600;color:var(--text);min-width:150px;text-align:center">${tPeriodoRotulo(modo, ref)}</div>
+    <button class="btn btn-secondary btn-sm" onclick="${fn}(1)" aria-label="Próximo período">›</button>
+    <button class="btn btn-secondary btn-sm" onclick="${fn}(0)">Hoje</button>
+  </div>`;
+}
+// Lista agrupada por dia dentro do período
+function tPeriodoListaHtml(lista, modo, ref) {
+  const hoje = tHojeISO();
+  const [ini, fim] = tPeriodoIntervalo(modo, ref);
+  const noPeriodo = lista.filter(t => t.prazo && t.prazo >= ini && t.prazo <= fim);
+  const grupos = [];
+  if (modo === 'dia' && ref === hoje) {
+    const atr = lista.filter(t => t.prazo && t.prazo < hoje && t.status !== 'concluida');
+    if (atr.length) grupos.push(['Atrasadas', atr, true]);
+  }
+  const porDia = {};
+  noPeriodo.forEach(t => { (porDia[t.prazo] = porDia[t.prazo] || []).push(t); });
+  Object.keys(porDia).sort().forEach(d => {
+    const ts = porDia[d].sort((a,b) => (a.status==='concluida') - (b.status==='concluida'));
+    grupos.push([modo === 'dia' ? null : tDiaTitulo(d), ts, false]);
+  });
+  if (modo === 'dia' && ref === hoje) {
+    const sem = lista.filter(t => !t.prazo && t.status !== 'concluida');
+    if (sem.length) grupos.push(['Sem data', sem, false]);
+  }
+  if (!grupos.length) {
+    return `<div style="color:var(--text3);text-align:center;padding:40px 20px;font-size:13px">Nenhuma tarefa ${modo==='dia'?'neste dia':modo==='semana'?'nesta semana':'neste mês'}.</div>`;
+  }
+  return grupos.map(([titulo, ts, alerta]) => `
+    <div style="margin-bottom:18px">
+      ${titulo ? `<div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:${alerta?'var(--red)':'var(--text3)'};margin-bottom:8px;padding-left:2px">${titulo} · ${ts.length}</div>` : ''}
+      <div class="esc-list">${ts.map(t => tItemHtml(t, hoje)).join('')}</div>
+    </div>`).join('');
+}
+function tPeriodoPasso(passo) {
+  _tRef = passo === 0 ? tHojeISO() : tPeriodoMover(_tfiltros.view, _tRef || tHojeISO(), passo);
+  tRenderLista();
+}
+
 function tSetView(view) {
   _tfiltros.view = view;
+  if (!_tRef) _tRef = tHojeISO();
   tRenderViews();
   tRenderLista();
 }
@@ -113,7 +196,7 @@ async function tCarregar() {
 }
 
 function tFiltrarTarefas() {
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = tHojeISO();
   let lista = [..._tarefasCache];
 
   // View
@@ -173,11 +256,18 @@ function tRenderLista() {
   const lista = tFiltrarTarefas();
   const hoje = new Date().toISOString().split('T')[0];
 
-  if (!lista.length) {
+  if (!lista.length && !['dia','semana','mes'].includes(_tfiltros.view)) {
     el.innerHTML = `<div style="color:var(--text3);text-align:center;padding:60px 20px">
       <div style="font-size:32px;margin-bottom:12px;opacity:.3">✅</div>
       <div>Nenhuma tarefa encontrada.</div>
     </div>`;
+    return;
+  }
+
+  // Visões por período: dia, semana, mês
+  if (['dia','semana','mes'].includes(_tfiltros.view)) {
+    if (!_tRef) _tRef = tHojeISO();
+    el.innerHTML = tPeriodoNavHtml(_tfiltros.view, _tRef, 'tPeriodoPasso') + tPeriodoListaHtml(lista, _tfiltros.view, _tRef);
     return;
   }
 

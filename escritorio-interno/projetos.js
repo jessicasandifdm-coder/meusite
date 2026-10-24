@@ -339,30 +339,44 @@ async function pAbrirDetalhe(id) {
         <button class="btn btn-secondary btn-sm" onclick="pNovaTarefaNoprojeto('${id}')">+ Nova tarefa</button>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px" id="pdet-views">
-        ${['todas','hoje','atrasadas','concluidas'].map(v=>`
-          <button class="btn btn-secondary btn-sm" style="font-size:11px" id="pdet-v-${v}" onclick="pDetViewTarefas('${id}','${v}',${JSON.stringify(tarefas)})">${
-            {todas:'Todas',hoje:'Hoje',atrasadas:'Atrasadas',concluidas:'Concluídas'}[v]
+        ${['dia','semana','mes','atrasadas','concluidas','todas'].map(v=>`
+          <button class="btn ${v==='semana'?'btn-primary':'btn-secondary'} btn-sm" style="font-size:11px" id="pdet-v-${v}" onclick="pDetViewTarefas('${id}','${v}')">${
+            {dia:'Dia',semana:'Semana',mes:'Mês',atrasadas:'Atrasadas',concluidas:'Concluídas',todas:'Todas'}[v]
           }</button>`).join('')}
       </div>
-      <div id="pdet-tarefas">
-        ${tarefas.length===0
-          ? `<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px">Nenhuma tarefa ainda.</div>`
-          : `<div class="esc-list">${tarefas.map(t=>tItemHtml(t,hoje)).join('')}</div>`}
-      </div>
+      <div id="pdet-tarefas"></div>
     </div>`;
+  _pDetTarefas = tarefas; _pDetView = 'semana'; _pDetRef = tHojeISO();
+  pDetRenderTarefas();
 }
 
-function pDetViewTarefas(projetoId, view, tarefas) {
-  const hoje = new Date().toISOString().split('T')[0];
+let _pDetTarefas = [], _pDetView = 'semana', _pDetRef = null;
+function pDetViewTarefas(projetoId, view) {
+  _pDetView = view;
+  if (!_pDetRef) _pDetRef = tHojeISO();
   document.querySelectorAll('[id^="pdet-v-"]').forEach(b=>{b.classList.remove('btn-primary');b.classList.add('btn-secondary');});
   const btn = document.getElementById('pdet-v-'+view);
   if (btn) { btn.classList.remove('btn-secondary'); btn.classList.add('btn-primary'); }
-  let lista = [...tarefas];
-  if      (view==='hoje')       lista = lista.filter(t=>t.prazo===hoje&&t.status!=='concluida');
-  else if (view==='atrasadas')  lista = lista.filter(t=>t.prazo&&t.prazo<hoje&&t.status!=='concluida');
-  else if (view==='concluidas') lista = lista.filter(t=>t.status==='concluida');
+  pDetRenderTarefas();
+}
+function pDetPasso(passo) {
+  _pDetRef = passo === 0 ? tHojeISO() : tPeriodoMover(_pDetView, _pDetRef || tHojeISO(), passo);
+  pDetRenderTarefas();
+}
+function pDetRenderTarefas() {
   const el = document.getElementById('pdet-tarefas');
   if (!el) return;
+  const hoje = tHojeISO();
+  const tarefas = _pDetTarefas || [];
+  if (!tarefas.length) { el.innerHTML = `<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px">Nenhuma tarefa ainda.</div>`; return; }
+  if (['dia','semana','mes'].includes(_pDetView)) {
+    el.innerHTML = tPeriodoNavHtml(_pDetView, _pDetRef, 'pDetPasso') + tPeriodoListaHtml(tarefas, _pDetView, _pDetRef);
+    return;
+  }
+  let lista = [...tarefas];
+  if      (_pDetView==='atrasadas')  lista = lista.filter(t=>t.prazo&&t.prazo<hoje&&t.status!=='concluida');
+  else if (_pDetView==='concluidas') lista = lista.filter(t=>t.status==='concluida');
+  lista.sort((a,b)=>(a.prazo||'9999').localeCompare(b.prazo||'9999'));
   el.innerHTML = lista.length===0
     ? `<div style="color:var(--text3);font-size:13px;text-align:center;padding:30px">Nenhuma tarefa nessa categoria.</div>`
     : `<div class="esc-list">${lista.map(t=>tItemHtml(t,hoje)).join('')}</div>`;
