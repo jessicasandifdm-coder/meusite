@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="As 7 frentes que a sua loja precisa ter em prática em novembro e dezembro. Por Jéssica Sandi.">
+<meta property="og:title" content="Plano Comercial de Final de Ano">
+<meta property="og:description" content="As 7 frentes que a sua loja precisa ter em prática em novembro e dezembro.">
+<meta property="og:image" content="https://www.ecoladenegociosjs.com/plano-final-de-ano/img/capa.jpg">
+<title>Plano Comercial de Final de Ano</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* Layout: uma coluna de leitura no celular; linha de dois meses; 7 frentes com o que fazer (sem o como) e a pergunta que fica aberta; checklist salvo no aparelho */
+:root{
+  --papel:#F7F2EA; --areia:#E8DCCB; --verde:#1C2B25; --grafite:#2B2520; --fio:#A8864F; --ouro:#7A6136;
+  --bg:var(--papel); --fg:var(--grafite); --muted:#6B6158; --line:#DDD1BF; --card:#FFFDF9; --band:var(--verde); --band-fg:var(--papel);
+  --soft:#EFE6D8; --done:#4E6B5A;
+  --serif:'Instrument Serif',Georgia,'Times New Roman',serif; --sans:Montserrat,system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141D19; --fg:#F1EBE1; --muted:#B3A898; --line:#2F3D36; --card:#1C2B25; --band:#0F1613; --band-fg:#F1EBE1;
+  --soft:#22322B; --done:#9DBBA8; --ouro:#C9AE7E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141D19; --fg:#F1EBE1; --muted:#B3A898; --line:#2F3D36; --card:#1C2B25; --band:#0F1613; --band-fg:#F1EBE1;
+  --soft:#22322B; --done:#9DBBA8; --ouro:#C9AE7E; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg)}
+body{background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px;line-height:1.55;margin:0}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0;text-wrap:balance;line-height:1.02}
+.eyebrow{font-size:.7rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--ouro)}
+
+.capa{background:var(--band);color:var(--band-fg);position:relative;overflow:hidden}
+.capa::before{content:"";position:absolute;inset:0;background:url(img/capa.jpg) center 40%/cover no-repeat}
+.capa::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,22,19,.55) 0%,rgba(15,22,19,.78) 55%,rgba(15,22,19,.92) 100%)}
+.capa .wrap{position:relative;z-index:1}
+.capa .wrap{padding-block:120px 44px;display:grid;gap:18px}
+.capa .eyebrow{color:var(--areia)}
+.capa h1{font-size:clamp(2.6rem,9vw,4.4rem)}
+.capa h1 em{color:var(--areia)}
+.capa p{margin:0;max-width:34em;font-size:1rem;opacity:.92}
+.fio{width:72px;height:1px;background:var(--fio)}
+.assina{font-size:.8rem;letter-spacing:.06em;opacity:.8}
+.geral{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:6px}
+.barra{flex:1 1 220px;height:6px;border-radius:6px;background:rgba(232,220,203,.2);overflow:hidden}
+.barra i{display:block;height:100%;width:0;background:var(--areia);transition:width .4s}
+.geral b{font-weight:500;font-variant-numeric:tabular-nums;font-size:.9rem}
+
+section{padding-block:36px}
+.lead{color:var(--muted);margin:10px 0 0;max-width:36em}
+
+/* os dois meses */
+.meses{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.mes{background:var(--soft);border-radius:14px;padding:18px 16px;display:grid;gap:6px;align-content:start}
+.mes h3{font-size:1.9rem}
+.mes p{margin:0;font-size:.88rem;color:var(--muted)}
+.mes .marcos{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.mes .marcos span{font-size:.72rem;font-weight:500;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-variant-numeric:tabular-nums}
+
+.frentes{display:grid;gap:14px;margin-top:22px}
+.frente{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 18px;display:grid;gap:12px}
+.frente header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.frente h3{font-size:1.75rem}
+.frente .oque{margin:4px 0 0;color:var(--muted);font-size:.92rem}
+.anel{flex:none;width:46px;height:46px}
+.anel circle{fill:none;stroke-width:4}
+.anel .bg{stroke:var(--line)} .anel .fg{stroke:var(--done);stroke-linecap:round;transition:stroke-dashoffset .4s}
+.anel text{fill:var(--fg);font:500 11px var(--sans);font-variant-numeric:tabular-nums}
+.itens{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.item label{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;padding:9px 0;border-top:1px solid var(--line);cursor:pointer}
+.item:first-child label{border-top:0}
+.item input{position:absolute;opacity:0;width:1px;height:1px}
+.item input+span{width:20px;height:20px;border:1.5px solid var(--muted);border-radius:6px;margin-top:1px;display:grid;place-items:center}
+.item input:checked+span{background:var(--done);border-color:var(--done)}
+.item input:checked+span::after{content:"";width:9px;height:5px;border-left:2px solid var(--card);border-bottom:2px solid var(--card);transform:translateY(-1px) rotate(-45deg)}
+.item input:focus-visible+span,.btn:focus-visible{outline:2px solid var(--fio);outline-offset:2px}
+.item .txt{min-width:0}
+.item input:checked~.txt{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.item .quando{font-size:.72rem;font-weight:500;letter-spacing:.04em;color:var(--ouro);white-space:nowrap}
+.porque{margin:0;font-size:.9rem;line-height:1.6;border-left:1px solid var(--fio);padding-left:12px}
+.porque b{font-weight:600}
+
+.fecha{background:var(--band);color:var(--band-fg);position:relative;overflow:hidden}
+.fecha::before{content:"";position:absolute;inset:0;background:url(img/fim.jpg) center/cover no-repeat;opacity:.18}
+.fecha .wrap{position:relative;z-index:1}
+.fecha .wrap{padding-block:48px;display:grid;gap:22px}
+.fecha h2{font-size:clamp(2rem,6vw,2.8rem)}
+.fecha h2 em{color:var(--areia)}
+.fecha > .wrap > p{margin:0;max-width:34em;opacity:.92}
+.duas{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.caixa{border:1px solid rgba(232,220,203,.25);border-radius:14px;padding:18px;display:grid;gap:8px;align-content:start}
+.caixa h3{font-size:1.5rem}
+.caixa p{margin:0;font-size:.92rem;opacity:.9}
+.btn{display:inline-block;margin-top:6px;background:var(--areia);color:#1C2B25;text-decoration:none;font-weight:500;font-size:.88rem;padding:11px 16px;border-radius:10px;justify-self:start}
+.rodape{font-size:.78rem;opacity:.7}
+@media (max-width:420px){.meses{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<div class="capa">
+  <div class="wrap">
+    <div class="eyebrow">Black Friday + Natal</div>
+    <h1>Plano Comercial de <em>Final de Ano</em></h1>
+    <div class="fio"></div>
+    <p>Novembro e dezembro são os dois meses que mais vendem no ano. Estas são as 7 frentes que a sua loja precisa ter em prática nesse período para não depender de improviso.</p>
+    <div class="geral" aria-live="polite">
+      <div class="barra" aria-hidden="true"><i id="barra"></i></div>
+      <b id="geral-txt">0 de 0 frentes em prática</b>
+    </div>
+    <div class="assina">por Jéssica Sandi · @jessicasandimentora</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <section>
+    <div class="eyebrow">Os dois meses</div>
+    <div class="meses">
+      <div class="mes"><h3>Novembro</h3><p>O mês de preparar a loja e vender na Black.</p><div class="marcos"><span>11/11</span><span>Black Friday</span></div></div>
+      <div class="mes"><h3>Dezembro</h3><p>O mês de presente, de volume e de fechar o ano.</p><div class="marcos"><span>12/12</span><span>Natal</span><span>Trocas</span></div></div>
+    </div>
+
+    <div class="frentes" id="frentes"></div>
+    <p class="lead" style="margin-top:18px">Marque cada frente quando ela estiver em prática na sua loja. As marcações ficam salvas neste aparelho.</p>
+  </section>
+</div>
+
+<div class="fecha">
+  <div class="wrap">
+    <div class="eyebrow" style="color:var(--areia)">Próximo passo</div>
+    <h2>Saber o que fazer é o começo. <em>O que faz vender é como você faz.</em></h2>
+    <p>Cada frente deste plano funciona de um jeito em cada loja: no público, no produto e no ticket. Montar isso para a realidade da sua loja é o que eu faço com as lojistas que acompanho.</p>
+    <div class="duas">
+      <div class="caixa">
+        <h3>Gerador de Caixa</h3>
+        <p>Ações comerciais prontas, com passo a passo, para você aplicar sozinha.</p>
+      </div>
+      <div class="caixa">
+        <h3>Mentoria Lapidar</h3>
+        <p>O plano da sua loja montado comigo, mês a mês, em marketing, vendas e rotina comercial, com acompanhamento na execução.</p>
+        <a class="btn" href="https://wa.me/message/RNPV5P37UL5YC1" target="_blank" rel="noopener">Falar com a Jéssica no WhatsApp</a>
+      </div>
+    </div>
+    <div class="rodape">Plano Comercial de Final de Ano · Jéssica Sandi · 2026</div>
+  </div>
+</div>
+
+<script>
+const FRENTES=[
+ {nome:'Campanhas',oque:'Duas grandes campanhas no período: Black Friday e Natal.',
+  itens:[['c1','Campanha de Black Friday planejada','Novembro'],['c2','Campanha de Natal planejada','Dezembro']],
+  porque:'<b>Por que entrar na Black, mesmo sem ser loja de promoção:</b> em novembro, a Black é o assunto. A cliente está procurando, comparando e pronta para comprar. Usar a palavra e a narrativa da Black é uma forma de a sua loja ser encontrada nesse momento, sem precisar virar liquidação. E o Natal é o mês de maior volume do ano: a cliente vai comprar presente de qualquer jeito, a questão é de quem.'},
+ {nome:'Lives',oque:'Lives com foco comercial nos dois períodos.',
+  itens:[['l1','Live na Black','Novembro'],['l2','Live no Natal','Dezembro']],
+  porque:'<b>Lives curtas, com um tema único:</b> uma coleção, uma oferta ou uma peça. No fim de ano a cliente está com pressa, e a live que vende é a que vai direto ao ponto.'},
+ {nome:'Datas especiais',oque:'Um pico de vendas nas datas iguais: 11/11 e 12/12.',
+  itens:[['d1','Ação no 11/11','Novembro'],['d2','Ação no 12/12','Dezembro']],
+  porque:'<b>A estratégia da Shopee:</b> as datas iguais já são conhecidas como dia de comprar. Escolha um produto da sua loja para uma ação rápida, de um dia, e aproveite um movimento que a cliente já espera.'},
+ {nome:'Grupo VIP',oque:'Pelo menos uma ação comercial por mês, exclusiva para o grupo.',
+  itens:[['g1','Ação no grupo VIP','Novembro'],['g2','Ação no grupo VIP','Dezembro']],
+  porque:'<b>Por que o grupo:</b> é ali que estão as clientes mais próximas da loja. Uma ação exclusiva por mês faz o grupo valer a pena e gera venda rápida.'},
+ {nome:'Clientes',oque:'A sua lista de clientes trabalhada para reativação e novas compras.',
+  itens:[['k1','Lista de clientes trabalhada','Nov e dez']],
+  porque:'<b>Por que a base:</b> quem já comprou está mais perto de comprar de novo. No fim de ano, a sua lista de clientes é a venda mais rápida da loja.'},
+ {nome:'Conteúdo',oque:'Toda semana, conteúdo de descoberta, desejo e venda no feed, com sequências estratégicas de stories.',
+  itens:[['t1','Conteúdo semanal de descoberta, desejo e venda','Nov e dez'],['t2','Sequências estratégicas de stories','Nov e dez']],
+  porque:'<b>Por que o conteúdo pesa mais agora:</b> no fim de ano a cliente decide rápido e compara muitas lojas. É o conteúdo que faz a sua loja ser encontrada, desejada e lembrada na hora da compra. Parar de postar no período mais movimentado é deixar a venda para a concorrente.'},
+ {nome:'Visibilidade',oque:'Pelo menos uma ação para chegar em quem ainda não conhece a loja.',
+  itens:[['v1','Ação de visibilidade em prática','Nov e dez']],
+  porque:'<b>Escolha a que cabe na sua loja:</b> tráfego pago, parceria com outra loja ou negócio local, ou uma influenciadora da região. Uma bem feita já faz diferença no período.'}
+];
+const KEY='plano-final-ano-2026-v2';
+let feitos={};try{feitos=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){feitos={}}
+function salvar(){try{localStorage.setItem(KEY,JSON.stringify(feitos))}catch(e){}}
+function anel(p){const r=19,c=2*Math.PI*r;return `<svg class="anel" viewBox="0 0 46 46" aria-hidden="true"><circle class="bg" cx="23" cy="23" r="${r}"/><circle class="fg" cx="23" cy="23" r="${r}" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-p)}" transform="rotate(-90 23 23)"/><text x="23" y="27" text-anchor="middle">${Math.round(p*100)}%</text></svg>`}
+function render(){
+  document.getElementById('frentes').innerHTML=FRENTES.map(f=>{
+    const n=f.itens.filter(([id])=>feitos[id]).length;
+    return `<article class="frente"><header><div><h3>${f.nome}</h3><p class="oque">${f.oque}</p></div>${anel(n/f.itens.length)}</header>
+      <ul class="itens">${f.itens.map(([id,t,q])=>`<li class="item"><label><input type="checkbox" id="ck-${id}" data-id="${id}" ${feitos[id]?'checked':''}><span></span><span class="txt">${t}</span><span class="quando">${q}</span></label></li>`).join('')}</ul>
+      <p class="porque">${f.porque}</p></article>`}).join('');
+  const prontas=FRENTES.filter(f=>f.itens.every(([id])=>feitos[id])).length;
+  document.getElementById('barra').style.width=(prontas/FRENTES.length*100)+'%';
+  document.getElementById('geral-txt').textContent=prontas+' de '+FRENTES.length+' frentes em prática';
+  document.querySelectorAll('input[data-id]').forEach(c=>c.onchange=()=>{feitos[c.dataset.id]=c.checked;salvar();render()});
+}
+render();
+</script>
+
+</body>
+</html>
