@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Desafio Lapidar</title>
+<meta name="description" content="Figurinhas e regras do Desafio Lapidar, para as alunas da Mentoria Lapidar.">
+<meta property="og:title" content="Desafio Lapidar">
+<meta property="og:description" content="Salve as figurinhas, poste nos stories e me marque. Até 31/12.">
+<meta property="og:image" content="https://www.ecoladenegociosjs.com/desafio-lapidar/figurinhas/figurinha-lapidar-mais-uma-venda.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* Identidade da Mentoria Lapidar */
+:root{--verde:#1C2B25;--areia:#E8DCCB;--off:#F7F2EA;--graf:#2B2520;--dour:#A8864F;--soft:#6E655C;--line:#E3D8C8;
+  --serif:'Instrument Serif',Georgia,serif;--sans:Montserrat,system-ui,-apple-system,'Segoe UI',sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html{background:var(--off)}
+body{margin:0;background:var(--off);color:var(--graf);font-family:var(--sans);font-size:15px;line-height:1.6}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.topo{background:var(--verde);color:var(--off);padding-top:env(safe-area-inset-top,0px)}
+.topo .wrap{padding-block:44px 40px;display:grid;gap:16px}
+.marca{font-size:.72rem;letter-spacing:.28em;font-weight:500;color:var(--areia)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(3rem,12vw,4.4rem);line-height:.95;margin:0}
+h1 em{color:var(--areia)}
+.fio{width:56px;height:1px;background:var(--dour)}
+.datas{font-size:.75rem;letter-spacing:.2em;font-weight:500;color:var(--areia)}
+.intro{margin:0;max-width:34em;color:#DCD3C6}
+section{padding-block:34px}
+h2{font-family:var(--serif);font-weight:400;font-size:2rem;margin:0 0 14px;line-height:1.05}
+h2 em{color:var(--dour)}
+ol.regras{list-style:none;margin:0;padding:0;counter-reset:n;display:grid}
+ol.regras li{counter-increment:n;padding:14px 0 14px 50px;border-bottom:1px solid var(--line);position:relative}
+ol.regras li:before{content:counter(n);position:absolute;left:0;top:10px;width:34px;height:34px;border-radius:50%;border:1px solid var(--dour);color:var(--verde);font:400 1.25rem/32px var(--serif);text-align:center}
+.premio{margin-top:22px;background:var(--verde);color:var(--off);border-radius:18px;padding:22px 20px;display:grid;gap:10px}
+.premio .k{font-size:.7rem;letter-spacing:.24em;color:var(--areia);font-weight:500}
+.premio h3{margin:0;font-family:var(--serif);font-weight:400;font-size:1.65rem;line-height:1.1}
+.premio p{margin:0;color:#DCD3C6}
+.premio ul{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.premio li{padding-left:18px;position:relative}
+.premio li:before{content:"";position:absolute;left:0;top:.7em;width:8px;height:1px;background:var(--dour)}
+.usos{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.uso{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.uso b{display:block;font-family:var(--serif);font-weight:400;font-size:1.2rem;color:var(--verde);line-height:1.15;margin-bottom:4px}
+.uso span{font-size:.85rem;color:var(--soft)}
+.lead{color:var(--soft);margin:-4px 0 16px}
+.grupo{font-size:.72rem;letter-spacing:.22em;font-weight:500;color:var(--dour);margin:22px 0 10px}
+.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fig{background:repeating-conic-gradient(#EFE7DB 0 25%,#FBF8F3 0 50%) 0 0/18px 18px;border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;place-items:center}
+.fig img{width:100%;max-width:220px;height:auto;display:block;-webkit-touch-callout:default}
+.dicas{display:grid;gap:10px}
+.dica{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:grid;gap:6px}
+.dica h3{margin:0;font-family:var(--serif);font-weight:400;font-size:1.35rem;color:var(--verde)}
+.dica ol{margin:0;padding-left:18px;color:var(--soft)}
+.dica li{margin:2px 0}
+footer{padding-block:24px 44px;color:var(--soft);font-size:.78rem;padding-bottom:max(44px,env(safe-area-inset-bottom,0px))}
+@media (max-width:420px){.usos{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topo"><div class="wrap">
+  <div class="marca">MENTORIA LAPIDAR</div>
+  <h1>Desafio <em>Lapidar</em></h1>
+  <div class="fio"></div>
+  <div class="datas">DE HOJE ATÉ 31/12</div>
+  <p class="intro">Loja que vende precisa mostrar que vende. Pedido saindo, sacola pronta, cliente atendida, você estudando a sua loja. Isso é prova social, e prova social se constrói todo dia.</p>
+</div></div>
+
+<div class="wrap">
+  <section>
+    <h2>Como participar</h2>
+    <ol class="regras">
+      <li>Salve as figurinhas desta página no seu celular.</li>
+      <li>Poste nos stories da sua loja um momento real: pedido saindo, venda, várias vendas de uma ação, você estudando ou assistindo a aula ao vivo.</li>
+      <li>Coloque uma das figurinhas e marque <b>@jessicasandimentora</b>. Cada story marcado conta.</li>
+    </ol>
+
+    <div class="premio">
+      <div class="k">O PRÊMIO</div>
+      <h3>Uma sessão individual comigo em janeiro para construir o planejamento 2027 da sua loja.</h3>
+      <p>Vence a aluna que postar mais stories com as figurinhas, me marcando, até 31/12. Não é uma conversa de ideias. Na sessão, a gente:</p>
+      <ul>
+        <li>analisa o mercado e o momento da sua loja</li>
+        <li>define as estratégias do ano</li>
+        <li>olha a estrutura que a loja precisa para sustentar isso</li>
+        <li>toma as decisões com base em dados e metas</li>
+      </ul>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <h2>Quando <em>usar</em></h2>
+    <div class="usos">
+      <div class="uso"><b>Pedido saindo</b><span>Caixa fechada, correio, motoboy na porta.</span></div>
+      <div class="uso"><b>Uma venda</b><span>A sacola pronta, a cliente que acabou de levar.</span></div>
+      <div class="uso"><b>Várias vendas</b><span>O resultado de uma ação: as sacolas todas juntas.</span></div>
+      <div class="uso"><b>Mentoria</b><span>Estudando, assistindo a aula ao vivo, aplicando o plano.</span></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <h2>As figurinhas</h2>
+    <p class="lead">Segure o dedo na figurinha e toque em "Salvar imagem". Ela fica no seu celular com o fundo transparente.</p>
+
+    <div class="grupo">PEDIDOS SAINDO</div>
+    <div class="figs">
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-pedido-saindo.png" alt="Figurinha Pedido saindo"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-pedidos-enviados.png" alt="Figurinha Pedidos enviados" loading="lazy"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-prontinho-para-entregar.png" alt="Figurinha Prontinho para entregar" loading="lazy"></div>
+    </div>
+
+    <div class="grupo">VENDAS</div>
+    <div class="figs">
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-mais-uma-venda.png" alt="Figurinha Mais uma venda por aqui" loading="lazy"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-mais-uma-cliente-atendida.png" alt="Figurinha Mais uma cliente atendida" loading="lazy"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-cliente-feliz.png" alt="Figurinha Cliente feliz é a nossa maior venda" loading="lazy"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-obrigada-pela-preferencia.png" alt="Figurinha Obrigada pela preferência" loading="lazy"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-a-loja-nao-para.png" alt="Figurinha A loja não para" loading="lazy"></div>
+    </div>
+
+    <div class="grupo">MENTORIA</div>
+    <div class="figs">
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-estudando.png" alt="Figurinha Estudando para ir mais longe" loading="lazy"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-mentoria-e-investimento.png" alt="Figurinha Mentoria é investimento no meu negócio" loading="lazy"></div>
+      <div class="fig"><img src="figurinhas/figurinha-lapidar-juntas-somos-mais-fortes.png" alt="Figurinha Juntas somos mais fortes" loading="lazy"></div>
+    </div>
+  </section>
+
+  <section style="padding-top:0">
+    <h2>Como colocar no story</h2>
+    <div class="dicas">
+      <div class="dica"><h3>iPhone</h3><ol>
+        <li>Abra a figurinha na galeria (Fotos).</li>
+        <li>Segure o dedo em cima dela e toque em "Copiar".</li>
+        <li>No story, toque na tela e escolha "Colar". A figurinha entra sem fundo, é só ajustar o tamanho.</li>
+      </ol></div>
+      <div class="dica"><h3>Android</h3><ol>
+        <li>No story, toque no ícone de figurinhas (a carinha quadrada no topo).</li>
+        <li>Escolha a figurinha de foto, a que abre a galeria.</li>
+        <li>Selecione a figurinha salva. Ela entra sem fundo, é só ajustar o tamanho.</li>
+      </ol></div>
+    </div>
+  </section>
+</div>
+<footer><div class="wrap">Desafio Lapidar · Mentoria Lapidar · Jéssica Sandi</div></footer>
+</body>
+</html>
